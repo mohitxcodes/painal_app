@@ -570,7 +570,8 @@ final List<FamilyMember> flatFamilyData = [
     birthYear: "2006",
     children: [],
     parentId: 42,
-    profilePhoto: "family-img/mohit-family/mohit.jpeg",
+    profilePhoto:
+        "https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg?semt=ais_hybrid&w=740",
   ),
 ];
 
