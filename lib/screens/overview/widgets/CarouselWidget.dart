@@ -76,7 +76,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
             itemCount: _carouselItems.length,
             itemBuilder: (context, index) {
               return Container(
-                margin: const EdgeInsets.only(left: 16, right: 16, top: 8),
+                margin: const EdgeInsets.only(left: 12, right: 12, top: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   gradient: LinearGradient(
@@ -132,7 +132,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                             _carouselItems[index]['title']!,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -141,7 +141,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                             _carouselItems[index]['titleHindi']!,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

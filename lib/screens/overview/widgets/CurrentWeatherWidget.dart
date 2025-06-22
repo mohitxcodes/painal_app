@@ -62,7 +62,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 12),
       child: Card(
         elevation: 8,
         shadowColor: Colors.green.withOpacity(0.3),
@@ -77,7 +77,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -85,18 +85,18 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Colors.green[700],
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Icon(
                         Icons.thermostat,
                         color: Colors.white,
-                        size: 28,
+                        size: 16,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +104,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                           const Text(
                             'Current Weather',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),
@@ -112,7 +112,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                           const Text(
                             'वर्तमान मौसम',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: Colors.green,
                             ),
@@ -122,85 +122,67 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                     ),
                     IconButton(
                       onPressed: fetchWeatherData,
-                      icon: Icon(Icons.refresh, color: Colors.green[700]),
+                      icon: Icon(
+                        Icons.refresh,
+                        color: Colors.green[700],
+                        size: 16,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 8),
 
                 if (isLoading)
-                  Column(
+                  Row(
                     children: [
-                      // Skeleton for main temperature and weather info
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Container(
-                                      width: 60,
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
                                 Container(
-                                  width: 150,
-                                  height: 16,
+                                  width: 50,
+                                  height: 25,
                                   decoration: BoxDecoration(
                                     color: Colors.grey[300],
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(width: 6),
                                 Container(
-                                  width: 120,
+                                  width: 40,
                                   height: 14,
                                   decoration: BoxDecoration(
                                     color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(4),
+                                    borderRadius: BorderRadius.circular(3),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                _buildSkeletonWeatherDetail(),
-                                const SizedBox(height: 8),
-                                _buildSkeletonWeatherDetail(),
-                                const SizedBox(height: 8),
-                                _buildSkeletonWeatherDetail(),
-                              ],
+                            const SizedBox(height: 4),
+                            Container(
+                              width: 100,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(3),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(child: _buildSkeletonWeatherDetail()),
-                          const SizedBox(width: 12),
-                          Expanded(child: _buildSkeletonWeatherDetail()),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _buildSkeletonWeatherDetail(),
+                            const SizedBox(height: 4),
+                            _buildSkeletonWeatherDetail(),
+                          ],
+                        ),
                       ),
                     ],
                   )
@@ -211,69 +193,54 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                         Icon(
                           Icons.error_outline,
                           color: Colors.red[400],
-                          size: 48,
+                          size: 24,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Text(
                           errorMessage,
                           style: TextStyle(
                             color: Colors.red[400],
-                            fontSize: 14,
+                            fontSize: 10,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         ElevatedButton(
                           onPressed: fetchWeatherData,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[700],
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                           ),
                           child: const Text(
                             'Retry',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white, fontSize: 10),
                           ),
                         ),
                       ],
                     ),
                   )
                 else if (weatherData != null)
-                  Column(
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      '${weatherData!['main']['temp'].round()}°C',
-                                      style: TextStyle(
-                                        fontSize: 36,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green[700],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      weatherData!['weather'][0]['main'],
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                const Text(
-                                  'Weather Station: Patna',
+                                Text(
+                                  '${weatherData!['main']['temp'].round()}°C',
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green[700],
                                   ),
                                 ),
+                                const SizedBox(width: 6),
                                 Text(
-                                  'Updated ${DateTime.now().minute} mins ago',
+                                  weatherData!['weather'][0]['main'],
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -281,56 +248,43 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                                 ),
                               ],
                             ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                _buildWeatherDetail(
-                                  'Humidity',
-                                  'आर्द्रता',
-                                  '${weatherData!['main']['humidity']}%',
-                                  Icons.water_drop,
-                                ),
-                                const SizedBox(height: 8),
-                                _buildWeatherDetail(
-                                  'Wind',
-                                  'हवा',
-                                  '${weatherData!['wind']['speed']} m/s',
-                                  Icons.air,
-                                ),
-                                const SizedBox(height: 8),
-                                _buildWeatherDetail(
-                                  'Pressure',
-                                  'दबाव',
-                                  '${weatherData!['main']['pressure']} hPa',
-                                  Icons.speed,
-                                ),
-                              ],
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Weather Station: Patna',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                        ],
+                            Text(
+                              'Updated ${DateTime.now().minute} mins ago',
+                              style: const TextStyle(
+                                fontSize: 8,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildWeatherDetail(
-                              'Feels Like',
-                              'अनुभूत तापमान',
-                              '${weatherData!['main']['feels_like'].round()}°C',
-                              Icons.thermostat,
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            _buildWeatherDetail(
+                              'Humidity',
+                              'आर्द्रता',
+                              '${weatherData!['main']['humidity']}%',
+                              Icons.water_drop,
                             ),
-                          ),
-                          Expanded(
-                            child: _buildWeatherDetail(
-                              'Visibility',
-                              'दृश्यता',
-                              '${(weatherData!['visibility'] / 1000).round()} km',
-                              Icons.visibility,
+                            const SizedBox(width: 12),
+                            _buildWeatherDetail(
+                              'Wind',
+                              'हवा',
+                              '${weatherData!['wind']['speed']} m/s',
+                              Icons.air,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   )
@@ -341,25 +295,29 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                         Icon(
                           Icons.cloud_off,
                           color: Colors.grey[400],
-                          size: 48,
+                          size: 24,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         Text(
                           'No weather data available',
                           style: TextStyle(
                             color: Colors.grey[600],
-                            fontSize: 14,
+                            fontSize: 10,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4),
                         ElevatedButton(
                           onPressed: fetchWeatherData,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green[700],
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                           ),
                           child: const Text(
                             'Load Weather',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white, fontSize: 10),
                           ),
                         ),
                       ],
@@ -379,80 +337,74 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
     String value,
     IconData icon,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.green[700], size: 20),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.green[700],
+    return Row(
+      children: [
+        Icon(icon, color: Colors.green[700], size: 12),
+        const SizedBox(width: 4),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[700],
+              ),
             ),
-          ),
-          Text(
-            labelEnglish,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.green[700],
+            Text(
+              labelEnglish,
+              style: TextStyle(
+                fontSize: 7,
+                fontWeight: FontWeight.w600,
+                color: Colors.green[700],
+              ),
             ),
-          ),
-          Text(
-            labelHindi,
-            style: TextStyle(fontSize: 9, color: Colors.green[600]),
-          ),
-        ],
-      ),
+            Text(
+              labelHindi,
+              style: TextStyle(fontSize: 6, color: Colors.green[600]),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
   Widget _buildSkeletonWeatherDetail() {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[400]!, width: 1),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(4),
-            ),
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: Colors.grey[400],
+            borderRadius: BorderRadius.circular(2),
           ),
-          const SizedBox(height: 4),
-          Container(
-            width: 40,
-            height: 14,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(4),
+        ),
+        const SizedBox(width: 4),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 30,
+              height: 10,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Container(
-            width: 30,
-            height: 9,
-            decoration: BoxDecoration(
-              color: Colors.grey[400],
-              borderRadius: BorderRadius.circular(4),
+            const SizedBox(height: 1),
+            Container(
+              width: 25,
+              height: 7,
+              decoration: BoxDecoration(
+                color: Colors.grey[400],
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

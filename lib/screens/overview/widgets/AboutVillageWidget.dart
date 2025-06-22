@@ -6,7 +6,7 @@ class AboutVillageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Card(
         elevation: 8,
         shadowColor: Colors.green.withOpacity(0.3),
@@ -21,7 +21,7 @@ class AboutVillageWidget extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -29,18 +29,18 @@ class AboutVillageWidget extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.green[700],
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         Icons.location_city,
                         color: Colors.white,
-                        size: 28,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +48,7 @@ class AboutVillageWidget extends StatelessWidget {
                           const Text(
                             'About Painal Village',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),
@@ -56,7 +56,7 @@ class AboutVillageWidget extends StatelessWidget {
                           const Text(
                             'पैनाल गाँव के बारे में',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: Colors.green,
                             ),
@@ -66,36 +66,36 @@ class AboutVillageWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
 
                 // Description without card wrapper
                 const Text(
                   'Village Description',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 const Text(
                   'Painal is a vibrant village located in Bihta Block of Patna District, Bihar. With a population of 9,618 people, it represents the rich cultural heritage and agricultural traditions of rural India.',
                   style: TextStyle(
-                    fontSize: 15,
-                    height: 1.6,
+                    fontSize: 12,
+                    height: 1.5,
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 const Text(
                   'The village is known for its strong community bonds, traditional festivals, and active participation in local governance.',
                   style: TextStyle(
-                    fontSize: 15,
-                    height: 1.6,
+                    fontSize: 12,
+                    height: 1.5,
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 // Key features in a grid with bilingual text
                 Row(
@@ -108,7 +108,7 @@ class AboutVillageWidget extends StatelessWidget {
                         '9,618',
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _buildFeatureItem(
                         Icons.home,
@@ -117,7 +117,7 @@ class AboutVillageWidget extends StatelessWidget {
                         '1,601',
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _buildFeatureItem(
                         Icons.school,
@@ -143,20 +143,20 @@ class AboutVillageWidget extends StatelessWidget {
     String value,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.green.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
+        border: Border.all(color: Colors.green.withOpacity(0.2), width: 0.5),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.green[700], size: 24),
+          Icon(icon, color: Colors.green[700], size: 20),
           const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.green[700],
             ),
@@ -164,14 +164,14 @@ class AboutVillageWidget extends StatelessWidget {
           Text(
             labelEnglish,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: FontWeight.w600,
               color: Colors.green[700],
             ),
           ),
           Text(
             labelHindi,
-            style: TextStyle(fontSize: 11, color: Colors.green[600]),
+            style: TextStyle(fontSize: 9, color: Colors.green[600]),
           ),
         ],
       ),

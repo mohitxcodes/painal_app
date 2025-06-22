@@ -6,7 +6,7 @@ class LocationInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 12),
       child: Card(
         elevation: 8,
         shadowColor: Colors.green.withOpacity(0.3),
@@ -21,7 +21,7 @@ class LocationInfoWidget extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -29,18 +29,18 @@ class LocationInfoWidget extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: Colors.green[700],
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         Icons.location_on,
                         color: Colors.white,
-                        size: 28,
+                        size: 20,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +48,7 @@ class LocationInfoWidget extends StatelessWidget {
                           const Text(
                             'Location Information',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),
@@ -56,7 +56,7 @@ class LocationInfoWidget extends StatelessWidget {
                           const Text(
                             'स्थान की जानकारी',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: Colors.green,
                             ),
@@ -66,7 +66,7 @@ class LocationInfoWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
 
                 // Location details in a grid layout
                 Row(
@@ -79,7 +79,7 @@ class LocationInfoWidget extends StatelessWidget {
                         Icons.location_city,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _buildLocationCard(
                         'District',
@@ -88,7 +88,7 @@ class LocationInfoWidget extends StatelessWidget {
                         Icons.map,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _buildLocationCard(
                         'State',
@@ -99,7 +99,7 @@ class LocationInfoWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -110,7 +110,7 @@ class LocationInfoWidget extends StatelessWidget {
                         Icons.account_balance,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _buildLocationCard(
                         'Pin Code',
@@ -119,7 +119,7 @@ class LocationInfoWidget extends StatelessWidget {
                         Icons.mail,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: _buildLocationCard(
                         'Post Office',
@@ -130,18 +130,18 @@ class LocationInfoWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
                 // Additional information section
                 const Text(
                   'Additional Details',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 _buildInfoRow('Distance from Patna', 'पटना से दूरी', '21 KM'),
                 _buildInfoRow('Distance from Bihta', 'बिहटा से दूरी', '9 KM'),
                 _buildInfoRow(
@@ -165,16 +165,16 @@ class LocationInfoWidget extends StatelessWidget {
     IconData icon,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.green.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
+        border: Border.all(color: Colors.green.withOpacity(0.2), width: 0.5),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.green[700], size: 24),
-          const SizedBox(height: 6),
+          Icon(icon, color: Colors.green[700], size: 20),
+          const SizedBox(height: 4),
           Text(
             value,
             style: TextStyle(
@@ -206,7 +206,7 @@ class LocationInfoWidget extends StatelessWidget {
 
   Widget _buildInfoRow(String labelEnglish, String labelHindi, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -220,12 +220,12 @@ class LocationInfoWidget extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.green[700],
-                    fontSize: 13,
+                    fontSize: 12,
                   ),
                 ),
                 Text(
                   labelHindi,
-                  style: TextStyle(color: Colors.green[600], fontSize: 11),
+                  style: TextStyle(color: Colors.green[600], fontSize: 10),
                 ),
               ],
             ),
@@ -234,7 +234,7 @@ class LocationInfoWidget extends StatelessWidget {
             flex: 3,
             child: Text(
               value,
-              style: const TextStyle(fontSize: 13, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ),
         ],
