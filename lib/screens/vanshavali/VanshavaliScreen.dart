@@ -740,94 +740,123 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   @override
   Widget build(BuildContext context) {
     final totalMembers = flatFamilyData.length;
+    final totalGenerations = _calculateGenerations();
     final double horizontalPadding =
         12 + 12; // from EdgeInsets.fromLTRB(12, ...)
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(160),
+        preferredSize: const Size.fromHeight(240),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.account_tree_rounded,
-                      color: Colors.green,
-                      size: 32,
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Vanshavali - Family Tree',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                              letterSpacing: 0.2,
+            child: SingleChildScrollView(
+              physics: NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Vanshavali - Family Tree',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                letterSpacing: 0.2,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'वंशावली - परिवार वृक्ष',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.green,
-                              letterSpacing: 0.1,
+                            const SizedBox(height: 2),
+                            Text(
+                              'वंशावली - परिवार वृक्ष',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green[700],
+                                letterSpacing: 0.1,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                            const SizedBox(height: 6),
+                            Text(
+                              'Explore your family lineage and discover connections across generations. Use the search to quickly find any member.',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.search, color: Colors.green),
-                      onPressed: _showSearchDialog,
-                      tooltip: 'Search Family Member',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.people, color: Colors.green, size: 16),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        'Total: $totalMembers',
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
+                    ],
+                  ),
+                  const SizedBox(height: 0),
+                  Row(
+                    children: [
+                      Text(
+                        'Total Members: ',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Explore your family lineage and discover connections across generations. Use the search to quickly find any member.',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.black54,
-                    fontWeight: FontWeight.w400,
+                      Text(
+                        '$totalMembers',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(width: 18),
+                      Text(
+                        'Generations: ',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        '$totalGenerations',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.search,
+                          color: Colors.green,
+                          size: 26,
+                        ),
+                        onPressed: _showSearchDialog,
+                        tooltip: 'Search Family Member',
+                      ),
+                    ],
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  const SizedBox(height: 0),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Color(0xFFE0E0E0),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1196,5 +1225,11 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         ),
       ],
     );
+  }
+
+  int _calculateGenerations() {
+    // Implementation of _calculateGenerations method
+    // This is a placeholder and should be replaced with the actual implementation
+    return 0; // Placeholder return, actual implementation needed
   }
 }
