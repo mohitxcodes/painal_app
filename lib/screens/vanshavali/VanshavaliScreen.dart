@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:ui';
 
 class FamilyMember {
   final int id;
@@ -648,86 +650,329 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   void _showSearchDialog() async {
     showDialog(
       context: context,
+      barrierColor: Colors.black.withOpacity(0.2),
       builder: (context) {
         String query = '';
-        List<FamilyMember> results = flatFamilyData;
+        List<FamilyMember> results = [];
         return StatefulBuilder(
           builder: (context, setState) {
             void updateResults(String value) {
               setState(() {
                 query = value;
-                results =
-                    flatFamilyData
-                        .where(
-                          (m) =>
-                              m.name.toLowerCase().contains(
-                                query.toLowerCase(),
-                              ) ||
-                              m.hindiName.contains(query),
-                        )
-                        .toList();
+                if (query.isEmpty) {
+                  results = [];
+                } else {
+                  results =
+                      flatFamilyData
+                          .where(
+                            (m) =>
+                                m.name.toLowerCase().contains(
+                                  query.toLowerCase(),
+                                ) ||
+                                m.hindiName.contains(query),
+                          )
+                          .toList();
+                }
               });
             }
 
-            return AlertDialog(
-              title: const Text('Search Family Member'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter name (English or Hindi)',
-                    ),
-                    onChanged: updateResults,
+            Widget _highlightText(
+              String text,
+              String query, {
+              TextStyle? style,
+              TextStyle? highlightStyle,
+            }) {
+              if (query.isEmpty) return Text(text, style: style);
+              final lower = text.toLowerCase();
+              final lowerQuery = query.toLowerCase();
+              final spans = <TextSpan>[];
+              int start = 0;
+              int idx;
+              while ((idx = lower.indexOf(lowerQuery, start)) != -1) {
+                if (idx > start) {
+                  spans.add(
+                    TextSpan(text: text.substring(start, idx), style: style),
+                  );
+                }
+                spans.add(
+                  TextSpan(
+                    text: text.substring(idx, idx + query.length),
+                    style:
+                        highlightStyle ??
+                        const TextStyle(
+                          backgroundColor: Color(0x33FFEB3B),
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 200,
-                    width: 300,
-                    child:
-                        results.isEmpty
-                            ? const Center(child: Text('No results'))
-                            : ListView.builder(
-                              itemCount: results.length,
-                              itemBuilder: (context, idx) {
-                                final member = results[idx];
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.green[100],
-                                    backgroundImage:
-                                        member.profilePhoto.isNotEmpty
-                                            ? NetworkImage(member.profilePhoto)
-                                            : null,
-                                    child:
-                                        member.profilePhoto.isEmpty
-                                            ? Text(
-                                              member.name.isNotEmpty
-                                                  ? member.name[0]
-                                                  : '?',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
+                );
+                start = idx + query.length;
+              }
+              if (start < text.length) {
+                spans.add(TextSpan(text: text.substring(start), style: style));
+              }
+              return RichText(text: TextSpan(children: spans));
+            }
+
+            return Stack(
+              children: [
+                // Blur background
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                  child: Container(color: Colors.transparent),
+                ),
+                Center(
+                  child: Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    insetPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 40,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.green.withOpacity(0.4),
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        color: Colors.white,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxWidth: 400,
+                          maxHeight: 440,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      autofocus: true,
+                                      decoration: InputDecoration(
+                                        hintText: 'Search by name...',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                              horizontal: 14,
+                                            ),
+                                        isDense: true,
+                                      ),
+                                      onChanged: updateResults,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                child:
+                                    query.isEmpty
+                                        ? Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.family_restroom,
+                                                color: Colors.green[200],
+                                                size: 48,
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                'Start typing to search for a family member',
+                                                style: TextStyle(
+                                                  color: Colors.black45,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                        : results.isEmpty
+                                        ? Center(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.sentiment_dissatisfied,
+                                                color: Colors.grey[400],
+                                                size: 40,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              const Text(
+                                                'No family members found',
+                                                style: TextStyle(
+                                                  color: Colors.black54,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                        : ListView.separated(
+                                          itemCount: results.length,
+                                          separatorBuilder:
+                                              (_, __) => const Divider(
+                                                height: 1,
+                                                color: Color(0xFFE0E0E0),
+                                              ),
+                                          itemBuilder: (context, idx) {
+                                            final member = results[idx];
+                                            final parent =
+                                                member.parentId != null
+                                                    ? flatFamilyData.firstWhere(
+                                                      (m) =>
+                                                          m.id ==
+                                                          member.parentId,
+                                                      orElse:
+                                                          () => FamilyMember(
+                                                            id: -1,
+                                                            name: 'No parent',
+                                                            hindiName: '',
+                                                            birthYear: '',
+                                                            children: [],
+                                                            profilePhoto: '',
+                                                          ),
+                                                    )
+                                                    : null;
+                                            return ListTile(
+                                              leading: CircleAvatar(
+                                                backgroundColor:
+                                                    Colors.green[100],
+                                                backgroundImage:
+                                                    member
+                                                            .profilePhoto
+                                                            .isNotEmpty
+                                                        ? NetworkImage(
+                                                          member.profilePhoto,
+                                                        )
+                                                        : null,
+                                                child:
+                                                    member.profilePhoto.isEmpty
+                                                        ? const Icon(
+                                                          Icons.person,
+                                                          color: Colors.green,
+                                                        )
+                                                        : null,
+                                              ),
+                                              title: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  _highlightText(
+                                                    member.name,
+                                                    query,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                  _highlightText(
+                                                    member.hindiName,
+                                                    query,
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      color: Colors.black87,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              subtitle:
+                                                  parent != null &&
+                                                          parent.id != -1
+                                                      ? Text(
+                                                        'Parent: ${parent.name}',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.black54,
+                                                        ),
+                                                      )
+                                                      : const Text(
+                                                        'No parent',
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.black38,
+                                                        ),
+                                                      ),
+                                              trailing: const Icon(
+                                                Icons.arrow_forward_ios,
+                                                size: 18,
                                                 color: Colors.green,
                                               ),
-                                            )
-                                            : null,
-                                  ),
-                                  title: Text(member.name),
-                                  subtitle: Text(member.hindiName),
-                                  onTap: () {
-                                    Navigator.of(context).pop();
-                                    _navigateToMember(member);
-                                  },
-                                );
-                              },
+                                              onTap: () {
+                                                Navigator.of(context).pop();
+                                                _navigateToMember(member);
+                                              },
+                                            );
+                                          },
+                                        ),
+                              ),
                             ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                right: 16,
+                                bottom: 10,
+                                top: 4,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Material(
+                                    color: Colors.green[700],
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(24),
+                                      onTap: () => Navigator.of(context).pop(),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                            const SizedBox(width: 3),
+                                            const Text(
+                                              'Close',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
                 ),
               ],
             );
@@ -877,8 +1122,13 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                 child: Center(
                   child: Container(
                     width: cardWidth,
-                    margin: const EdgeInsets.symmetric(vertical: 18),
-                    padding: const EdgeInsets.all(18),
+                    margin: const EdgeInsets.only(top: 8, bottom: 18),
+                    padding: const EdgeInsets.fromLTRB(
+                      10,
+                      10,
+                      10,
+                      20,
+                    ), // extra bottom padding for navigation button
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: Colors.green[200]!, width: 1.2),
@@ -903,11 +1153,11 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                   onPressed: _navigateBack,
                                   icon: const Icon(
                                     Icons.arrow_back,
-                                    color: Colors.green,
+                                    color: Colors.black87,
                                   ),
                                   label: const Text(
                                     'Back',
-                                    style: TextStyle(color: Colors.green),
+                                    style: TextStyle(color: Colors.black87),
                                   ),
                                 ),
                               ),
@@ -932,23 +1182,78 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children:
                                       _currentMember.childMembers.map((child) {
-                                        return Column(
+                                        return Stack(
+                                          alignment: Alignment.bottomCenter,
                                           children: [
                                             _familyMemberCard(child),
-                                            TextButton.icon(
-                                              onPressed:
-                                                  () => _navigateToChild(child),
-                                              icon: const Icon(
-                                                Icons.arrow_downward,
-                                                size: 16,
-                                                color: Colors.green,
-                                              ),
-                                              label: const Text(
-                                                'Show Children',
-                                                style: TextStyle(
-                                                  color: Colors.green,
-                                                ),
-                                              ),
+                                            Positioned(
+                                              child:
+                                                  child.childMembers.isNotEmpty
+                                                      ? Material(
+                                                        color:
+                                                            Colors.green[700],
+                                                        shape:
+                                                            const CircleBorder(),
+                                                        child: InkWell(
+                                                          customBorder:
+                                                              const CircleBorder(),
+                                                          onTap:
+                                                              () =>
+                                                                  _navigateToChild(
+                                                                    child,
+                                                                  ),
+                                                          child: const Padding(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  6.0,
+                                                                ),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .arrow_downward,
+                                                              color:
+                                                                  Colors.white,
+                                                              size: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                      : Material(
+                                                        color: Colors.red[200],
+                                                        shape:
+                                                            const CircleBorder(),
+                                                        child: InkWell(
+                                                          customBorder:
+                                                              const CircleBorder(),
+                                                          onTap: () {
+                                                            ScaffoldMessenger.of(
+                                                              context,
+                                                            ).showSnackBar(
+                                                              const SnackBar(
+                                                                content: Text(
+                                                                  'No children for this member.',
+                                                                ),
+                                                                duration:
+                                                                    Duration(
+                                                                      seconds:
+                                                                          2,
+                                                                    ),
+                                                              ),
+                                                            );
+                                                          }, // Disabled navigation
+                                                          child: const Padding(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  6.0,
+                                                                ),
+                                                            child: Icon(
+                                                              Icons.close,
+                                                              color:
+                                                                  Colors.white,
+                                                              size: 16,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
                                             ),
                                           ],
                                         );
@@ -973,16 +1278,27 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   Widget _familyMemberCard(FamilyMember member) {
     return GestureDetector(
       onTap: () => _showMemberDetails(member),
-      child: Card(
-        elevation: 4,
+      child: Container(
         margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.green[1],
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.green[100]!, width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.withOpacity(0.07),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
-                radius: 20,
+                radius: 22,
                 backgroundColor: Colors.green[100],
                 backgroundImage:
                     member.profilePhoto.isNotEmpty
@@ -993,16 +1309,16 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                         ? const Icon(
                           Icons.person,
                           color: Colors.green,
-                          size: 22,
+                          size: 24,
                         )
                         : null,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
                 member.name,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
+                  fontSize: 15,
                   color: Colors.black87,
                 ),
               ),
@@ -1011,9 +1327,10 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                 style: const TextStyle(fontSize: 13, color: Colors.green),
               ),
               Text(
-                'जन्म वर्ष: ${member.birthYear}',
+                'Born: ${member.birthYear}',
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
+              const SizedBox(height: 18), // Space for navigation button
             ],
           ),
         ),
