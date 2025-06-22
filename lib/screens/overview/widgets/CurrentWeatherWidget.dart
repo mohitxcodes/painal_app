@@ -106,7 +106,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                              color: Colors.black87,
                             ),
                           ),
                           const Text(

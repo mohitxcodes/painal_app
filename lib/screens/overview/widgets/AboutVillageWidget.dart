@@ -50,7 +50,7 @@ class AboutVillageWidget extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                              color: Colors.black87,
                             ),
                           ),
                           const Text(
