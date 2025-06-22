@@ -30,7 +30,7 @@ class AboutVillageWidget extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               const Text(
-                'पैनल',
+                'पैनाल',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

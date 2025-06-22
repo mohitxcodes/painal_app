@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
             Text(
-              'पैनल गाँव',
+              'पैनाल गाँव',
               style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ],

@@ -13,17 +13,17 @@ class _CarouselWidgetState extends State<CarouselWidget> {
   final List<Map<String, String>> _carouselItems = [
     {
       'title': 'Village Landscape',
-      'subtitle': 'Beautiful rural scenery of Painal',
+      'titleHindi': 'गाँव का दृश्य',
       'image': 'assets/images/village_landscape.jpg',
     },
     {
       'title': 'Local Market',
-      'subtitle': 'Bustling village market activities',
+      'titleHindi': 'स्थानीय बाजार',
       'image': 'assets/images/local_market.jpg',
     },
     {
       'title': 'Community Life',
-      'subtitle': 'Vibrant community gatherings',
+      'titleHindi': 'सामुदायिक जीवन',
       'image': 'assets/images/community.jpg',
     },
   ];
@@ -114,18 +114,20 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.7),
+                            Colors.black.withOpacity(0.8),
                           ],
                         ),
                       ),
                     ),
-                    // Text overlay at bottom left
+                    // Text overlay at bottom left with bilingual content
                     Positioned(
                       bottom: 20,
                       left: 20,
+                      right: 20,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // English Title
                           Text(
                             _carouselItems[index]['title']!,
                             style: const TextStyle(
@@ -134,14 +136,16 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          // Hindi Title
                           Text(
-                            _carouselItems[index]['subtitle']!,
+                            _carouselItems[index]['titleHindi']!,
                             style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
+                          const SizedBox(height: 4),
                         ],
                       ),
                     ),
