@@ -624,72 +624,361 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     }
   }
 
+  void _navigateToMember(FamilyMember member) {
+    // Build the navigation stack to this member
+    List<FamilyMember> stack = [];
+    FamilyMember? current = member;
+    while (current?.parentId != null) {
+      final parent = flatFamilyData.firstWhere(
+        (m) => m.id == current!.parentId,
+        orElse: () => current!,
+      );
+      if (parent.id == current!.id) break;
+      stack.insert(0, parent);
+      current = parent;
+    }
+    setState(() {
+      _navigationStack
+        ..clear()
+        ..addAll(stack);
+      _currentMember = member;
+    });
+  }
+
+  void _showSearchDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String query = '';
+        List<FamilyMember> results = flatFamilyData;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void updateResults(String value) {
+              setState(() {
+                query = value;
+                results =
+                    flatFamilyData
+                        .where(
+                          (m) =>
+                              m.name.toLowerCase().contains(
+                                query.toLowerCase(),
+                              ) ||
+                              m.hindiName.contains(query),
+                        )
+                        .toList();
+              });
+            }
+
+            return AlertDialog(
+              title: const Text('Search Family Member'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter name (English or Hindi)',
+                    ),
+                    onChanged: updateResults,
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 200,
+                    width: 300,
+                    child:
+                        results.isEmpty
+                            ? const Center(child: Text('No results'))
+                            : ListView.builder(
+                              itemCount: results.length,
+                              itemBuilder: (context, idx) {
+                                final member = results[idx];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: Colors.green[100],
+                                    backgroundImage:
+                                        member.profilePhoto.isNotEmpty
+                                            ? NetworkImage(member.profilePhoto)
+                                            : null,
+                                    child:
+                                        member.profilePhoto.isEmpty
+                                            ? Text(
+                                              member.name.isNotEmpty
+                                                  ? member.name[0]
+                                                  : '?',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green,
+                                              ),
+                                            )
+                                            : null,
+                                  ),
+                                  title: Text(member.name),
+                                  subtitle: Text(member.hindiName),
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    _navigateToMember(member);
+                                  },
+                                );
+                              },
+                            ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'Vanshavali - Family Tree',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_navigationStack.isNotEmpty)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: _navigateBack,
-                    icon: const Icon(Icons.arrow_back, color: Colors.green),
-                    label: const Text(
-                      'Back',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                  ),
-                ),
-              _familyMemberCard(_currentMember),
-              if (_currentMember.childMembers.isNotEmpty) ...[
-                // Draw vertical line
-                Container(
-                  width: 2,
-                  height: 32,
-                  color: Colors.green[200],
-                  margin: const EdgeInsets.symmetric(vertical: 4),
-                ),
+    final totalMembers = flatFamilyData.length;
+    final double horizontalPadding =
+        12 + 12; // from EdgeInsets.fromLTRB(12, ...)
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(160),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
-                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      _currentMember.childMembers.map((child) {
-                        return Column(
-                          children: [
-                            _familyMemberCard(child),
-                            TextButton.icon(
-                              onPressed: () => _navigateToChild(child),
-                              icon: const Icon(
-                                Icons.arrow_downward,
-                                size: 16,
-                                color: Colors.green,
+                  children: [
+                    const Icon(
+                      Icons.account_tree_rounded,
+                      color: Colors.green,
+                      size: 32,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Vanshavali - Family Tree',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              letterSpacing: 0.2,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'वंशावली - परिवार वृक्ष',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.green,
+                              letterSpacing: 0.1,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search, color: Colors.green),
+                      onPressed: _showSearchDialog,
+                      tooltip: 'Search Family Member',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.people, color: Colors.green, size: 16),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        'Total: $totalMembers',
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Explore your family lineage and discover connections across generations. Use the search to quickly find any member.',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double screenWidth = MediaQuery.of(context).size.width;
+          final double contentWidth = screenWidth - horizontalPadding;
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Center(
+                child: Container(
+                  width: contentWidth,
+                  margin: const EdgeInsets.symmetric(vertical: 18),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: Colors.green[200]!, width: 1.2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, innerConstraints) {
+                      final contentInnerWidth = innerConstraints.maxWidth;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (_navigationStack.isNotEmpty)
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed: _navigateBack,
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.green,
+                                ),
+                                label: const Text(
+                                  'Back',
+                                  style: TextStyle(color: Colors.green),
+                                ),
                               ),
-                              label: const Text(
-                                'Show Children',
-                                style: TextStyle(color: Colors.green),
+                            ),
+                          // Main member card always full width
+                          SizedBox(
+                            width: contentInnerWidth,
+                            child: _familyMemberCard(_currentMember),
+                          ),
+                          if (_currentMember.childMembers.isNotEmpty) ...[
+                            // Draw vertical line
+                            Container(
+                              width: 2,
+                              height: 32,
+                              color: Colors.green[200],
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                            ),
+                            // Children row scrollable inside the bordered area
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children:
+                                    _currentMember.childMembers.map((child) {
+                                      return Column(
+                                        children: [
+                                          _familyMemberCard(child),
+                                          TextButton.icon(
+                                            onPressed:
+                                                () => _navigateToChild(child),
+                                            icon: const Icon(
+                                              Icons.arrow_downward,
+                                              size: 16,
+                                              color: Colors.green,
+                                            ),
+                                            label: const Text(
+                                              'Show Children',
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
                               ),
                             ),
                           ],
-                        );
-                      }).toList(),
+                        ],
+                      );
+                    },
+                  ),
                 ),
-              ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _familyMemberCard(FamilyMember member) {
+    return GestureDetector(
+      onTap: () => _showMemberDetails(member),
+      child: Card(
+        elevation: 4,
+        margin: const EdgeInsets.all(8),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.green[100],
+                backgroundImage:
+                    member.profilePhoto.isNotEmpty
+                        ? NetworkImage(member.profilePhoto)
+                        : null,
+                child:
+                    member.profilePhoto.isEmpty
+                        ? const Icon(
+                          Icons.person,
+                          color: Colors.green,
+                          size: 22,
+                        )
+                        : null,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                member.name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+              Text(
+                member.hindiName,
+                style: const TextStyle(fontSize: 13, color: Colors.green),
+              ),
+              Text(
+                'जन्म वर्ष: ${member.birthYear}',
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
             ],
           ),
         ),
@@ -697,54 +986,209 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     );
   }
 
-  Widget _familyMemberCard(FamilyMember member) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.all(8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: Colors.green[100],
-              backgroundImage:
-                  member.profilePhoto.isNotEmpty
-                      ? NetworkImage(member.profilePhoto)
-                      : null,
-              child:
-                  member.profilePhoto.isEmpty
-                      ? Text(
-                        member.name.isNotEmpty ? member.name[0] : '?',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                          fontSize: 18,
+  void _showMemberDetails(FamilyMember member) {
+    final parent =
+        member.parentId != null
+            ? flatFamilyData.firstWhere(
+              (m) => m.id == member.parentId,
+              orElse: () => member,
+            )
+            : null;
+    final children = member.childMembers;
+    final siblings =
+        member.parentId != null
+            ? flatFamilyData
+                .where(
+                  (m) => m.parentId == member.parentId && m.id != member.id,
+                )
+                .toList()
+            : <FamilyMember>[];
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.45,
+          minChildSize: 0.3,
+          maxChildSize: 0.85,
+          builder: (context, scrollController) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final double maxWidth = constraints.maxWidth;
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
                         ),
-                      )
-                      : null,
-            ),
-            const SizedBox(height: 8),
+                      ),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.green[100],
+                            backgroundImage:
+                                member.profilePhoto.isNotEmpty
+                                    ? NetworkImage(member.profilePhoto)
+                                    : null,
+                            child:
+                                member.profilePhoto.isEmpty
+                                    ? const Icon(
+                                      Icons.person,
+                                      color: Colors.green,
+                                      size: 28,
+                                    )
+                                    : null,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  member.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Text(
+                                  member.hindiName,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                Text(
+                                  'जन्म वर्ष: ${member.birthYear}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      if (parent != null)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Parent:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            _memberMiniCard(parent),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      if (siblings.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Siblings:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: siblings.map(_memberMiniCard).toList(),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      if (children.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Children:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: children.map(_memberMiniCard).toList(),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _memberMiniCard(FamilyMember member) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircleAvatar(
+          radius: 16,
+          backgroundColor: Colors.green[100],
+          backgroundImage:
+              member.profilePhoto.isNotEmpty
+                  ? NetworkImage(member.profilePhoto)
+                  : null,
+          child:
+              member.profilePhoto.isEmpty
+                  ? const Icon(Icons.person, color: Colors.green, size: 18)
+                  : null,
+        ),
+        const SizedBox(width: 8),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Text(
               member.name,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.green,
+                fontSize: 13,
+                color: Colors.black87,
               ),
             ),
             Text(
               member.hindiName,
-              style: const TextStyle(fontSize: 13, color: Colors.green),
-            ),
-            Text(
-              'जन्म वर्ष: ${member.birthYear}',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.green),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }
