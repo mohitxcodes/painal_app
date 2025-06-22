@@ -836,95 +836,101 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         builder: (context, constraints) {
           final double screenWidth = MediaQuery.of(context).size.width;
           final double contentWidth = screenWidth - horizontalPadding;
+          final double maxContentWidth = 900;
+          final double cardWidth =
+              contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Center(
-                child: Container(
-                  width: contentWidth,
-                  margin: const EdgeInsets.symmetric(vertical: 18),
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: Colors.green[200]!, width: 1.2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green.withOpacity(0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, innerConstraints) {
-                      final contentInnerWidth = innerConstraints.maxWidth;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          if (_navigationStack.isNotEmpty)
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextButton.icon(
-                                onPressed: _navigateBack,
-                                icon: const Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.green,
-                                ),
-                                label: const Text(
-                                  'Back',
-                                  style: TextStyle(color: Colors.green),
+            child: SizedBox(
+              width: screenWidth, // Take full width for centering
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Center(
+                  child: Container(
+                    width: cardWidth,
+                    margin: const EdgeInsets.symmetric(vertical: 18),
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: Colors.green[200]!, width: 1.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withOpacity(0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, innerConstraints) {
+                        final contentInnerWidth = innerConstraints.maxWidth;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (_navigationStack.isNotEmpty)
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: TextButton.icon(
+                                  onPressed: _navigateBack,
+                                  icon: const Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.green,
+                                  ),
+                                  label: const Text(
+                                    'Back',
+                                    style: TextStyle(color: Colors.green),
+                                  ),
                                 ),
                               ),
+                            // Main member card always full width
+                            SizedBox(
+                              width: contentInnerWidth,
+                              child: _familyMemberCard(_currentMember),
                             ),
-                          // Main member card always full width
-                          SizedBox(
-                            width: contentInnerWidth,
-                            child: _familyMemberCard(_currentMember),
-                          ),
-                          if (_currentMember.childMembers.isNotEmpty) ...[
-                            // Draw vertical line
-                            Container(
-                              width: 2,
-                              height: 32,
-                              color: Colors.green[200],
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                            ),
-                            // Children row scrollable inside the bordered area
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children:
-                                    _currentMember.childMembers.map((child) {
-                                      return Column(
-                                        children: [
-                                          _familyMemberCard(child),
-                                          TextButton.icon(
-                                            onPressed:
-                                                () => _navigateToChild(child),
-                                            icon: const Icon(
-                                              Icons.arrow_downward,
-                                              size: 16,
-                                              color: Colors.green,
-                                            ),
-                                            label: const Text(
-                                              'Show Children',
-                                              style: TextStyle(
+                            if (_currentMember.childMembers.isNotEmpty) ...[
+                              // Draw vertical line
+                              Container(
+                                width: 2,
+                                height: 32,
+                                color: Colors.green[200],
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                              ),
+                              // Children row scrollable inside the bordered area
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children:
+                                      _currentMember.childMembers.map((child) {
+                                        return Column(
+                                          children: [
+                                            _familyMemberCard(child),
+                                            TextButton.icon(
+                                              onPressed:
+                                                  () => _navigateToChild(child),
+                                              icon: const Icon(
+                                                Icons.arrow_downward,
+                                                size: 16,
                                                 color: Colors.green,
                                               ),
+                                              label: const Text(
+                                                'Show Children',
+                                                style: TextStyle(
+                                                  color: Colors.green,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      );
-                                    }).toList(),
+                                          ],
+                                        );
+                                      }).toList(),
+                                ),
                               ),
-                            ),
+                            ],
                           ],
-                        ],
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
