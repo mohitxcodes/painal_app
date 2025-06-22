@@ -8,65 +8,235 @@ class LocationInfoWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Card(
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.location_on, color: Colors.green[700], size: 30),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Location Information',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
+        elevation: 8,
+        shadowColor: Colors.green.withOpacity(0.3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Colors.green[50]!],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with icon and bilingual title
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green[700],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Location Information',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const Text(
+                            'स्थान की जानकारी',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Location details in a grid layout
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildLocationCard(
+                        'Block',
+                        'ब्लॉक',
+                        'Bihta',
+                        Icons.location_city,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildLocationCard(
+                        'District',
+                        'जिला',
+                        'Patna',
+                        Icons.map,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildLocationCard(
+                        'State',
+                        'राज्य',
+                        'Bihar',
+                        Icons.flag,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildLocationCard(
+                        'Division',
+                        'मंडल',
+                        'Patna',
+                        Icons.account_balance,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildLocationCard(
+                        'Pin Code',
+                        'पिन कोड',
+                        '800111',
+                        Icons.mail,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildLocationCard(
+                        'Post Office',
+                        'डाकघर',
+                        'Painal',
+                        Icons.local_post_office,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Additional information section
+                const Text(
+                  'Additional Details',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
                   ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              _buildInfoRow('Block', 'Bihta'),
-              _buildInfoRow('District', 'Patna'),
-              _buildInfoRow('State', 'Bihar'),
-              _buildInfoRow('Division', 'Patna'),
-              _buildInfoRow('Pin Code', '800111'),
-              _buildInfoRow('Post Office', 'Sadisopur'),
-              _buildInfoRow('Distance from Patna', '21 KM'),
-              _buildInfoRow('Distance from Bihta', '9 KM'),
-              _buildInfoRow('Elevation', '62 meters above sea level'),
-              _buildInfoRow(
-                'Languages',
-                'Hindi, Magahi, Maithili, Bhojpuri, English, Angika',
-              ),
-            ],
+                ),
+                const SizedBox(height: 12),
+                _buildInfoRow('Distance from Patna', 'पटना से दूरी', '21 KM'),
+                _buildInfoRow('Distance from Bihta', 'बिहटा से दूरी', '9 KM'),
+                _buildInfoRow(
+                  'Elevation',
+                  'ऊंचाई',
+                  '62 meters above sea level',
+                ),
+                _buildInfoRow('Languages', 'भाषाएं', 'Magahi, Hindi'),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildLocationCard(
+    String labelEnglish,
+    String labelHindi,
+    String value,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.green.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.green.withOpacity(0.3), width: 1),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.green[700], size: 24),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[700],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            labelEnglish,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Colors.green[700],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            labelHindi,
+            style: TextStyle(fontSize: 9, color: Colors.green[600]),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String labelEnglish, String labelHindi, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 140,
-            child: Text(
-              '$label:',
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-                fontSize: 15,
-              ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  labelEnglish,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green[700],
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  labelHindi,
+                  style: TextStyle(color: Colors.green[600], fontSize: 11),
+                ),
+              ],
             ),
           ),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 15))),
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+          ),
         ],
       ),
     );

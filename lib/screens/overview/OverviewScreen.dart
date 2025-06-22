@@ -3,7 +3,6 @@ import 'widgets/CarouselWidget.dart';
 import 'widgets/AboutVillageWidget.dart';
 import 'widgets/CurrentWeatherWidget.dart';
 import 'widgets/LocationInfoWidget.dart';
-import 'widgets/DemographicsWidget.dart';
 
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
@@ -20,8 +19,6 @@ class OverviewScreen extends StatelessWidget {
           const CurrentWeatherWidget(),
           const SizedBox(height: 20),
           const LocationInfoWidget(),
-          const SizedBox(height: 20),
-          const DemographicsWidget(),
           const SizedBox(height: 20),
         ],
       ),
