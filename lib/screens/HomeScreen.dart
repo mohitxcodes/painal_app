@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
-import '../overview/OverviewScreen.dart';
-import '../book/BookScreen.dart';
-import '../gallery/GalleryScreen.dart';
+import 'overview/OverviewScreen.dart';
+import 'book/BookScreen.dart';
+import 'gallery/GalleryScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,9 +31,22 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Painal Village',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              'Painal Village',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+            Text(
+              'पैनल गाँव',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
+          ],
         ),
         backgroundColor: Colors.green[700],
         elevation: 0,
