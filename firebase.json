@@ -1,0 +1,41 @@
+{
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "painal-1203",
+                    "appId": "1:669853098768:android:3829ace5325d72dddf7b95",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "ios": {
+                "default": {
+                    "projectId": "painal-1203",
+                    "appId": "1:669853098768:ios:8dca2db1dde65b9edf7b95",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "ios/Runner/GoogleService-Info.plist"
+                }
+            },
+            "macos": {
+                "default": {
+                    "projectId": "painal-1203",
+                    "appId": "1:669853098768:ios:8dca2db1dde65b9edf7b95",
+                    "uploadDebugSymbols": false,
+                    "fileOutput": "macos/Runner/GoogleService-Info.plist"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "painal-1203",
+                    "configurations": {
+                        "android": "1:669853098768:android:3829ace5325d72dddf7b95",
+                        "ios": "1:669853098768:ios:8dca2db1dde65b9edf7b95",
+                        "macos": "1:669853098768:ios:8dca2db1dde65b9edf7b95",
+                        "web": "1:669853098768:web:821523f5828e87fcdf7b95",
+                        "windows": "1:669853098768:web:eca9498bdbcb6adcdf7b95"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "669853098768",
+    "project_id": "painal-1203",
+    "storage_bucket": "painal-1203.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669853098768:android:3829ace5325d72dddf7b95",
+        "android_client_info": {
+          "package_name": "com.example.painal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbc-bgXF5OQbX4ADttxMFbneyze36wM1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
