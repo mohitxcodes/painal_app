@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:painal/data/FamilyData.dart';
 // import 'package:painal/data/FamilyData.dart';
 import 'dart:ui';
 import 'package:painal/models/FamilyMember.dart';
@@ -44,6 +45,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   void initState() {
     super.initState();
     _loadFamilyData();
+    // uploadInitialData();
   }
 
   Future<void> _loadFamilyData() async {
