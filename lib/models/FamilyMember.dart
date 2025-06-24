@@ -6,6 +6,7 @@ class FamilyMember {
   final List<dynamic> children;
   final int? parentId;
   final String profilePhoto;
+  List<FamilyMember> childMembers = [];
 
   FamilyMember({
     required this.id,
