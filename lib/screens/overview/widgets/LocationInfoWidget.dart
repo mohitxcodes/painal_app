@@ -138,7 +138,7 @@ class LocationInfoWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -180,7 +180,7 @@ class LocationInfoWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.green[700],
+              color: Colors.black87,
             ),
             textAlign: TextAlign.center,
           ),
@@ -190,7 +190,7 @@ class LocationInfoWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: Colors.green[700],
+              color: Colors.black87,
             ),
             textAlign: TextAlign.center,
           ),
@@ -219,7 +219,7 @@ class LocationInfoWidget extends StatelessWidget {
                   labelEnglish,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: Colors.green[700],
+                    color: Colors.black87,
                     fontSize: 12,
                   ),
                 ),

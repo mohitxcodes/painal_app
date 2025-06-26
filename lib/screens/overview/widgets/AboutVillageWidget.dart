@@ -74,7 +74,7 @@ class AboutVillageWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -158,7 +158,7 @@ class AboutVillageWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: Colors.green[700],
+              color: Colors.black87,
             ),
           ),
           Text(
@@ -166,7 +166,7 @@ class AboutVillageWidget extends StatelessWidget {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
-              color: Colors.green[700],
+              color: Colors.black87,
             ),
           ),
           Text(

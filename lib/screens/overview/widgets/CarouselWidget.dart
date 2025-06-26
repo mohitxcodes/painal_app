@@ -14,17 +14,17 @@ class _CarouselWidgetState extends State<CarouselWidget> {
     {
       'title': 'Village Landscape',
       'titleHindi': 'गाँव का दृश्य',
-      'image': 'assets/images/village_landscape.jpg',
+      'image': 'assets/images/painal01.jpeg',
     },
     {
       'title': 'Local Market',
       'titleHindi': 'स्थानीय बाजार',
-      'image': 'assets/images/local_market.jpg',
+      'image': 'assets/images/painal02.jpeg',
     },
     {
       'title': 'Community Life',
       'titleHindi': 'सामुदायिक जीवन',
-      'image': 'assets/images/community.jpg',
+      'image': 'assets/images/painal01.jpeg',
     },
   ];
 
@@ -91,18 +91,14 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                 ),
                 child: Stack(
                   children: [
-                    // Placeholder for image (you can replace with actual images)
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.green[100],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          _getIconForIndex(index),
-                          size: 80,
-                          color: Colors.green[700],
-                        ),
+                    // Actual image as background
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.asset(
+                        _carouselItems[index]['image']!,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
                       ),
                     ),
                     // Gradient overlay for text readability
@@ -179,18 +175,5 @@ class _CarouselWidgetState extends State<CarouselWidget> {
         ],
       ),
     );
-  }
-
-  IconData _getIconForIndex(int index) {
-    switch (index) {
-      case 0:
-        return Icons.landscape;
-      case 1:
-        return Icons.store;
-      case 2:
-        return Icons.people;
-      default:
-        return Icons.landscape;
-    }
   }
 }
