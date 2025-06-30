@@ -37,6 +37,7 @@ dependencies:
   http: ^1.4.0
   firebase_core: ^3.14.0
   cloud_firestore: ^5.6.9
+  photo_view: ^0.15.0
 
 dev_dependencies:
   flutter_test:

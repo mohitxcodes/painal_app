@@ -1,116 +1,272 @@
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
-class BookScreen extends StatelessWidget {
+class BookScreen extends StatefulWidget {
   const BookScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Card(
-            elevation: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Book - Village Records & Information',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildBookSection('Census Records', [
-                    'Total Population: 9,618',
-                    'Male Population: 5,098 (53.0%)',
-                    'Female Population: 4,520 (47.0%)',
-                    'Total Houses: 1,601',
-                    'Literacy Rate: 60.3%',
-                    'Female Literacy: 24.0%',
-                  ]),
-                  const SizedBox(height: 20),
-                  _buildBookSection('Geographic Information', [
-                    'Location: 21 KM west of Patna',
-                    'Block: Bihta',
-                    'District: Patna',
-                    'State: Bihar',
-                    'Elevation: 62 meters above sea level',
-                    'Pin Code: 800111',
-                  ]),
-                  const SizedBox(height: 20),
-                  _buildBookSection('Infrastructure Records', [
-                    'Schools: Multiple government and private schools',
-                    'Colleges: Higher education institutions nearby',
-                    'Transport: Connected by NH139 and NH922',
-                    'Railway: Multiple stations within 10 KM',
-                    'Healthcare: Medical facilities available',
-                    'Markets: Local markets and commercial areas',
-                  ]),
-                  const SizedBox(height: 20),
-                  _buildBookSection('Historical Records', [
-                    'Village establishment and history',
-                    'Traditional governance systems',
-                    'Agricultural development timeline',
-                    'Educational progress records',
-                    'Infrastructure development history',
-                  ]),
-                  const SizedBox(height: 20),
-                  _buildBookSection('Economic Records', [
-                    'Primary occupation: Agriculture',
-                    'Local market activities',
-                    'Small-scale industries',
-                    'Employment statistics',
-                    'Economic development indicators',
-                  ]),
-                  const SizedBox(height: 20),
-                  _buildBookSection('Administrative Records', [
-                    'Village Panchayat details',
-                    'Government schemes implementation',
-                    'Public distribution system',
-                    'Health and sanitation records',
-                    'Development project documentation',
-                  ]),
-                ],
-              ),
+  State<BookScreen> createState() => _BookScreenState();
+}
+
+class _BookScreenState extends State<BookScreen> {
+  final int totalPages = 5;
+  int currentPage = 0;
+  final PageController _pageController = PageController();
+  bool isFullscreen = false;
+
+  // Replace with your own image URLs if desired
+  final List<String> pageImageUrls = [
+    'https://imgs.search.brave.com/dKIQm3AJ0TCSAIZld11e2a5X8gL7p8HISnrU_e5DbBo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NzFqODZ2cW03bUwu/anBn',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1750994812/lhx1jyi5pau2jxrd3kbx.jpg',
+    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308',
+    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e',
+    'https://images.unsplash.com/photo-1519985176271-adb1088fa94c',
+  ];
+
+  void _jumpToPage() async {
+    final controller = TextEditingController();
+    int? selectedPage = await showDialog<int>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Jump to Page'),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(hintText: 'Enter page number'),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final page = int.tryParse(controller.text);
+                  if (page != null && page > 0 && page <= totalPages) {
+                    Navigator.pop(context, page - 1);
+                  }
+                },
+                child: const Text('Go'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
+    if (selectedPage != null) {
+      _pageController.jumpToPage(selectedPage);
+    }
   }
 
-  Widget _buildBookSection(String title, List<String> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.green,
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar:
+          isFullscreen
+              ? null
+              : PreferredSize(
+                preferredSize: const Size.fromHeight(140),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Painal Village Book',
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                            letterSpacing: 0.2,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const Spacer(),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.fullscreen,
+                                            color: Colors.green,
+                                            size: 22,
+                                          ),
+                                          onPressed:
+                                              () => setState(
+                                                () => isFullscreen = true,
+                                              ),
+                                          tooltip: 'Fullscreen',
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.search,
+                                            color: Colors.green,
+                                            size: 22,
+                                          ),
+                                          tooltip: 'Search',
+                                          onPressed: () {
+                                            /* TODO: Add search functionality */
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 0),
+                                    const Text(
+                                      'पैनाल गाँव पुस्तक',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.green,
+                                        letterSpacing: 0.1,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  'Total Pages: ',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                Text(
+                                  '$totalPages',
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(width: 18),
+                                const Text(
+                                  'Current Page: ',
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                Text(
+                                  '${currentPage + 1}',
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const Spacer(),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 0),
+                          const Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: Color(0xFFE0E0E0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+      body: Stack(
+        children: [
+          PhotoViewGallery.builder(
+            pageController: _pageController,
+            itemCount: totalPages,
+            scrollPhysics: const BouncingScrollPhysics(),
+            backgroundDecoration: const BoxDecoration(color: Colors.white),
+            builder: (context, index) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider: NetworkImage(pageImageUrls[index]),
+                minScale: PhotoViewComputedScale.contained,
+                maxScale: PhotoViewComputedScale.covered * 3.0,
+                heroAttributes: PhotoViewHeroAttributes(tag: 'page_$index'),
+              );
+            },
+            onPageChanged: (index) {
+              setState(() {
+                currentPage = index;
+              });
+            },
+            scrollDirection: Axis.horizontal,
+            loadingBuilder:
+                (context, event) =>
+                    const Center(child: CircularProgressIndicator()),
           ),
-        ),
-        const SizedBox(height: 8),
-        ...items.map(
-          (item) => Padding(
-            padding: const EdgeInsets.only(left: 16, top: 4),
-            child: Row(
-              children: [
-                const Icon(Icons.book, size: 16, color: Colors.green),
-                const SizedBox(width: 8),
-                Expanded(child: Text(item)),
-              ],
+          if (!isFullscreen)
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Page ${currentPage + 1} of $totalPages',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          if (isFullscreen)
+            Positioned(
+              top: 40,
+              right: 20,
+              child: SafeArea(
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.fullscreen_exit,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                  tooltip: 'Exit Fullscreen',
+                  onPressed: () => setState(() => isFullscreen = false),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
