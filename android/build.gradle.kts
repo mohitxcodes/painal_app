@@ -1,3 +1,12 @@
+import org.gradle.api.tasks.Delete
+import org.gradle.api.file.Directory
+
+plugins {
+    id("com.android.application") version "8.7.0" apply false
+    id("org.jetbrains.kotlin.android") version "1.8.22" apply false
+    id("com.google.gms.google-services") version "4.3.10" apply false
+}
+
 allprojects {
     repositories {
         google()
