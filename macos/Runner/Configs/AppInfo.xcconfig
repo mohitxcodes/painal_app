@@ -8,7 +8,7 @@
 PRODUCT_NAME = painal
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.painal
+PRODUCT_BUNDLE_IDENTIFIER = com.mohitxcodes.painal
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.

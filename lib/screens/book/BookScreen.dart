@@ -17,11 +17,7 @@ class _BookScreenState extends State<BookScreen> {
 
   // Replace with your own image URLs if desired
   final List<String> pageImageUrls = [
-    'https://imgs.search.brave.com/dKIQm3AJ0TCSAIZld11e2a5X8gL7p8HISnrU_e5DbBo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL0kv/NzFqODZ2cW03bUwu/anBn',
     'https://res.cloudinary.com/mohitxcodes/image/upload/v1750994812/lhx1jyi5pau2jxrd3kbx.jpg',
-    'https://images.unsplash.com/photo-1519125323398-675f0ddb6308',
-    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e',
-    'https://images.unsplash.com/photo-1519985176271-adb1088fa94c',
   ];
 
   void _jumpToPage() async {

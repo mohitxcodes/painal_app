@@ -1,4 +1,4 @@
-package com.example.painal
+package com.mohitxcodes.painal
 
 import io.flutter.embedding.android.FlutterActivity
 

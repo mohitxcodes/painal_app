@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.painal</string>
+	<string>com.mohitxcodes.painal</string>
 	<key>PROJECT_ID</key>
 	<string>painal-1203</string>
 	<key>STORAGE_BUCKET</key>

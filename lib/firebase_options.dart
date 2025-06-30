@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '669853098768',
     projectId: 'painal-1203',
     storageBucket: 'painal-1203.firebasestorage.app',
-    iosBundleId: 'com.example.painal',
+    iosBundleId: 'com.mohitxcodes.painal',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '669853098768',
     projectId: 'painal-1203',
     storageBucket: 'painal-1203.firebasestorage.app',
-    iosBundleId: 'com.example.painal',
+    iosBundleId: 'com.mohitxcodes.painal',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
