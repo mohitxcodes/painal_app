@@ -38,6 +38,7 @@ dependencies:
   firebase_core: ^3.14.0
   cloud_firestore: ^5.6.9
   photo_view: ^0.15.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,13 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/painal_icon.png"
+  adaptive_icon_foreground: "assets/painal_icon.png"
+  adaptive_icon_background: "#ffffff"
 
 # The following section is specific to Flutter packages.
 flutter:
