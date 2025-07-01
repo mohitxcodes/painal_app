@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 // import 'package:painal/data/FamilyData.dart';
 import 'dart:ui';
 import 'package:painal/models/FamilyMember.dart';
+import 'package:painal/apis/UploadImage.dart';
 
 Future<List<FamilyMember>> fetchFamilyMembers() async {
   final snapshot =
@@ -322,6 +323,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                                     : null;
                                             return ListTile(
                                               leading: CircleAvatar(
+                                                radius: 22,
                                                 backgroundColor:
                                                     Colors.green[100],
                                                 backgroundImage:
@@ -330,13 +332,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                                             .isNotEmpty
                                                         ? NetworkImage(
                                                           member.profilePhoto,
-                                                        )
-                                                        : null,
-                                                child:
-                                                    member.profilePhoto.isEmpty
-                                                        ? const Icon(
-                                                          Icons.person,
-                                                          color: Colors.green,
                                                         )
                                                         : null,
                                               ),
@@ -462,7 +457,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       return const Center(child: Text('No data available.'));
     }
     final totalMembers = _familyData!.length;
-    final totalGenerations = _calculateGenerations(_familyData!);
     final double horizontalPadding =
         12 + 12; // from EdgeInsets.fromLTRB(12, ...)
     return Scaffold(
@@ -751,7 +745,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
-                radius: 22,
+                radius: 28,
                 backgroundColor: Colors.green[100],
                 backgroundImage:
                     member.profilePhoto.isNotEmpty
@@ -762,7 +756,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                         ? const Icon(
                           Icons.person,
                           color: Colors.green,
-                          size: 24,
+                          size: 28,
                         )
                         : null,
               ),
@@ -1151,7 +1145,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                           ? const Icon(
                             Icons.person,
                             color: Colors.green,
-                            size: 24,
+                            size: 22,
                           )
                           : null,
                 ),
@@ -1215,22 +1209,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     );
   }
 
-  int _calculateGenerations(List<FamilyMember> data) {
-    // Calculate the max depth of the tree
-    int maxDepth = 0;
-    void dfs(FamilyMember member, int depth) {
-      if (depth > maxDepth) maxDepth = depth;
-      for (var child in member.childMembers) {
-        dfs(child, depth + 1);
-      }
-    }
-
-    for (var root in data.where((m) => m.parentId == null)) {
-      dfs(root, 1);
-    }
-    return maxDepth;
-  }
-
   void _showEditMemberDrawer(FamilyMember member) {
     final nameController = TextEditingController(text: member.name);
     final hindiNameController = TextEditingController(text: member.hindiName);
@@ -1257,16 +1235,61 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 38,
+                          backgroundColor: Colors.green[100],
+                          backgroundImage:
+                              member.profilePhoto.isNotEmpty
+                                  ? NetworkImage(member.profilePhoto)
+                                  : null,
+                          child:
+                              member.profilePhoto.isEmpty
+                                  ? const Icon(
+                                    Icons.person,
+                                    color: Colors.green,
+                                    size: 38,
+                                  )
+                                  : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Material(
+                            color: Colors.white,
+                            shape: const CircleBorder(),
+                            elevation: 2,
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () async {
+                                await pickAndUploadImage();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'If upload was successful, copy the image URL from the console and paste it below.',
+                                      ),
+                                      duration: Duration(seconds: 5),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  const SizedBox(height: 10),
                   const Text(
                     'Edit Member',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
