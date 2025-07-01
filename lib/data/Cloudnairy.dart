@@ -1,6 +1,9 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class CloudinaryConfig {
-  static const String cloudName = 'mohitxcodes';
-  static const String uploadPreset = 'painal_upload';
+  static String get cloudName => dotenv.env['CLOUDINARY_CLOUD_NAME'] ?? '';
+  static String get uploadPreset =>
+      dotenv.env['CLOUDINARY_UPLOAD_PRESET'] ?? '';
   static String get apiUrl =>
       'https://api.cloudinary.com/v1_1/$cloudName/image/upload';
 }

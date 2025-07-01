@@ -2,15 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:painal/data/Cloudnairy.dart';
 
-class CloudinaryConfig {
-  static const String cloudName = 'YOUR_CLOUD_NAME';
-  static const String uploadPreset = 'YOUR_UPLOAD_PRESET';
-  static String get apiUrl =>
-      'https://api.cloudinary.com/v1_1/$cloudName/image/upload';
-}
-
-Future<void> pickAndUploadImage() async {
+Future<String?> pickAndUploadImage() async {
   final picker = ImagePicker();
   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -32,10 +26,13 @@ Future<void> pickAndUploadImage() async {
       final respStr = await response.stream.bytesToString();
       var jsonResponse = json.decode(respStr);
       print('-----------Upload successful: ${jsonResponse['secure_url']}');
+      return jsonResponse['secure_url'] as String?;
     } else {
-      print('----------Upload failed: ${response.statusCode}');
+      print('----------Upload failed: ${response}');
+      return null;
     }
   } else {
     print('No image selected.');
+    return null;
   }
 }

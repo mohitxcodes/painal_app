@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 // import 'package:painal/data/FamilyData.dart';
-// import 'package:painal/data/FamilyData.dart';
+import 'package:painal/data/FamilyData.dart';
 import 'dart:ui';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/apis/UploadImage.dart';
@@ -1213,6 +1213,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     final nameController = TextEditingController(text: member.name);
     final hindiNameController = TextEditingController(text: member.hindiName);
     final dobController = TextEditingController(text: member.birthYear);
+    String? uploadedPhotoUrl = member.profilePhoto;
     bool loading = false;
     showModalBottomSheet(
       context: context,
@@ -1241,11 +1242,13 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                           radius: 38,
                           backgroundColor: Colors.green[100],
                           backgroundImage:
-                              member.profilePhoto.isNotEmpty
-                                  ? NetworkImage(member.profilePhoto)
+                              (uploadedPhotoUrl != null &&
+                                      uploadedPhotoUrl?.isNotEmpty == true)
+                                  ? NetworkImage(uploadedPhotoUrl ?? '')
                                   : null,
                           child:
-                              member.profilePhoto.isEmpty
+                              (uploadedPhotoUrl == null ||
+                                      uploadedPhotoUrl?.isEmpty != false)
                                   ? const Icon(
                                     Icons.person,
                                     color: Colors.green,
@@ -1263,14 +1266,30 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                             child: InkWell(
                               customBorder: const CircleBorder(),
                               onTap: () async {
-                                await pickAndUploadImage();
-                                if (context.mounted) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder:
+                                      (context) => const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                );
+                                final url = await pickAndUploadImage();
+                                Navigator.of(context).pop();
+                                if (url != null && url.isNotEmpty) {
+                                  setState(() {
+                                    uploadedPhotoUrl = url;
+                                  });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text(
-                                        'If upload was successful, copy the image URL from the console and paste it below.',
-                                      ),
-                                      duration: Duration(seconds: 5),
+                                      content: Text('Profile photo uploaded!'),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Image upload failed.'),
+                                      backgroundColor: Colors.red,
                                     ),
                                   );
                                 }
@@ -1350,6 +1369,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                         'hindiName':
                                             hindiNameController.text.trim(),
                                         'birthYear': dobController.text.trim(),
+                                        'profilePhoto': uploadedPhotoUrl ?? '',
                                       });
                                   if (context.mounted) {
                                     Navigator.of(context).pop();
@@ -1410,6 +1430,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     final hindiNameController = TextEditingController();
     final dobController = TextEditingController();
     final profilePhotoController = TextEditingController();
+    String? uploadedPhotoUrl;
     bool loading = false;
     showModalBottomSheet(
       context: context,
@@ -1432,16 +1453,79 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 38,
+                          backgroundColor: Colors.green[100],
+                          backgroundImage:
+                              (uploadedPhotoUrl != null &&
+                                      uploadedPhotoUrl!.isNotEmpty)
+                                  ? NetworkImage(uploadedPhotoUrl!)
+                                  : null,
+                          child:
+                              (uploadedPhotoUrl == null ||
+                                      uploadedPhotoUrl!.isEmpty)
+                                  ? const Icon(
+                                    Icons.person,
+                                    color: Colors.green,
+                                    size: 38,
+                                  )
+                                  : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Material(
+                            color: Colors.white,
+                            shape: const CircleBorder(),
+                            elevation: 2,
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () async {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder:
+                                      (context) => const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                );
+                                final url = await pickAndUploadImage();
+                                Navigator.of(context).pop();
+                                if (url != null && url.isNotEmpty) {
+                                  setState(() {
+                                    uploadedPhotoUrl = url;
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Profile photo uploaded!'),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Image upload failed.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  const SizedBox(height: 10),
                   const Text(
                     'Add Family Member',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -1476,16 +1560,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: profilePhotoController,
-                    decoration: InputDecoration(
-                      labelText: 'Profile Photo URL (optional)',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 22),
                   SizedBox(
                     width: double.infinity,
@@ -1509,8 +1583,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                     dobController.text.trim().isEmpty
                                         ? 'Unavailable'
                                         : dobController.text.trim();
-                                final profilePhoto =
-                                    profilePhotoController.text.trim();
+                                final profilePhoto = uploadedPhotoUrl ?? '';
                                 if (name.isEmpty || hindiName.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -1543,10 +1616,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                         'birthYear': dob,
                                         'children': <int>[],
                                         'parentId': parent.id,
-                                        'profilePhoto':
-                                            profilePhoto.isEmpty
-                                                ? ''
-                                                : profilePhoto,
+                                        'profilePhoto': profilePhoto,
                                       });
                                   // Update parent's children list
                                   final updatedChildren = List<int>.from(
