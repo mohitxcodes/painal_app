@@ -957,7 +957,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                               icon: const Icon(Icons.edit, size: 20),
                               label: const Text('Edit'),
                               onPressed: () {
-                                // TODO: Implement edit functionality
+                                _showEditMemberDrawer(member);
                               },
                             ),
                           ),
@@ -984,11 +984,36 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                               ),
                               label: const Text('Add'),
                               onPressed: () {
-                                // TODO: Implement add functionality
+                                _showAddMemberDrawer(member);
                               },
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.red[100],
+                            foregroundColor: Colors.red[800],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 12,
+                            ),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          icon: const Icon(Icons.delete_outline, size: 22),
+                          label: const Text('Delete'),
+                          onPressed: () {
+                            _showDeleteConfirmation(member);
+                          },
+                        ),
                       ),
                       const SizedBox(height: 20),
                       if (parent != null)
@@ -1204,5 +1229,465 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       dfs(root, 1);
     }
     return maxDepth;
+  }
+
+  void _showEditMemberDrawer(FamilyMember member) {
+    final nameController = TextEditingController(text: member.name);
+    final hindiNameController = TextEditingController(text: member.hindiName);
+    final dobController = TextEditingController(text: member.birthYear);
+    bool loading = false;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const Text(
+                    'Edit Member',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  const SizedBox(height: 18),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: hindiNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Hindi Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: dobController,
+                    decoration: InputDecoration(
+                      labelText: 'Birth Year',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[700],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed:
+                          loading
+                              ? null
+                              : () async {
+                                setState(() => loading = true);
+                                try {
+                                  await FirebaseFirestore.instance
+                                      .collection('familyMembers')
+                                      .doc(member.id.toString())
+                                      .update({
+                                        'name': nameController.text.trim(),
+                                        'hindiName':
+                                            hindiNameController.text.trim(),
+                                        'birthYear': dobController.text.trim(),
+                                      });
+                                  if (context.mounted) {
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Member updated successfully!',
+                                        ),
+                                      ),
+                                    );
+                                    // Optionally reload data
+                                    _loadFamilyData();
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to update: $e'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                } finally {
+                                  if (context.mounted)
+                                    setState(() => loading = false);
+                                }
+                              },
+                      child:
+                          loading
+                              ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                              : const Text(
+                                'Save Changes',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showAddMemberDrawer(FamilyMember parent) {
+    final nameController = TextEditingController();
+    final hindiNameController = TextEditingController();
+    final dobController = TextEditingController();
+    final profilePhotoController = TextEditingController();
+    bool loading = false;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const Text(
+                    'Add Family Member',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  const SizedBox(height: 18),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: hindiNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Hindi Name',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: dobController,
+                    decoration: InputDecoration(
+                      labelText: 'Birth Year (optional)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: profilePhotoController,
+                    decoration: InputDecoration(
+                      labelText: 'Profile Photo URL (optional)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green[700],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed:
+                          loading
+                              ? null
+                              : () async {
+                                final name = nameController.text.trim();
+                                final hindiName =
+                                    hindiNameController.text.trim();
+                                final dob =
+                                    dobController.text.trim().isEmpty
+                                        ? 'Unavailable'
+                                        : dobController.text.trim();
+                                final profilePhoto =
+                                    profilePhotoController.text.trim();
+                                if (name.isEmpty || hindiName.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Name and Hindi Name are required.',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                setState(() => loading = true);
+                                try {
+                                  // Find max id in _familyData
+                                  int maxId = 0;
+                                  if (_familyData != null &&
+                                      _familyData!.isNotEmpty) {
+                                    maxId = _familyData!
+                                        .map((m) => m.id)
+                                        .reduce((a, b) => a > b ? a : b);
+                                  }
+                                  final newId = maxId + 1;
+                                  await FirebaseFirestore.instance
+                                      .collection('familyMembers')
+                                      .doc(newId.toString())
+                                      .set({
+                                        'id': newId,
+                                        'name': name,
+                                        'hindiName': hindiName,
+                                        'birthYear': dob,
+                                        'children': <int>[],
+                                        'parentId': parent.id,
+                                        'profilePhoto':
+                                            profilePhoto.isEmpty
+                                                ? ''
+                                                : profilePhoto,
+                                      });
+                                  // Update parent's children list
+                                  final updatedChildren = List<int>.from(
+                                    parent.children,
+                                  )..add(newId);
+                                  await FirebaseFirestore.instance
+                                      .collection('familyMembers')
+                                      .doc(parent.id.toString())
+                                      .update({'children': updatedChildren});
+                                  if (context.mounted) {
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Member added successfully!',
+                                        ),
+                                      ),
+                                    );
+                                    _loadFamilyData();
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to add: $e'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                } finally {
+                                  if (context.mounted)
+                                    setState(() => loading = false);
+                                }
+                              },
+                      child:
+                          loading
+                              ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                              : const Text(
+                                'Add Member',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmation(FamilyMember member) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+              SizedBox(width: 10),
+              Text('Confirm Deletion'),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to delete "${member.name}"?\nThis action cannot be undone.',
+            style: const TextStyle(fontSize: 15),
+          ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[700],
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _deleteMember(member);
+              },
+              child: const Text(
+                'Delete',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteMember(FamilyMember member) async {
+    try {
+      // Remove member from Firestore
+      await FirebaseFirestore.instance
+          .collection('familyMembers')
+          .doc(member.id.toString())
+          .delete();
+      // Remove from parent's children list if parent exists
+      if (member.parentId != null) {
+        final parentDoc =
+            await FirebaseFirestore.instance
+                .collection('familyMembers')
+                .doc(member.parentId.toString())
+                .get();
+        if (parentDoc.exists) {
+          final parentData = parentDoc.data()!;
+          final List<dynamic> children = List.from(
+            parentData['children'] ?? [],
+          );
+          children.remove(member.id);
+          await FirebaseFirestore.instance
+              .collection('familyMembers')
+              .doc(member.parentId.toString())
+              .update({'children': children});
+        }
+      }
+      if (context.mounted) {
+        // Close all drawers
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Member deleted successfully!')),
+        );
+        _loadFamilyData();
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
