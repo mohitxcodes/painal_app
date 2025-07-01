@@ -1627,7 +1627,10 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                       .doc(parent.id.toString())
                                       .update({'children': updatedChildren});
                                   if (context.mounted) {
-                                    Navigator.of(context).pop();
+                                    // Close all open drawers/dialogs
+                                    Navigator.of(
+                                      context,
+                                    ).popUntil((route) => route.isFirst);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
