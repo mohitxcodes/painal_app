@@ -21,40 +21,6 @@ class _BookScreenState extends State<BookScreen> {
     'https://res.cloudinary.com/mohitxcodes/image/upload/v1750994812/lhx1jyi5pau2jxrd3kbx.jpg',
   ];
 
-  void _jumpToPage() async {
-    final controller = TextEditingController();
-    int? selectedPage = await showDialog<int>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Jump to Page'),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(hintText: 'Enter page number'),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  final page = int.tryParse(controller.text);
-                  if (page != null && page > 0 && page <= totalPages) {
-                    Navigator.pop(context, page - 1);
-                  }
-                },
-                child: const Text('Go'),
-              ),
-            ],
-          ),
-    );
-    if (selectedPage != null) {
-      _pageController.jumpToPage(selectedPage);
-    }
-  }
-
   void _showSearchDialog() async {
     final controller = TextEditingController();
     int? selectedPage = await showDialog<int>(
