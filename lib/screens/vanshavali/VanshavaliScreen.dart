@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:painal/data/FamilyData.dart';
+// import 'package:painal/data/FamilyData.dart';
 // import 'package:painal/data/FamilyData.dart';
 import 'dart:ui';
 import 'package:painal/models/FamilyMember.dart';
@@ -481,11 +481,11 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             const Text(
-                              'Vanshavali - Family Tree',
+                              'Vanshavali',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -495,9 +495,9 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(height: 2),
+                            SizedBox(width: 4),
                             Text(
-                              'वंशावली - परिवार वृक्ष',
+                              '(वंशावली - परिवार वृक्ष)',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -507,64 +507,40 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Explore your family lineage and discover connections across generations. Use the search to quickly find any member.',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            const Spacer(),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 0),
                   Row(
                     children: [
                       const Text(
                         'Total Members: ',
                         style: TextStyle(
                           color: Colors.black87,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 14,
                         ),
                       ),
                       Text(
                         '$totalMembers',
-                        style: const TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(width: 18),
-                      const Text(
-                        'Generations: ',
                         style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                      Text(
-                        '$totalGenerations',
-                        style: const TextStyle(
-                          color: Colors.black87,
+                          color: Colors.green[700],
                           fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                          fontSize: 16,
                         ),
                       ),
                       const Spacer(),
+                      const SizedBox(width: 8),
+                      // Search icon button (right)
                       IconButton(
                         icon: const Icon(
                           Icons.search,
+                          size: 26, // Increased size for more boldness
                           color: Colors.green,
-                          size: 26,
+                          weight:
+                              900, // Flutter 3.10+ supports weight for MaterialIcons
                         ),
                         onPressed: _showSearchDialog,
                         tooltip: 'Search Family Member',

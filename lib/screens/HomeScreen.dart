@@ -56,8 +56,8 @@ class _HomeScreenState extends State<HomeScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           tabs: const [
-            Tab(text: 'Overview', icon: Icon(Icons.home)),
-            Tab(text: 'Vanshali', icon: Icon(Icons.people)),
+            Tab(text: 'Home', icon: Icon(Icons.home)),
+            Tab(text: 'Vanshavali', icon: Icon(Icons.people)),
             Tab(text: 'Book', icon: Icon(Icons.book)),
             Tab(text: 'Gallery', icon: Icon(Icons.photo_library)),
           ],
