@@ -5,75 +5,41 @@ class GalleryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        final galleryItems = [
-          {
-            'title': 'Village Landscape',
-            'icon': Icons.landscape,
-            'color': Colors.green,
-          },
-          {
-            'title': 'Local Market',
-            'icon': Icons.store,
-            'color': Colors.orange,
-          },
-          {'title': 'Schools', 'icon': Icons.school, 'color': Colors.blue},
-          {
-            'title': 'Transport',
-            'icon': Icons.directions_bus,
-            'color': Colors.purple,
-          },
-          {
-            'title': 'Agriculture',
-            'icon': Icons.agriculture,
-            'color': Colors.brown,
-          },
-          {'title': 'Community', 'icon': Icons.people, 'color': Colors.teal},
-        ];
-
-        return Card(
-          elevation: 4,
-          child: InkWell(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    '${galleryItems[index]['title']} - Coming Soon!',
-                  ),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  galleryItems[index]['icon'] as IconData,
-                  size: 50,
-                  color: galleryItems[index]['color'] as Color,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  galleryItems[index]['title'] as String,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.photo_library_outlined,
+              color: Colors.green[400],
+              size: 80,
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 24),
+            Text(
+              'Gallery Coming Soon',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[700],
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              '''We are working hard to bring you a beautiful
+collection of village memories and moments.''',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
