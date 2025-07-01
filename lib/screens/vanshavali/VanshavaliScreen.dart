@@ -793,6 +793,10 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
 
   void _showMemberDetails(FamilyMember member) {
     if (_familyData == null) return;
+    // Close any previous drawer before opening a new one
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
     final parent =
         member.parentId != null
             ? _familyData!.firstWhere(
@@ -818,7 +822,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,
-          initialChildSize: 0.45,
+          initialChildSize: 0.5,
           minChildSize: 0.3,
           maxChildSize: 0.85,
           builder: (context, scrollController) {
@@ -843,6 +847,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                         ),
                       ),
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           CircleAvatar(
                             radius: 28,
@@ -865,29 +870,122 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  member.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                Text(
-                                  member.hindiName,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                                Text(
-                                  'जन्म वर्ष: ${member.birthYear}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            member.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            member.hindiName,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                          Text(
+                                            'जन्म वर्ष: ${member.birthYear}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        // TODO: Implement report functionality
+                                      },
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.red[700],
+                                        textStyle: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 0,
+                                        ),
+                                        minimumSize: const Size(0, 0),
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.report_gmailerrorred_outlined,
+                                        size: 16,
+                                        color: Colors.red,
+                                      ),
+                                      label: const Text('Report'),
+                                    ),
+                                  ],
                                 ),
                               ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.green[600],
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 12,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              icon: const Icon(Icons.edit, size: 20),
+                              label: const Text('Edit'),
+                              onPressed: () {
+                                // TODO: Implement edit functionality
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.green[400],
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 12,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                size: 22,
+                              ),
+                              label: const Text('Add'),
+                              onPressed: () {
+                                // TODO: Implement add functionality
+                              },
                             ),
                           ),
                         ],
@@ -897,56 +995,93 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Parent:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Father',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  '(पिता)',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 6),
-                            _memberMiniCard(parent),
-                            const SizedBox(height: 16),
-                          ],
-                        ),
-                      if (siblings.isNotEmpty)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Siblings:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: siblings.map(_memberMiniCard).toList(),
-                            ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
+                            _memberRectCard(parent),
+                            const SizedBox(height: 18),
                           ],
                         ),
                       if (children.isNotEmpty)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Children:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Children',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  '(बच्चे)',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
                             Wrap(
                               spacing: 8,
-                              runSpacing: 8,
-                              children: children.map(_memberMiniCard).toList(),
+                              children: children.map(_memberRectCard).toList(),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 18),
+                          ],
+                        ),
+                      if (siblings.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  'Siblings',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  '(भाई-बहन)',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              children: siblings.map(_memberRectCard).toList(),
+                            ),
+                            const SizedBox(height: 18),
                           ],
                         ),
                     ],
@@ -960,41 +1095,98 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     );
   }
 
-  Widget _memberMiniCard(FamilyMember member) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircleAvatar(
-          radius: 16,
-          backgroundColor: Colors.green[100],
-          backgroundImage:
-              member.profilePhoto.isNotEmpty
-                  ? NetworkImage(member.profilePhoto)
-                  : null,
-          child:
-              member.profilePhoto.isEmpty
-                  ? const Icon(Icons.person, color: Colors.green, size: 18)
-                  : null,
-        ),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              member.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
-                color: Colors.black87,
-              ),
+  Widget _memberRectCard(FamilyMember member) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () => _showMemberDetails(member),
+      child: Card(
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: const Color(0xFFF9FAFB), // subtle off-white
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.green[100]!, width: 1.2),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: Colors.green[100],
+                  backgroundImage:
+                      member.profilePhoto.isNotEmpty
+                          ? NetworkImage(member.profilePhoto)
+                          : null,
+                  child:
+                      member.profilePhoto.isEmpty
+                          ? const Icon(
+                            Icons.person,
+                            color: Colors.green,
+                            size: 24,
+                          )
+                          : null,
+                ),
+                const SizedBox(width: 18),
+                Container(width: 1.5, height: 38, color: Colors.green[50]),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            member.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Text(
+                            member.hindiName,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (member.birthYear.isNotEmpty)
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green[50],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'DOB: ${member.birthYear}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.green,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Text(
-              member.hindiName,
-              style: const TextStyle(fontSize: 12, color: Colors.green),
-            ),
-          ],
+          ),
         ),
-      ],
+      ),
     );
   }
 
