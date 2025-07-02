@@ -762,7 +762,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                member.name,
+                member.hindiName,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -770,7 +770,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                 ),
               ),
               Text(
-                member.hindiName,
+                member.name,
                 style: const TextStyle(fontSize: 13, color: Colors.green),
               ),
               Text(
@@ -873,7 +873,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            member.name,
+                                            member.hindiName,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 18,
@@ -881,7 +881,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                             ),
                                           ),
                                           Text(
-                                            member.hindiName,
+                                            member.name,
                                             style: const TextStyle(
                                               fontSize: 16,
                                               color: Colors.green,
@@ -1159,7 +1159,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            member.name,
+                            member.hindiName,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -1167,7 +1167,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                             ),
                           ),
                           Text(
-                            member.hindiName,
+                            member.name,
                             style: const TextStyle(
                               fontSize: 13,
                               color: Colors.green,
@@ -1372,7 +1372,24 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                         'profilePhoto': uploadedPhotoUrl ?? '',
                                       });
                                   if (context.mounted) {
-                                    Navigator.of(context).pop();
+                                    // Close all open drawers/dialogs
+                                    Navigator.of(
+                                      context,
+                                    ).popUntil((route) => route.isFirst);
+                                    await _loadFamilyData();
+
+                                    // Navigate to the edited member's family tree
+                                    final editedMemberInData = _familyData
+                                        ?.firstWhere(
+                                          (m) => m.id == member.id,
+                                          orElse: () => _familyData!.first,
+                                        );
+
+                                    if (editedMemberInData != null) {
+                                      // Build navigation stack to reach the edited member
+                                      _navigateToMember(editedMemberInData);
+                                    }
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
@@ -1380,8 +1397,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                         ),
                                       ),
                                     );
-                                    // Optionally reload data
-                                    _loadFamilyData();
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
@@ -1631,6 +1646,20 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                     Navigator.of(
                                       context,
                                     ).popUntil((route) => route.isFirst);
+                                    await _loadFamilyData();
+
+                                    // Navigate to the parent tree of the added member
+                                    final parentInData = _familyData
+                                        ?.firstWhere(
+                                          (m) => m.id == parent.id,
+                                          orElse: () => _familyData!.first,
+                                        );
+
+                                    if (parentInData != null) {
+                                      // Build navigation stack to reach the parent
+                                      _navigateToMember(parentInData);
+                                    }
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
@@ -1638,7 +1667,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                         ),
                                       ),
                                     );
-                                    _loadFamilyData();
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
