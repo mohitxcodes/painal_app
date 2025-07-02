@@ -92,24 +92,6 @@ class _HomeScreenState extends State<HomeScreen>
                                   await FirebaseAuth.instance.signOut();
                                   if (mounted) Navigator.of(context).pop();
                                 },
-                                onViewRequests: () {
-                                  // TODO: Implement view requests
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('View Requests pressed'),
-                                    ), // Placeholder
-                                  );
-                                },
-                                onViewReports: () {
-                                  // TODO: Implement view reports
-                                  Navigator.of(context).pop();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('View Reports pressed'),
-                                    ), // Placeholder
-                                  );
-                                },
                               ),
                         );
                       },

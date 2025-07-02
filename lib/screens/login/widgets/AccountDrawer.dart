@@ -1,18 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:painal/screens/reports/ReportsScreen.dart';
 
 class AccountDrawer extends StatelessWidget {
   final String email;
   final VoidCallback onLogout;
-  final VoidCallback onViewRequests;
-  final VoidCallback onViewReports;
 
-  const AccountDrawer({
-    super.key,
-    required this.email,
-    required this.onLogout,
-    required this.onViewRequests,
-    required this.onViewReports,
-  });
+  const AccountDrawer({super.key, required this.email, required this.onLogout});
+
+  void _openReports(BuildContext context) {
+    Navigator.of(context).pop();
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ReportsScreen()));
+  }
+
+  void _openRequests(BuildContext context) {
+    Navigator.of(context).pop();
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Requests'),
+            content: const Text('Requests page coming soon.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+          ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +178,7 @@ class AccountDrawer extends StatelessWidget {
                                   ),
                                   icon: const Icon(Icons.list_alt, size: 20),
                                   label: const Text('View Requests'),
-                                  onPressed: onViewRequests,
+                                  onPressed: () => _openRequests(context),
                                 ),
                               ),
                               const SizedBox(width: 14),
@@ -181,7 +199,7 @@ class AccountDrawer extends StatelessWidget {
                                   ),
                                   icon: const Icon(Icons.report, size: 20),
                                   label: const Text('View Reports'),
-                                  onPressed: onViewReports,
+                                  onPressed: () => _openReports(context),
                                 ),
                               ),
                             ],
