@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,6 +12,46 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _loading = false;
+
+  Future<void> _login() async {
+    setState(() => _loading = true);
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+        Navigator.of(context).pop();
+      }
+    } on FirebaseAuthException catch (e) {
+      String msg = 'Login failed.';
+      if (e.code == 'user-not-found') {
+        msg = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        msg = 'Wrong password provided.';
+      } else if (e.message != null) {
+        msg = e.message!;
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), backgroundColor: Colors.red),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         obscureText: true,
                       ),
-                      const SizedBox(height: 10),
                       const SizedBox(height: 18),
                       SizedBox(
                         width: double.infinity,
@@ -126,17 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             elevation: 2,
                             shadowColor: Colors.green[200],
                           ),
-                          onPressed:
-                              _loading
-                                  ? null
-                                  : () {
-                                    setState(() => _loading = true);
-                                    // For now, just print credentials
-                                    print(
-                                      'Email: \\${_emailController.text}, Password: \\${_passwordController.text}',
-                                    );
-                                    setState(() => _loading = false);
-                                  },
+                          onPressed: _loading ? null : _login,
                           child:
                               _loading
                                   ? const SizedBox(
