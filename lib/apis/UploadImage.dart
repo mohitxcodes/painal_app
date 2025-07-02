@@ -28,7 +28,7 @@ Future<String?> pickAndUploadImage() async {
       print('-----------Upload successful: ${jsonResponse['secure_url']}');
       return jsonResponse['secure_url'] as String?;
     } else {
-      print('----------Upload failed: ${response}');
+      print('----------Upload failed: $response');
       return null;
     }
   } else {

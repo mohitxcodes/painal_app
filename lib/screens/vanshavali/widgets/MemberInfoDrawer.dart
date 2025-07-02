@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/models/FamilyMember.dart';
-import 'package:painal/screens/vanshavali/widgets/member_rect_card.dart';
+import 'package:painal/screens/vanshavali/widgets/DrawerFamilyCard.dart';
+import 'package:provider/provider.dart';
 
 class MemberDetailsModal extends StatelessWidget {
   final FamilyMember member;
@@ -11,9 +13,10 @@ class MemberDetailsModal extends StatelessWidget {
   final VoidCallback onAdd;
   final VoidCallback onDelete;
   final void Function(FamilyMember) onShowDetails;
+  final ScrollController? scrollController;
 
   const MemberDetailsModal({
-    Key? key,
+    super.key,
     required this.member,
     required this.parent,
     required this.children,
@@ -22,14 +25,18 @@ class MemberDetailsModal extends StatelessWidget {
     required this.onAdd,
     required this.onDelete,
     required this.onShowDetails,
-  }) : super(key: key);
+    this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final userAuth = Provider.of<AuthProviderUser>(context);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final double maxWidth = constraints.maxWidth;
         return SingleChildScrollView(
+          controller: scrollController,
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +99,7 @@ class MemberDetailsModal extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    'जन्म वर्ष: \\${member.birthYear}',
+                                    'जन्म fवर्ष: ${member.birthYear}',
                                     style: const TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -132,71 +139,77 @@ class MemberDetailsModal extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.green[600],
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+              if (userAuth.isAdmin)
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.green[600],
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 12,
-                        ),
-                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                        icon: const Icon(Icons.edit, size: 20),
+                        label: const Text('Edit'),
+                        onPressed: onEdit,
                       ),
-                      icon: const Icon(Icons.edit, size: 20),
-                      label: const Text('Edit'),
-                      onPressed: onEdit,
                     ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.green[400],
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.green[400],
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 12,
-                        ),
-                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                        icon: const Icon(Icons.add_circle_outline, size: 22),
+                        label: const Text('Add'),
+                        onPressed: onAdd,
                       ),
-                      icon: const Icon(Icons.add_circle_outline, size: 22),
-                      label: const Text('Add'),
-                      onPressed: onAdd,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.red[100],
-                    foregroundColor: Colors.red[800],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 12,
-                    ),
-                    textStyle: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  icon: const Icon(Icons.delete_outline, size: 22),
-                  label: const Text('Delete'),
-                  onPressed: onDelete,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
+              if (userAuth.isAdmin)
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.red[100],
+                      foregroundColor: Colors.red[800],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 12,
+                      ),
+                      textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    icon: const Icon(Icons.delete_outline, size: 22),
+                    label: const Text('Delete'),
+                    onPressed: onDelete,
+                  ),
+                ),
+              if (userAuth.isAdmin) const SizedBox(height: 20),
               if (parent != null)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

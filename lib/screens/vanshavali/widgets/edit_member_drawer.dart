@@ -7,8 +7,7 @@ class EditMemberDrawer extends StatefulWidget {
   final FamilyMember member;
   final VoidCallback? onSaved;
 
-  const EditMemberDrawer({Key? key, required this.member, this.onSaved})
-    : super(key: key);
+  const EditMemberDrawer({super.key, required this.member, this.onSaved});
 
   @override
   State<EditMemberDrawer> createState() => _EditMemberDrawerState();

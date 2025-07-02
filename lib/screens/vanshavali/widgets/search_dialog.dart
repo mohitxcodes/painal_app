@@ -7,10 +7,10 @@ class SearchDialog extends StatefulWidget {
   final void Function(FamilyMember) onMemberSelected;
 
   const SearchDialog({
-    Key? key,
+    super.key,
     required this.familyData,
     required this.onMemberSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<SearchDialog> createState() => _SearchDialogState();
@@ -241,7 +241,7 @@ class _SearchDialogState extends State<SearchDialog> {
                                       subtitle:
                                           parent != null && parent.id != -1
                                               ? Text(
-                                                'Parent: \\${parent.name}',
+                                                'Parent: ${parent.name}',
                                                 style: const TextStyle(
                                                   fontSize: 12,
                                                   color: Colors.black54,

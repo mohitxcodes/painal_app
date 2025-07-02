@@ -9,11 +9,11 @@ class AddMemberDrawer extends StatefulWidget {
   final List<FamilyMember> familyData;
 
   const AddMemberDrawer({
-    Key? key,
+    super.key,
     required this.parent,
     required this.familyData,
     this.onSaved,
-  }) : super(key: key);
+  });
 
   @override
   State<AddMemberDrawer> createState() => _AddMemberDrawerState();

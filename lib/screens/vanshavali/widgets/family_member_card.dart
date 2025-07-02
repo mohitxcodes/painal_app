@@ -5,8 +5,7 @@ class FamilyMemberCard extends StatelessWidget {
   final FamilyMember member;
   final VoidCallback? onTap;
 
-  const FamilyMemberCard({Key? key, required this.member, this.onTap})
-    : super(key: key);
+  const FamilyMemberCard({super.key, required this.member, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +60,7 @@ class FamilyMemberCard extends StatelessWidget {
                 style: const TextStyle(fontSize: 13, color: Colors.green),
               ),
               Text(
-                'Born: \\${member.birthYear}',
+                'Born: ${member.birthYear}',
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
               const SizedBox(height: 18), // Space for navigation button

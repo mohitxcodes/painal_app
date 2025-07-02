@@ -5,8 +5,7 @@ class MemberRectCard extends StatelessWidget {
   final FamilyMember member;
   final VoidCallback? onTap;
 
-  const MemberRectCard({Key? key, required this.member, this.onTap})
-    : super(key: key);
+  const MemberRectCard({super.key, required this.member, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +83,7 @@ class MemberRectCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              'DOB: \\${member.birthYear}',
+                              'DOB : ${member.birthYear}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: Colors.green,

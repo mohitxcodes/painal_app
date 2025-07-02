@@ -5,7 +5,6 @@ import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/firebase_options.dart';
 import 'package:painal/screens/HomeScreen.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

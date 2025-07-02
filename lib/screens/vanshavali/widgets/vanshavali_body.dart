@@ -10,13 +10,13 @@ class VanshavaliBody extends StatelessWidget {
   final void Function(FamilyMember) onCardTap;
 
   const VanshavaliBody({
-    Key? key,
+    super.key,
     required this.currentMember,
     required this.navigationStack,
     required this.onNavigateBack,
     required this.onNavigateToChild,
     required this.onCardTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
