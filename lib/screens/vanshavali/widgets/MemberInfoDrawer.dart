@@ -4,7 +4,7 @@ import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/widgets/DrawerFamilyCard.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/screens/vanshavali/widgets/member_action_menu.dart';
-import 'package:painal/screens/vanshavali/widgets/report_error_modal.dart';
+import 'package:painal/screens/vanshavali/widgets/report_error_drawer.dart';
 
 class MemberDetailsModal extends StatelessWidget {
   final FamilyMember member;
@@ -128,10 +128,18 @@ class MemberDetailsModal extends StatelessWidget {
                                         onAddChild: onAdd,
                                         onReportError: () async {
                                           Navigator.of(context).pop();
-                                          await showDialog(
+                                          await showModalBottomSheet(
                                             context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                    top: Radius.circular(20),
+                                                  ),
+                                            ),
                                             builder:
-                                                (context) => ReportErrorModal(
+                                                (context) => ReportErrorDrawer(
                                                   memberName: member.hindiName,
                                                   memberNameEnglish:
                                                       member.name,
