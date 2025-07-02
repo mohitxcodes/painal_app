@@ -1,11 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
+import 'package:provider/provider.dart';
 import 'overview/OverviewScreen.dart';
 import 'book/BookScreen.dart';
 import 'gallery/GalleryScreen.dart';
 import 'package:painal/screens/LoginScreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:painal/apis/CheckAdmin.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,17 +19,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool isAdmin = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    checkIfAdmin().then((value) {
-      setState(() {
-        isAdmin = value;
-      });
-    });
   }
 
   @override
@@ -38,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProviderUser>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -63,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen>
           Padding(
             padding: const EdgeInsets.only(right: 10.0, top: 6.0, bottom: 6.0),
             child:
-                isAdmin
+                authProvider.isAdmin
                     ? OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.white, width: 1.2),

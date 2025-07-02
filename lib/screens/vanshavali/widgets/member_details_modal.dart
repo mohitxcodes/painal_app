@@ -1,0 +1,318 @@
+import 'package:flutter/material.dart';
+import 'package:painal/models/FamilyMember.dart';
+import 'package:painal/screens/vanshavali/widgets/member_rect_card.dart';
+
+class MemberDetailsModal extends StatelessWidget {
+  final FamilyMember member;
+  final FamilyMember? parent;
+  final List<FamilyMember> children;
+  final List<FamilyMember> siblings;
+  final VoidCallback onEdit;
+  final VoidCallback onAdd;
+  final VoidCallback onDelete;
+  final void Function(FamilyMember) onShowDetails;
+
+  const MemberDetailsModal({
+    Key? key,
+    required this.member,
+    required this.parent,
+    required this.children,
+    required this.siblings,
+    required this.onEdit,
+    required this.onAdd,
+    required this.onDelete,
+    required this.onShowDetails,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxWidth = constraints.maxWidth;
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Colors.green[100],
+                    backgroundImage:
+                        member.profilePhoto.isNotEmpty
+                            ? NetworkImage(member.profilePhoto)
+                            : null,
+                    child:
+                        member.profilePhoto.isEmpty
+                            ? const Icon(
+                              Icons.person,
+                              color: Colors.green,
+                              size: 28,
+                            )
+                            : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    member.hindiName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Text(
+                                    member.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  Text(
+                                    'जन्म वर्ष: \\${member.birthYear}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed:
+                                  () {}, // TODO: Implement report functionality
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red[700],
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 0,
+                                ),
+                                minimumSize: const Size(0, 0),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              icon: const Icon(
+                                Icons.report_gmailerrorred_outlined,
+                                size: 16,
+                                color: Colors.red,
+                              ),
+                              label: const Text('Report'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green[600],
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 12,
+                        ),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      icon: const Icon(Icons.edit, size: 20),
+                      label: const Text('Edit'),
+                      onPressed: onEdit,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.green[400],
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 12,
+                        ),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      icon: const Icon(Icons.add_circle_outline, size: 22),
+                      label: const Text('Add'),
+                      onPressed: onAdd,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.red[100],
+                    foregroundColor: Colors.red[800],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 12,
+                    ),
+                    textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  icon: const Icon(Icons.delete_outline, size: 22),
+                  label: const Text('Delete'),
+                  onPressed: onDelete,
+                ),
+              ),
+              const SizedBox(height: 20),
+              if (parent != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Father',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '(पिता)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.green,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    MemberRectCard(
+                      member: parent!,
+                      onTap: () => onShowDetails(parent!),
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+                ),
+              if (children.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Children',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '(बच्चे)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.green,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children:
+                          children
+                              .map(
+                                (c) => MemberRectCard(
+                                  member: c,
+                                  onTap: () => onShowDetails(c),
+                                ),
+                              )
+                              .toList(),
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+                ),
+              if (siblings.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          'Siblings',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '(भाई-बहन)',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.green,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children:
+                          siblings
+                              .map(
+                                (s) => MemberRectCard(
+                                  member: s,
+                                  onTap: () => onShowDetails(s),
+                                ),
+                              )
+                              .toList(),
+                    ),
+                    const SizedBox(height: 18),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:painal/apis/CheckAdmin.dart';
+import 'package:painal/apis/AuthProviderUser.dart';
 // import 'package:painal/data/FamilyData.dart';
 import 'package:painal/data/FamilyData.dart';
 import 'dart:ui';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/apis/UploadImage.dart';
+import 'package:provider/provider.dart';
 
 Future<List<FamilyMember>> fetchFamilyMembers() async {
   final snapshot =
@@ -38,7 +39,6 @@ class VanshavaliScreen extends StatefulWidget {
 
 class _VanshavaliScreenState extends State<VanshavaliScreen> {
   List<FamilyMember>? _familyData;
-  bool isAdmin = false;
   FamilyMember? _currentMember;
   final List<FamilyMember> _navigationStack = [];
   bool _loading = true;
@@ -49,11 +49,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     super.initState();
     _loadFamilyData();
     // uploadInitialData();
-    checkIfAdmin().then((value) {
-      setState(() {
-        isAdmin = value;
-      });
-    });
   }
 
   Future<void> _loadFamilyData() async {
@@ -454,6 +449,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authUser = Provider.of<AuthProviderUser>(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -937,61 +933,60 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                         ],
                       ),
                       const SizedBox(height: 18),
-                      if (isAdmin)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: Colors.green[600],
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 12,
-                                  ),
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.green[600],
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                icon: const Icon(Icons.edit, size: 20),
-                                label: const Text('Edit'),
-                                onPressed: () {
-                                  _showEditMemberDrawer(member);
-                                },
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 12,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
+                              icon: const Icon(Icons.edit, size: 20),
+                              label: const Text('Edit'),
+                              onPressed: () {
+                                _showEditMemberDrawer(member);
+                              },
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: Colors.green[400],
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 12,
-                                  ),
-                                  textStyle: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.green[400],
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                icon: const Icon(
-                                  Icons.add_circle_outline,
-                                  size: 22,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 12,
                                 ),
-                                label: const Text('Add'),
-                                onPressed: () {
-                                  _showAddMemberDrawer(member);
-                                },
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                size: 22,
+                              ),
+                              label: const Text('Add'),
+                              onPressed: () {
+                                _showAddMemberDrawer(member);
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 14),
                       SizedBox(
                         width: double.infinity,
