@@ -11,15 +11,23 @@ class BookScreen extends StatefulWidget {
 }
 
 class _BookScreenState extends State<BookScreen> {
-  final int totalPages = 5;
+  // Replace with your own image URLs if desired
+  final List<String> pageImageUrls = [
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-2.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-3.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-4.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-5.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-6.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-7.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-8.jpg",
+    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-9.jpg",
+  ];
+
+  final int totalPages = 9;
   int currentPage = 0;
   final PageController _pageController = PageController();
   bool isFullscreen = false;
-
-  // Replace with your own image URLs if desired
-  final List<String> pageImageUrls = [
-    'https://res.cloudinary.com/mohitxcodes/image/upload/v1750994812/lhx1jyi5pau2jxrd3kbx.jpg',
-  ];
 
   void _showSearchDialog() async {
     final controller = TextEditingController();
