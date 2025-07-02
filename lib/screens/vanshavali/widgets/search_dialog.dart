@@ -26,14 +26,16 @@ class _SearchDialogState extends State<SearchDialog> {
       if (query.isEmpty) {
         results = [];
       } else {
+        final isNumeric = int.tryParse(query) != null;
         results =
-            widget.familyData
-                .where(
-                  (m) =>
-                      m.name.toLowerCase().contains(query.toLowerCase()) ||
-                      m.hindiName.contains(query),
-                )
-                .toList();
+            widget.familyData.where((m) {
+              final matchesName = m.name.toLowerCase().contains(
+                query.toLowerCase(),
+              );
+              final matchesHindi = m.hindiName.contains(query);
+              final matchesId = isNumeric && m.id.toString().contains(query);
+              return matchesName || matchesHindi || matchesId;
+            }).toList();
       }
     });
   }
