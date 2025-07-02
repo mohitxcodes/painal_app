@@ -6,7 +6,8 @@ import 'package:provider/provider.dart';
 import 'overview/OverviewScreen.dart';
 import 'book/BookScreen.dart';
 import 'gallery/GalleryScreen.dart';
-import 'package:painal/screens/LoginScreen.dart';
+import 'package:painal/screens/login/LoginScreen.dart';
+import 'package:painal/screens/login/widgets/AccountDrawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -81,29 +82,34 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                       onPressed: () {
-                        // Show My Account dialog or page
                         showDialog(
                           context: context,
+                          barrierColor: Colors.black.withOpacity(0.18),
                           builder:
-                              (context) => AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                title: const Text('My Account'),
-                                actions: [
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.of(context).pop(),
-                                    child: const Text('Close'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      await FirebaseAuth.instance.signOut();
-                                      if (mounted) Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Logout'),
-                                  ),
-                                ],
+                              (context) => AccountDrawer(
+                                email: authProvider.user?.email ?? '',
+                                onLogout: () async {
+                                  await FirebaseAuth.instance.signOut();
+                                  if (mounted) Navigator.of(context).pop();
+                                },
+                                onViewRequests: () {
+                                  // TODO: Implement view requests
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('View Requests pressed'),
+                                    ), // Placeholder
+                                  );
+                                },
+                                onViewReports: () {
+                                  // TODO: Implement view reports
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('View Reports pressed'),
+                                    ), // Placeholder
+                                  );
+                                },
                               ),
                         );
                       },
