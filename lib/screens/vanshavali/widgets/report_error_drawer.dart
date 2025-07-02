@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ReportErrorDrawer extends StatefulWidget {
+  final int memberId;
   final String memberName;
   final String? memberNameEnglish;
   final String? memberDob;
-  final void Function({String? correctName, String? correctDob}) onSubmit;
+  final void Function()? onSubmitted; // Optional callback after submit
 
   const ReportErrorDrawer({
     super.key,
+    required this.memberId,
     required this.memberName,
     this.memberNameEnglish,
     this.memberDob,
-    required this.onSubmit,
+    this.onSubmitted,
   });
 
   @override
@@ -23,6 +26,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
   bool wrongDob = false;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
+  bool _submitting = false;
 
   @override
   void initState() {
@@ -48,6 +52,38 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
     if (wrongName && nameController.text.trim().isEmpty) return false;
     if (wrongDob && dobController.text.trim().isEmpty) return false;
     return wrongName || wrongDob;
+  }
+
+  Future<void> _submitReport() async {
+    if (!canSubmit || _submitting) return;
+    setState(() => _submitting = true);
+    try {
+      await FirebaseFirestore.instance.collection('reports').add({
+        'memberId': widget.memberId,
+        'membername': widget.memberName,
+        'correctName': wrongName ? nameController.text.trim() : null,
+        'correctDob': wrongDob ? dobController.text.trim() : null,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Report submitted! Thank you.')),
+        );
+        widget.onSubmitted?.call();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to submit report: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
@@ -294,13 +330,16 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                 ),
                                 icon: const Icon(Icons.close, size: 18),
                                 label: const Text('Cancel'),
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed:
+                                    _submitting
+                                        ? null
+                                        : () => Navigator.of(context).pop(),
                               ),
                               const SizedBox(width: 12),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
-                                      canSubmit
+                                      canSubmit && !_submitting
                                           ? Colors.green[700]
                                           : Colors.green[200],
                                   foregroundColor: Colors.white,
@@ -314,25 +353,23 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                   textStyle: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  elevation: canSubmit ? 2 : 0,
+                                  elevation: canSubmit && !_submitting ? 2 : 0,
                                 ),
-                                icon: const Icon(Icons.send, size: 18),
+                                icon:
+                                    _submitting
+                                        ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.2,
+                                          ),
+                                        )
+                                        : const Icon(Icons.send, size: 18),
                                 label: const Text('Submit'),
                                 onPressed:
-                                    canSubmit
-                                        ? () {
-                                          widget.onSubmit(
-                                            correctName:
-                                                wrongName
-                                                    ? nameController.text.trim()
-                                                    : null,
-                                            correctDob:
-                                                wrongDob
-                                                    ? dobController.text.trim()
-                                                    : null,
-                                          );
-                                          Navigator.of(context).pop();
-                                        }
+                                    canSubmit && !_submitting
+                                        ? _submitReport
                                         : null,
                               ),
                             ],

@@ -140,34 +140,11 @@ class MemberDetailsModal extends StatelessWidget {
                                             ),
                                             builder:
                                                 (context) => ReportErrorDrawer(
+                                                  memberId: member.id,
                                                   memberName: member.hindiName,
                                                   memberNameEnglish:
                                                       member.name,
-                                                  onSubmit: ({
-                                                    String? correctName,
-                                                    String? correctDob,
-                                                  }) {
-                                                    String msg =
-                                                        'Report submitted:';
-                                                    if (correctName != null &&
-                                                        correctName
-                                                            .isNotEmpty) {
-                                                      msg +=
-                                                          '\nCorrect Name: $correctName';
-                                                    }
-                                                    if (correctDob != null &&
-                                                        correctDob.isNotEmpty) {
-                                                      msg +=
-                                                          '\nCorrect DOB: $correctDob';
-                                                    }
-                                                    ScaffoldMessenger.of(
-                                                      context,
-                                                    ).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(msg),
-                                                      ),
-                                                    );
-                                                  },
+                                                  memberDob: member.birthYear,
                                                 ),
                                           );
                                         },
