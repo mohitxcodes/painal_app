@@ -121,8 +121,8 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     )
                     : OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.white, width: 1.2),
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(color: Colors.white, width: 1.2),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,

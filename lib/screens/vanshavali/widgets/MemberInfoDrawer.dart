@@ -3,6 +3,8 @@ import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/widgets/DrawerFamilyCard.dart';
 import 'package:provider/provider.dart';
+import 'package:painal/screens/vanshavali/widgets/member_action_menu.dart';
+import 'package:painal/screens/vanshavali/widgets/report_error_modal.dart';
 
 class MemberDetailsModal extends StatelessWidget {
   final FamilyMember member;
@@ -108,28 +110,63 @@ class MemberDetailsModal extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            TextButton.icon(
-                              onPressed:
-                                  () {}, // TODO: Implement report functionality
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.red[700],
-                                textStyle: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 0,
-                                ),
-                                minimumSize: const Size(0, 0),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
+                            IconButton(
                               icon: const Icon(
-                                Icons.report_gmailerrorred_outlined,
-                                size: 16,
-                                color: Colors.red,
+                                Icons.more_vert,
+                                color: Colors.black54,
                               ),
-                              label: const Text('Report'),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                  ),
+                                  builder:
+                                      (context) => MemberActionMenu(
+                                        onAddChild: onAdd,
+                                        onReportError: () async {
+                                          Navigator.of(context).pop();
+                                          await showDialog(
+                                            context: context,
+                                            builder:
+                                                (context) => ReportErrorModal(
+                                                  memberName: member.hindiName,
+                                                  memberNameEnglish:
+                                                      member.name,
+                                                  onSubmit: ({
+                                                    String? correctName,
+                                                    String? correctDob,
+                                                  }) {
+                                                    String msg =
+                                                        'Report submitted:';
+                                                    if (correctName != null &&
+                                                        correctName
+                                                            .isNotEmpty) {
+                                                      msg +=
+                                                          '\nCorrect Name: $correctName';
+                                                    }
+                                                    if (correctDob != null &&
+                                                        correctDob.isNotEmpty) {
+                                                      msg +=
+                                                          '\nCorrect DOB: $correctDob';
+                                                    }
+                                                    ScaffoldMessenger.of(
+                                                      context,
+                                                    ).showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(msg),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                          );
+                                        },
+                                        parentName: member.hindiName,
+                                      ),
+                                );
+                              },
                             ),
                           ],
                         ),
