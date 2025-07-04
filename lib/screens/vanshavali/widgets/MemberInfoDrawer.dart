@@ -190,7 +190,7 @@ class MemberDetailsModal extends StatelessWidget {
                     Expanded(
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
-                          backgroundColor: Colors.green[400],
+                          backgroundColor: Colors.green[600],
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
