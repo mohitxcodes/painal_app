@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:painal/screens/reports/ReportsScreen.dart';
+import 'package:painal/screens/requests/RequestsScreen.dart';
 
 class AccountDrawer extends StatelessWidget {
   final String email;
@@ -16,20 +17,9 @@ class AccountDrawer extends StatelessWidget {
 
   void _openRequests(BuildContext context) {
     Navigator.of(context).pop();
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Requests'),
-            content: const Text('Requests page coming soon.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-          ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const RequestsScreen()));
   }
 
   @override

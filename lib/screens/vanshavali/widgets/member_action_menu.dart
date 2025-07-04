@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:painal/screens/vanshavali/widgets/add_child_request_drawer.dart';
 
 class MemberActionMenu extends StatelessWidget {
   final VoidCallback onAddChild;
   final VoidCallback onReportError;
   final String parentName;
+  final int parentId;
 
   const MemberActionMenu({
     super.key,
     required this.onAddChild,
     required this.onReportError,
     required this.parentName,
+    required this.parentId,
   });
 
   @override
@@ -42,9 +45,18 @@ class MemberActionMenu extends StatelessWidget {
                   'Request to add a child for $parentName. You will be asked to provide details for the new child.',
                   style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
-                onTap: () {
+                onTap: () async {
                   Navigator.of(context).pop();
-                  onAddChild();
+                  await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder:
+                        (context) => AddChildRequestDrawer(
+                          parentId: parentId,
+                          parentName: parentName,
+                        ),
+                  );
                 },
               ),
               const Divider(height: 0, thickness: 1, indent: 12, endIndent: 12),

@@ -149,6 +149,7 @@ class MemberDetailsModal extends StatelessWidget {
                                           );
                                         },
                                         parentName: member.hindiName,
+                                        parentId: member.id,
                                       ),
                                 );
                               },
