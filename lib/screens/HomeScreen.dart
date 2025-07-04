@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen>
     final authProvider = Provider.of<AuthProviderUser>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

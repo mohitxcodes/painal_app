@@ -75,25 +75,24 @@ class _CarouselWidgetState extends State<CarouselWidget> {
             },
             itemCount: _carouselItems.length,
             itemBuilder: (context, index) {
-              return Container(
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOut,
                 margin: const EdgeInsets.only(left: 12, right: 12, top: 8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.green[700]!,
-                      Colors.green[500]!,
-                      Colors.green[300]!,
-                    ],
-                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.10),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 child: Stack(
                   children: [
-                    // Actual image as background
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(24),
                       child: Image.asset(
                         _carouselItems[index]['image']!,
                         fit: BoxFit.cover,
@@ -101,47 +100,91 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                         height: double.infinity,
                       ),
                     ),
-                    // Gradient overlay for text readability
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Colors.black.withOpacity(0.8),
+                    // Glassmorphism overlay for text
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        margin: const EdgeInsets.all(0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(24),
+                            bottomRight: Radius.circular(24),
+                          ),
+                          color: Colors.white.withOpacity(0.18),
+                          backgroundBlendMode: BlendMode.overlay,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 500),
+                              child: Text(
+                                _carouselItems[index]['title']!,
+                                key: ValueKey(_carouselItems[index]['title']),
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 2,
+                                      color: Colors.white,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 500),
+                              child: Text(
+                                _carouselItems[index]['titleHindi']!,
+                                key: ValueKey(
+                                  _carouselItems[index]['titleHindi'],
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 2,
+                                      color: Colors.white,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    // Text overlay at bottom left with bilingual content
+                    // Swipe hint
                     Positioned(
-                      bottom: 20,
                       left: 20,
-                      right: 20,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // English Title
+                      bottom: 12,
+                      child: Row(
+                        children: const [
+                          Icon(
+                            Icons.chevron_left,
+                            color: Colors.black38,
+                            size: 22,
+                          ),
                           Text(
-                            _carouselItems[index]['title']!,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                            'Swipe',
+                            style: TextStyle(
+                              color: Colors.black38,
+                              fontSize: 13,
                             ),
                           ),
-                          // Hindi Title
-                          Text(
-                            _carouselItems[index]['titleHindi']!,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
                         ],
                       ),
                     ),
@@ -157,15 +200,14 @@ class _CarouselWidgetState extends State<CarouselWidget> {
             child: Row(
               children: List.generate(
                 _carouselItems.length,
-                (index) => Container(
+                (index) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   width: _currentPage == index ? 20 : 8,
                   height: 8,
                   decoration: BoxDecoration(
                     color:
-                        _currentPage == index
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.5),
+                        _currentPage == index ? Colors.green : Colors.grey[300],
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
