@@ -5,6 +5,7 @@ import 'package:painal/screens/vanshavali/widgets/DrawerFamilyCard.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/screens/vanshavali/widgets/member_action_menu.dart';
 import 'package:painal/screens/vanshavali/widgets/report_error_drawer.dart';
+import 'package:photo_view/photo_view.dart';
 
 class MemberDetailsModal extends StatelessWidget {
   final FamilyMember member;
@@ -29,6 +30,58 @@ class MemberDetailsModal extends StatelessWidget {
     required this.onShowDetails,
     this.scrollController,
   });
+
+  void _showProfileImage(BuildContext context) {
+    if (member.profilePhoto.isEmpty) return;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.9),
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: EdgeInsets.zero,
+            child: Stack(
+              children: [
+                // Full screen photo view
+                PhotoView(
+                  imageProvider: NetworkImage(member.profilePhoto),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.covered * 3.0,
+                  heroAttributes: PhotoViewHeroAttributes(
+                    tag: 'profile_${member.id}',
+                  ),
+                  loadingBuilder:
+                      (context, event) => const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      ),
+                ),
+                // Close button
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 20,
+                  right: 20,
+                  child: SafeArea(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,21 +110,27 @@ class MemberDetailsModal extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.green[100],
-                    backgroundImage:
-                        member.profilePhoto.isNotEmpty
-                            ? NetworkImage(member.profilePhoto)
-                            : null,
-                    child:
-                        member.profilePhoto.isEmpty
-                            ? const Icon(
-                              Icons.person,
-                              color: Colors.green,
-                              size: 28,
-                            )
-                            : null,
+                  GestureDetector(
+                    onTap: () => _showProfileImage(context),
+                    child: Hero(
+                      tag: 'profile_${member.id}',
+                      child: CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.green[100],
+                        backgroundImage:
+                            member.profilePhoto.isNotEmpty
+                                ? NetworkImage(member.profilePhoto)
+                                : null,
+                        child:
+                            member.profilePhoto.isEmpty
+                                ? const Icon(
+                                  Icons.person,
+                                  color: Colors.green,
+                                  size: 28,
+                                )
+                                : null,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
