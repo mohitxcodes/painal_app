@@ -6,10 +6,12 @@ import 'package:hive/hive.dart';
 class DeleteConfirmationDialog extends StatefulWidget {
   final FamilyMember member;
   final VoidCallback? onDeleted;
+  final String collectionName;
 
   const DeleteConfirmationDialog({
     super.key,
     required this.member,
+    required this.collectionName,
     this.onDeleted,
   });
 
@@ -25,14 +27,14 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
     setState(() => _loading = true);
     try {
       await FirebaseFirestore.instance
-          .collection('familyMembers')
+          .collection(widget.collectionName)
           .doc(widget.member.id.toString())
           .delete();
       // Remove from parent's children list if parent exists
       if (widget.member.parentId != null) {
         final parentDoc =
             await FirebaseFirestore.instance
-                .collection('familyMembers')
+                .collection(widget.collectionName)
                 .doc(widget.member.parentId.toString())
                 .get();
         if (parentDoc.exists) {
@@ -42,7 +44,7 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
           );
           children.remove(widget.member.id);
           await FirebaseFirestore.instance
-              .collection('familyMembers')
+              .collection(widget.collectionName)
               .doc(widget.member.parentId.toString())
               .update({
                 'children': children,
@@ -94,6 +96,7 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    print("----------------------" + widget.collectionName);
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       title: Row(

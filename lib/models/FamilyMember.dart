@@ -44,14 +44,28 @@ class FamilyMember {
   });
 
   factory FamilyMember.fromMap(Map<String, dynamic> data) {
+    int? parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value);
+      return null;
+    }
+
     return FamilyMember(
-      id: data['id'],
-      name: data['name'],
-      hindiName: data['hindiName'],
-      birthYear: data['birthYear'],
-      children: List<int>.from(data['children']),
-      parentId: data['parentId'],
-      profilePhoto: data['profilePhoto'],
+      id: parseInt(data['id']) ?? 0,
+      name: data['name'] ?? '',
+      hindiName: data['hindiName'] ?? '',
+      birthYear: data['birthYear'] ?? '',
+      children:
+          (data['children'] is List)
+              ? List<int>.from(
+                (data['children'] as List)
+                    .where((e) => e != null)
+                    .map((e) => parseInt(e) ?? 0),
+              )
+              : <int>[],
+      parentId: parseInt(data['parentId']),
+      profilePhoto: data['profilePhoto'] ?? '',
       lastUpdated:
           data['lastUpdated'] != null
               ? (data['lastUpdated'] is DateTime

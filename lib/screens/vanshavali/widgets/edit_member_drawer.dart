@@ -7,8 +7,14 @@ import 'package:hive/hive.dart';
 class EditMemberDrawer extends StatefulWidget {
   final FamilyMember member;
   final VoidCallback? onSaved;
+  final String collectionName;
 
-  const EditMemberDrawer({super.key, required this.member, this.onSaved});
+  const EditMemberDrawer({
+    super.key,
+    required this.member,
+    required this.collectionName,
+    this.onSaved,
+  });
 
   @override
   State<EditMemberDrawer> createState() => _EditMemberDrawerState();
@@ -42,7 +48,7 @@ class _EditMemberDrawerState extends State<EditMemberDrawer> {
     setState(() => loading = true);
     try {
       await FirebaseFirestore.instance
-          .collection('familyMembers')
+          .collection(widget.collectionName)
           .doc(widget.member.id.toString())
           .update({
             'name': nameController.text.trim(),

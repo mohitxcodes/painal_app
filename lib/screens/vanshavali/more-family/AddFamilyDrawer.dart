@@ -45,8 +45,9 @@ class _AddFamilyDrawerState extends State<AddFamilyDrawer> {
     setState(() => loading = true);
     try {
       final collectionName = name.replaceAll(' ', '') + 'Family';
-      // Add head member to the family collection
-      await FirebaseFirestore.instance.collection(collectionName).add({
+      // Add head member to the family collection with id 1
+      await FirebaseFirestore.instance.collection(collectionName).doc('1').set({
+        'id': 1,
         'name': name,
         'hindiName': hindiName,
         'birthYear': dob,

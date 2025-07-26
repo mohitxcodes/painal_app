@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/more-family/AddFamilyDrawer.dart';
+import 'package:painal/screens/vanshavali/more-family/FamilyTreeScreen.dart';
 
 class MoreFamilyScreen extends StatefulWidget {
   const MoreFamilyScreen({super.key});
@@ -55,7 +56,7 @@ class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
           (context) => AddFamilyDrawer(
             onSaved: () {
               Navigator.of(context).pop();
-              setState(() {}); // Refresh families
+              setState(() {}); // Refetch families after drawer closes
             },
           ),
     );
@@ -185,7 +186,14 @@ class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
                         ),
                       ),
                       onPressed: () {
-                        // View family logic here
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => FamilyTreeScreen(
+                                  collectionName: family['collection'],
+                                ),
+                          ),
+                        );
                       },
                       child: const Text(
                         'View',

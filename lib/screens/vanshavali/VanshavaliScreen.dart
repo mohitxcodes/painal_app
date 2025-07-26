@@ -279,6 +279,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       builder: (context) {
         return EditMemberDrawer(
           member: member,
+          collectionName: 'familyMembers',
           onSaved: () async {
             await _loadFamilyData();
             final editedMemberInData = _familyData?.firstWhere(
@@ -305,6 +306,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         return AddMemberDrawer(
           parent: parent,
           familyData: _familyData!,
+          collectionName: 'familyMembers',
           onSaved: () async {
             await _loadFamilyData();
             final parentInData = _familyData?.firstWhere(
@@ -327,6 +329,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       builder: (context) {
         return DeleteConfirmationDialog(
           member: member,
+          collectionName: 'familyMembers',
           onDeleted: () async {
             await _loadFamilyData();
             // After deletion, go to root if current member was deleted

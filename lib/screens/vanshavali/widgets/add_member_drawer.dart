@@ -8,11 +8,13 @@ class AddMemberDrawer extends StatefulWidget {
   final FamilyMember parent;
   final VoidCallback? onSaved;
   final List<FamilyMember> familyData;
+  final String collectionName;
 
   const AddMemberDrawer({
     super.key,
     required this.parent,
     required this.familyData,
+    required this.collectionName,
     this.onSaved,
   });
 
@@ -62,7 +64,7 @@ class _AddMemberDrawerState extends State<AddMemberDrawer> {
       }
       final newId = maxId + 1;
       await FirebaseFirestore.instance
-          .collection('familyMembers')
+          .collection(widget.collectionName)
           .doc(newId.toString())
           .set({
             'id': newId,
@@ -78,7 +80,7 @@ class _AddMemberDrawerState extends State<AddMemberDrawer> {
       final updatedChildren = List<int>.from(widget.parent.children)
         ..add(newId);
       await FirebaseFirestore.instance
-          .collection('familyMembers')
+          .collection(widget.collectionName)
           .doc(widget.parent.id.toString())
           .update({
             'children': updatedChildren,
