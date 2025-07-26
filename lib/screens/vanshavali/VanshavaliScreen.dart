@@ -353,23 +353,9 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   @override
   Widget build(BuildContext context) {
     final userAuth = Provider.of<AuthProviderUser>(context);
-    // Show modal dialog for non-admins if update is available
-    if (_showUpdateBanner && !userAuth.isAdmin) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (ModalRoute.of(context)?.isCurrent ?? true) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder:
-                (ctx) => _UpdateDialog(
-                  onFetch: () async {
-                    await _refreshFromFirebase();
-                  },
-                ),
-          );
-        }
-      });
-    }
+    bool showBanner = _showUpdateBanner && !userAuth.isAdmin;
+    bool _fetchingBanner = false;
+    // Remove modal dialog logic
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -391,6 +377,81 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
               physics: const NeverScrollableScrollPhysics(),
               child: Column(
                 children: [
+                  if (showBanner)
+                    StatefulBuilder(
+                      builder: (context, setBannerState) {
+                        return Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.orange.shade300,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.warning_amber_rounded,
+                                color: Colors.orange,
+                                size: 28,
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(
+                                child: Text(
+                                  'Family data has changed. Please get the latest data.',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              _fetchingBanner
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.orange,
+                                    ),
+                                  )
+                                  : ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 10,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      setBannerState(
+                                        () => _fetchingBanner = true,
+                                      );
+                                      await _refreshFromFirebase();
+                                      setBannerState(
+                                        () => _fetchingBanner = false,
+                                      );
+                                    },
+                                    child: const Text(
+                                      'Get Latest Data',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   VanshavaliHeader(
                     totalMembers: totalMembers,
                     onSearchPressed: _showSearchDialog,
