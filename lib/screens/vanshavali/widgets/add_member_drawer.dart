@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/apis/UploadImage.dart';
+import 'package:hive/hive.dart';
 
 class AddMemberDrawer extends StatefulWidget {
   final FamilyMember parent;
@@ -79,6 +80,33 @@ class _AddMemberDrawerState extends State<AddMemberDrawer> {
           .collection('familyMembers')
           .doc(widget.parent.id.toString())
           .update({'children': updatedChildren});
+      // --- Hive update ---
+      final box = Hive.box<FamilyMember>('familyBox');
+      final newMember = FamilyMember(
+        id: newId,
+        name: name,
+        hindiName: hindiName,
+        birthYear: dob,
+        children: [],
+        parentId: widget.parent.id,
+        profilePhoto: profilePhoto,
+      );
+      await box.put(newId, newMember);
+      // Update parent in Hive
+      final parent = box.get(widget.parent.id);
+      if (parent != null) {
+        final updatedParent = FamilyMember(
+          id: parent.id,
+          name: parent.name,
+          hindiName: parent.hindiName,
+          birthYear: parent.birthYear,
+          children: updatedChildren,
+          parentId: parent.parentId,
+          profilePhoto: parent.profilePhoto,
+        );
+        await box.put(parent.id, updatedParent);
+      }
+      // --- End Hive update ---
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(

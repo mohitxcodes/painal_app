@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-// import 'package:painal/data/FamilyData.dart';
+import 'package:hive/hive.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
 import 'package:painal/screens/vanshavali/widgets/MemberInfoDrawer.dart';
@@ -9,6 +9,8 @@ import 'package:painal/screens/vanshavali/widgets/add_member_drawer.dart';
 import 'package:painal/screens/vanshavali/widgets/delete_confirmation_dialog.dart';
 import 'package:painal/screens/vanshavali/widgets/vanshavali_header.dart';
 import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
+import 'package:provider/provider.dart';
+import 'package:painal/apis/AuthProviderUser.dart';
 
 Future<List<FamilyMember>> fetchFamilyMembers() async {
   final snapshot =
@@ -49,16 +51,25 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   void initState() {
     super.initState();
     _loadFamilyData();
-    // uploadInitialData();
   }
 
-  Future<void> _loadFamilyData() async {
+  Future<void> _loadFamilyData({bool forceRefresh = false}) async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final data = await fetchFamilyMembers();
+      final box = Hive.box<FamilyMember>('familyBox');
+      List<FamilyMember> data = [];
+      if (!forceRefresh && box.isNotEmpty) {
+        data = box.values.toList();
+      } else {
+        data = await fetchFamilyMembers();
+        await box.clear();
+        for (var member in data) {
+          await box.put(member.id, member);
+        }
+      }
       if (data.isNotEmpty) {
         for (var root in data.where((m) => m.parentId == null)) {
           buildFamilyTreeFromFlatData(data, root.id);
@@ -80,6 +91,13 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         _loading = false;
       });
     }
+  }
+
+  void _refreshFromFirebase() async {
+    await _loadFamilyData(forceRefresh: true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Family data refreshed from Firebase!')),
+    );
   }
 
   void _navigateToChild(FamilyMember child) {
@@ -278,6 +296,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userAuth = Provider.of<AuthProviderUser>(context);
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -297,9 +316,29 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
-              child: VanshavaliHeader(
-                totalMembers: totalMembers,
-                onSearchPressed: _showSearchDialog,
+              child: Column(
+                children: [
+                  VanshavaliHeader(
+                    totalMembers: totalMembers,
+                    onSearchPressed: _showSearchDialog,
+                  ),
+                  if (userAuth.isAdmin)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Refresh from Firebase'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green[700],
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: _refreshFromFirebase,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

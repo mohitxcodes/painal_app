@@ -1,11 +1,31 @@
+import 'package:hive/hive.dart';
+
+part 'FamilyMember.g.dart';
+
+@HiveType(typeId: 1)
 class FamilyMember {
+  @HiveField(0)
   final int id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String hindiName;
+
+  @HiveField(3)
   final String birthYear;
-  final List<dynamic> children;
+
+  @HiveField(4)
+  final List<int> children;
+
+  @HiveField(5)
   final int? parentId;
+
+  @HiveField(6)
   final String profilePhoto;
+
+  @HiveField(7)
   List<FamilyMember> childMembers = [];
 
   FamilyMember({

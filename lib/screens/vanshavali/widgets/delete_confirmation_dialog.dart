@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
 class DeleteConfirmationDialog extends StatefulWidget {
   final FamilyMember member;
@@ -46,6 +47,27 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
               .update({'children': children});
         }
       }
+      // --- Hive update ---
+      final box = Hive.box<FamilyMember>('familyBox');
+      await box.delete(widget.member.id);
+      if (widget.member.parentId != null) {
+        final parent = box.get(widget.member.parentId);
+        if (parent != null) {
+          final updatedChildren = List<int>.from(parent.children)
+            ..remove(widget.member.id);
+          final updatedParent = FamilyMember(
+            id: parent.id,
+            name: parent.name,
+            hindiName: parent.hindiName,
+            birthYear: parent.birthYear,
+            children: updatedChildren,
+            parentId: parent.parentId,
+            profilePhoto: parent.profilePhoto,
+          );
+          await box.put(parent.id, updatedParent);
+        }
+      }
+      // --- End Hive update ---
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(

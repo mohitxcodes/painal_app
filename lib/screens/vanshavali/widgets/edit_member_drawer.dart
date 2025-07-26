@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/apis/UploadImage.dart';
+import 'package:hive/hive.dart';
 
 class EditMemberDrawer extends StatefulWidget {
   final FamilyMember member;
@@ -49,6 +50,19 @@ class _EditMemberDrawerState extends State<EditMemberDrawer> {
             'birthYear': dobController.text.trim(),
             'profilePhoto': uploadedPhotoUrl ?? '',
           });
+      // --- Hive update ---
+      final box = Hive.box<FamilyMember>('familyBox');
+      final updatedMember = FamilyMember(
+        id: widget.member.id,
+        name: nameController.text.trim(),
+        hindiName: hindiNameController.text.trim(),
+        birthYear: dobController.text.trim(),
+        children: widget.member.children,
+        parentId: widget.member.parentId,
+        profilePhoto: uploadedPhotoUrl ?? '',
+      );
+      await box.put(widget.member.id, updatedMember);
+      // --- End Hive update ---
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
