@@ -19,7 +19,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.mohitxcodes.painal"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = "27.0.12077973" // ✅ added correct NDK version
 
     compileOptions {
@@ -34,7 +34,7 @@ android {
     defaultConfig {
         applicationId = "com.mohitxcodes.painal"
         minSdk = 23 // ✅ raised to meet firebase-auth requirement
-        targetSdk = 34
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
