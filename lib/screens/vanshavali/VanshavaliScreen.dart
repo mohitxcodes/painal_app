@@ -11,6 +11,7 @@ import 'package:painal/screens/vanshavali/widgets/vanshavali_header.dart';
 import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
+import 'package:painal/screens/vanshavali/more-family/MoreFamilyScreen.dart';
 
 Future<List<FamilyMember>> fetchFamilyMembers() async {
   final snapshot =
@@ -461,14 +462,11 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                       alignment: Alignment.centerRight,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Refresh from Firebase'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[700],
-                            foregroundColor: Colors.white,
-                          ),
+                        child: IconButton(
+                          icon: const Icon(Icons.refresh, color: Colors.green),
                           onPressed: _refreshFromFirebase,
+                          color: Colors.green[700],
+                          tooltip: 'Refresh',
                         ),
                       ),
                     ),
@@ -492,28 +490,65 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Center(
-                  child: Container(
-                    width: cardWidth,
-                    margin: const EdgeInsets.only(top: 8, bottom: 18),
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.green[200]!, width: 1.2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withOpacity(0.04),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: cardWidth,
+                        margin: const EdgeInsets.only(top: 8, bottom: 18),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Colors.green[200]!,
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.green.withOpacity(0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: VanshavaliBody(
-                      currentMember: _currentMember!,
-                      navigationStack: _navigationStack,
-                      onNavigateBack: _navigateBack,
-                      onNavigateToChild: _navigateToChild,
-                      onCardTap: _showMemberDetails,
-                    ),
+                        child: VanshavaliBody(
+                          currentMember: _currentMember!,
+                          navigationStack: _navigationStack,
+                          onNavigateBack: _navigateBack,
+                          onNavigateToChild: _navigateToChild,
+                          onCardTap: _showMemberDetails,
+                        ),
+                      ),
+                      SizedBox(
+                        width: cardWidth,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: Colors.green.shade100,
+                              width: 2,
+                            ),
+                            foregroundColor: Colors.green.shade400,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const MoreFamilyScreen(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'View More Vanshavali',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -44,6 +44,7 @@ class VanshavaliBody extends StatelessWidget {
             onTap: () => onCardTap(currentMember),
           ),
         ),
+
         if (currentMember.childMembers.isNotEmpty) ...[
           // Draw vertical line
           Container(
