@@ -1,75 +1,203 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:painal/models/FamilyMember.dart';
-import 'package:painal/screens/vanshavali/widgets/family_member_card.dart';
+import 'package:painal/screens/vanshavali/more-family/AddFamilyDrawer.dart';
 
-class MoreFamilyScreen extends StatelessWidget {
+class MoreFamilyScreen extends StatefulWidget {
   const MoreFamilyScreen({super.key});
 
   @override
+  State<MoreFamilyScreen> createState() => _MoreFamilyScreenState();
+}
+
+class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
+  Future<List<Map<String, dynamic>>> fetchFamilies() async {
+    // Fetch all families from the 'families' root collection
+    final familiesSnapshot =
+        await FirebaseFirestore.instance.collection('families').get();
+    final List<Map<String, dynamic>> families = [];
+    for (final doc in familiesSnapshot.docs) {
+      final data = doc.data();
+      final collectionName = data['collectionName'] as String?;
+      if (collectionName == null) continue;
+      // Fetch the head member from the family collection
+      final membersSnapshot =
+          await FirebaseFirestore.instance
+              .collection(collectionName)
+              .limit(1)
+              .get();
+      final head =
+          membersSnapshot.docs.isNotEmpty
+              ? membersSnapshot.docs.first.data()
+              : {};
+      // Count total members
+      final membersCountSnapshot =
+          await FirebaseFirestore.instance.collection(collectionName).get();
+      families.add({
+        'collection': collectionName,
+        'name': collectionName,
+        'head': head['name'] ?? data['headName'] ?? '',
+        'members': membersCountSnapshot.docs.length,
+        'profilePhoto': head['profilePhoto'] ?? data['profilePhoto'] ?? '',
+      });
+    }
+    return families;
+  }
+
+  void _openAddFamilyDrawer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => AddFamilyDrawer(
+            onSaved: () {
+              Navigator.of(context).pop();
+              setState(() {}); // Refresh families
+            },
+          ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Placeholder data
-    final List<FamilyMember> members = [
-      FamilyMember(
-        id: 1,
-        name: 'Amit',
-        hindiName: 'अमित',
-        birthYear: '1980',
-        children: [],
-        parentId: null,
-        profilePhoto: '',
-        lastUpdated: null,
-      ),
-      FamilyMember(
-        id: 2,
-        name: 'Sunita',
-        hindiName: 'सुनीता',
-        birthYear: '1982',
-        children: [],
-        parentId: null,
-        profilePhoto: '',
-        lastUpdated: null,
-      ),
-      FamilyMember(
-        id: 3,
-        name: 'Ravi',
-        hindiName: 'रवि',
-        birthYear: '2000',
-        children: [],
-        parentId: null,
-        profilePhoto: '',
-        lastUpdated: null,
-      ),
-      FamilyMember(
-        id: 4,
-        name: 'Priya',
-        hindiName: 'प्रिया',
-        birthYear: '2002',
-        children: [],
-        parentId: null,
-        profilePhoto: '',
-        lastUpdated: null,
-      ),
-    ];
     return Scaffold(
       appBar: AppBar(
         title: const Text('More Vanshavali'),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: members.length,
-          itemBuilder: (context, index) {
-            return FamilyMemberCard(member: members[index], onTap: () {});
-          },
-        ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: fetchFamilies(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final families = snapshot.data ?? [];
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: families.length + 1,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                // Add Family button at the top
+                return SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    icon: const Icon(Icons.add),
+                    label: const Text(
+                      'Add Family',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    onPressed: _openAddFamilyDrawer,
+                  ),
+                );
+              }
+              final family = families[index - 1];
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.green.shade50,
+                      radius: 28,
+                      backgroundImage:
+                          (family['profilePhoto'] != null &&
+                                  family['profilePhoto'].isNotEmpty)
+                              ? NetworkImage(family['profilePhoto'])
+                              : null,
+                      child:
+                          (family['profilePhoto'] == null ||
+                                  family['profilePhoto'].isEmpty)
+                              ? Icon(
+                                Icons.family_restroom,
+                                color: Colors.green.shade700,
+                                size: 32,
+                              )
+                              : null,
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ((family['head'] as String?)?.split(' ').first ??
+                                    '') +
+                                ' Family',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            family['head'],
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${family['members']} Members',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.green, width: 2),
+                        foregroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () {
+                        // View family logic here
+                      },
+                      child: const Text(
+                        'View',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
