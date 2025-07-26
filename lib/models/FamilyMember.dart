@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 part 'FamilyMember.g.dart';
 
@@ -28,6 +29,9 @@ class FamilyMember {
   @HiveField(7)
   List<FamilyMember> childMembers = [];
 
+  @HiveField(8)
+  final DateTime? lastUpdated;
+
   FamilyMember({
     required this.id,
     required this.name,
@@ -36,6 +40,7 @@ class FamilyMember {
     required this.children,
     this.parentId,
     required this.profilePhoto,
+    this.lastUpdated,
   });
 
   factory FamilyMember.fromMap(Map<String, dynamic> data) {
@@ -47,6 +52,12 @@ class FamilyMember {
       children: List<int>.from(data['children']),
       parentId: data['parentId'],
       profilePhoto: data['profilePhoto'],
+      lastUpdated:
+          data['lastUpdated'] != null
+              ? (data['lastUpdated'] is DateTime
+                  ? data['lastUpdated']
+                  : (data['lastUpdated'] as Timestamp).toDate())
+              : null,
     );
   }
 }

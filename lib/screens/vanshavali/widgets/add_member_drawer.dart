@@ -72,6 +72,7 @@ class _AddMemberDrawerState extends State<AddMemberDrawer> {
             'children': <int>[],
             'parentId': widget.parent.id,
             'profilePhoto': profilePhoto,
+            'lastUpdated': FieldValue.serverTimestamp(),
           });
       // Update parent's children list
       final updatedChildren = List<int>.from(widget.parent.children)
@@ -79,7 +80,10 @@ class _AddMemberDrawerState extends State<AddMemberDrawer> {
       await FirebaseFirestore.instance
           .collection('familyMembers')
           .doc(widget.parent.id.toString())
-          .update({'children': updatedChildren});
+          .update({
+            'children': updatedChildren,
+            'lastUpdated': FieldValue.serverTimestamp(),
+          });
       // --- Hive update ---
       final box = Hive.box<FamilyMember>('familyBox');
       final newMember = FamilyMember(

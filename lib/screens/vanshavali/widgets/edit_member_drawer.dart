@@ -49,6 +49,7 @@ class _EditMemberDrawerState extends State<EditMemberDrawer> {
             'hindiName': hindiNameController.text.trim(),
             'birthYear': dobController.text.trim(),
             'profilePhoto': uploadedPhotoUrl ?? '',
+            'lastUpdated': FieldValue.serverTimestamp(),
           });
       // --- Hive update ---
       final box = Hive.box<FamilyMember>('familyBox');

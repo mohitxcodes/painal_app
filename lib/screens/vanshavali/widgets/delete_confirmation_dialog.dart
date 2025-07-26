@@ -44,7 +44,10 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
           await FirebaseFirestore.instance
               .collection('familyMembers')
               .doc(widget.member.parentId.toString())
-              .update({'children': children});
+              .update({
+                'children': children,
+                'lastUpdated': FieldValue.serverTimestamp(),
+              });
         }
       }
       // --- Hive update ---

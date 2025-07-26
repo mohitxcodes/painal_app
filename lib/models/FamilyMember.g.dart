@@ -24,13 +24,14 @@ class FamilyMemberAdapter extends TypeAdapter<FamilyMember> {
       children: (fields[4] as List).cast<int>(),
       parentId: fields[5] as int?,
       profilePhoto: fields[6] as String,
+      lastUpdated: fields[8] as DateTime?,
     )..childMembers = (fields[7] as List).cast<FamilyMember>();
   }
 
   @override
   void write(BinaryWriter writer, FamilyMember obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -46,7 +47,9 @@ class FamilyMemberAdapter extends TypeAdapter<FamilyMember> {
       ..writeByte(6)
       ..write(obj.profilePhoto)
       ..writeByte(7)
-      ..write(obj.childMembers);
+      ..write(obj.childMembers)
+      ..writeByte(8)
+      ..write(obj.lastUpdated);
   }
 
   @override
