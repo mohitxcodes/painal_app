@@ -190,7 +190,11 @@ class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
                           MaterialPageRoute(
                             builder:
                                 (context) => FamilyTreeScreen(
+                                  onSearchPressed: () {},
                                   collectionName: family['collection'],
+                                  heading: 'Vanshavali',
+                                  hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                                  totalMembers: family['members'],
                                 ),
                           ),
                         );

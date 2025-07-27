@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RequestsScreen extends StatefulWidget {
-  const RequestsScreen({Key? key}) : super(key: key);
+  const RequestsScreen({super.key});
 
   @override
   State<RequestsScreen> createState() => _RequestsScreenState();

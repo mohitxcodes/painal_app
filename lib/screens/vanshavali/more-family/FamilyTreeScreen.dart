@@ -6,10 +6,22 @@ import 'package:painal/screens/vanshavali/widgets/add_member_drawer.dart';
 import 'package:painal/screens/vanshavali/widgets/edit_member_drawer.dart';
 import 'package:painal/screens/vanshavali/widgets/delete_confirmation_dialog.dart';
 import 'package:painal/screens/vanshavali/widgets/MemberInfoDrawer.dart';
+import 'package:painal/screens/vanshavali/widgets/vanshavali_header.dart';
 
 class FamilyTreeScreen extends StatefulWidget {
   final String collectionName;
-  const FamilyTreeScreen({super.key, required this.collectionName});
+  final int totalMembers;
+  final String heading;
+  final String hindiHeading;
+  final VoidCallback onSearchPressed;
+  const FamilyTreeScreen({
+    super.key,
+    required this.collectionName,
+    required this.heading,
+    required this.hindiHeading,
+    required this.totalMembers,
+    required this.onSearchPressed,
+  });
 
   @override
   State<FamilyTreeScreen> createState() => _FamilyTreeScreenState();
@@ -209,30 +221,39 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
     return Scaffold(
       appBar: AppBar(title: const Text('Family Tree')),
-      body: Center(
-        child: Container(
-          width: cardWidth,
-          margin: const EdgeInsets.only(top: 8, bottom: 18),
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: Colors.green[200]!, width: 1.2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.green.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+      body: Row(
+        children: [
+          VanshavaliHeader(
+            onSearchPressed: widget.onSearchPressed,
+            totalMembers: widget.totalMembers,
+            heading: widget.heading,
+            hindiHeading: widget.hindiHeading,
           ),
-          child: VanshavaliBody(
-            currentMember: _currentMember!,
-            navigationStack: _navigationStack,
-            onNavigateBack: _navigateBack,
-            onNavigateToChild: _navigateToChild,
-            onCardTap: _showMemberDetails,
+          SizedBox(height: 20),
+          Container(
+            width: cardWidth,
+            margin: const EdgeInsets.only(top: 8, bottom: 18),
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.green[200]!, width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: VanshavaliBody(
+              currentMember: _currentMember!,
+              navigationStack: _navigationStack,
+              onNavigateBack: _navigateBack,
+              onNavigateToChild: _navigateToChild,
+              onCardTap: _showMemberDetails,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -459,6 +459,8 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                   VanshavaliHeader(
                     totalMembers: totalMembers,
                     onSearchPressed: _showSearchDialog,
+                    heading: 'Vanshavali',
+                    hindiHeading: '(वंशावली - परिवार वृक्ष)',
                   ),
                   if (userAuth.isAdmin)
                     Align(
