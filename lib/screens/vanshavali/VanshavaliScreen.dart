@@ -59,6 +59,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   }
 
   Future<void> _checkForRemoteUpdates() async {
+    bool updateNeeded = false;
     // Get the latest lastUpdated from Firestore
     final snapshot =
         await FirebaseFirestore.instance
@@ -86,10 +87,55 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         }
         setState(() {
           _localLastUpdated = localTime;
-          _showUpdateBanner =
-              localTime == null || remoteTime.isAfter(localTime);
+          updateNeeded = localTime == null || remoteTime.isAfter(localTime);
         });
       }
+    }
+    // After checking main collection, also check other families
+    try {
+      final famSnap = await FirebaseFirestore.instance.collection('families').get();
+      for (final doc in famSnap.docs) {
+        final String? col = doc.data()['collectionName'];
+        if (col == null || col.isEmpty) continue;
+
+        // Get remote latest
+        final remoteSnap = await FirebaseFirestore.instance
+            .collection(col)
+            .orderBy('lastUpdated', descending: true)
+            .limit(1)
+            .get();
+        if (remoteSnap.docs.isEmpty) continue;
+        final Timestamp? ts = remoteSnap.docs.first.data()['lastUpdated'];
+        if (ts == null) continue;
+        final remoteLatest = ts.toDate();
+
+        // Get local latest
+        DateTime? localLatest;
+        final boxName = 'familyBox_${col}';
+        if (await Hive.boxExists(boxName)) {
+          final box = Hive.isBoxOpen(boxName)
+              ? Hive.box<FamilyMember>(boxName)
+              : await Hive.openBox<FamilyMember>(boxName);
+          for (final m in box.values) {
+            final lu = m.lastUpdated;
+            if (lu != null) {
+              if (localLatest == null || lu.isAfter(localLatest)) {
+                localLatest = lu;
+              }
+            }
+          }
+        }
+        if (localLatest == null || remoteLatest.isAfter(localLatest)) {
+          updateNeeded = true;
+          break;
+        }
+      }
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() {
+        _showUpdateBanner = updateNeeded;
+      });
     }
   }
 
@@ -148,13 +194,49 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   }
 
   Future<void> _refreshFromFirebase() async {
+    // Refresh main family data
     await _loadFamilyData(forceRefresh: true);
+    // Refresh all additional families used in MoreFamilyScreen
+    await _refreshOtherFamilies();
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Family data refreshed from Firebase!')),
+      const SnackBar(content: Text('All family data refreshed!')), // unified message
     );
     setState(() {
       _showUpdateBanner = false;
     });
+  }
+
+  /// Fetches every family listed in the root `families` collection,
+  /// pulls the latest members from Firestore, and updates their
+  /// corresponding Hive boxes (familyBox_<collectionName>).
+  Future<void> _refreshOtherFamilies() async {
+    try {
+      final familiesSnapshot =
+          await FirebaseFirestore.instance.collection('families').get();
+      for (final doc in familiesSnapshot.docs) {
+        final data = doc.data();
+        final String? collectionName = data['collectionName'];
+        if (collectionName == null || collectionName.isEmpty) continue;
+
+        final membersSnap = await FirebaseFirestore.instance
+            .collection(collectionName)
+            .get();
+        final members = membersSnap.docs
+            .map((d) => FamilyMember.fromMap(d.data()))
+            .toList();
+        if (members.isEmpty) continue;
+
+        final box = await Hive.openBox<FamilyMember>('familyBox_${collectionName}');
+        await box.clear();
+        for (final member in members) {
+          await box.put(member.id, member);
+        }
+      }
+    } catch (e) {
+      // For now just print, but avoid crashing refresh flow
+      debugPrint('Error refreshing other families: \$e');
+    }
   }
 
   void _navigateToChild(FamilyMember child) {
@@ -193,14 +275,49 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     });
   }
 
+  Future<List<FamilyMember>> _getAllFamilyMembers() async {
+    List<FamilyMember> all = [];
+    // main vanshavali cache
+    final mainBox = Hive.box<FamilyMember>('familyBox');
+    all.addAll(mainBox.values);
+
+    // more families caches
+    try {
+      final famSnap = await FirebaseFirestore.instance.collection('families').get();
+      for (final doc in famSnap.docs) {
+        final String? col = doc.data()['collectionName'];
+        if (col == null || col.isEmpty) continue;
+        final boxName = 'familyBox_${col}';
+        Box<FamilyMember> box;
+        if (Hive.isBoxOpen(boxName)) {
+          box = Hive.box<FamilyMember>(boxName);
+        } else if (await Hive.boxExists(boxName)) {
+          box = await Hive.openBox<FamilyMember>(boxName);
+        } else {
+          // no cache yet
+          continue;
+        }
+        all.addAll(box.values);
+      }
+    } catch (_) {}
+    return all;
+  }
+
   void _showSearchDialog() async {
+    final members = await _getAllFamilyMembers();
+    if (members.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No family data available for search.')),
+      );
+      return;
+    }
     if (_familyData == null) return;
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.2),
       builder:
           (context) => SearchDialog(
-            familyData: _familyData!,
+            familyData: members,
             onMemberSelected: (member) => _navigateToMember(member),
           ),
     );

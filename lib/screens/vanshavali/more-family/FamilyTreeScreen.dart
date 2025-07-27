@@ -121,7 +121,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
       builder: (context) {
         return AddMemberDrawer(
           parent: parent,
-          familyData: _familyData!,
+          familyData: _familyData ?? <FamilyMember>[],
           collectionName: widget.collectionName,
           onSaved: () => _loadFamilyData(forceRefresh: true),
         );
@@ -161,18 +161,18 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
   }
 
   void _showMemberDetails(FamilyMember member) {
-    if (_familyData == null) return;
+    if (_familyData == null || _familyData!.isEmpty) return;
     final parent =
         member.parentId != null
             ? _familyData!.firstWhere(
-              (m) => m.id == member.parentId,
-              orElse: () => member,
-            )
+                (m) => m.id == member.parentId,
+                orElse: () => member,
+              )
             : null;
     final children = member.childMembers;
     final siblings =
         member.parentId != null
-            ? _familyData!
+            ? (_familyData ?? <FamilyMember>[])
                 .where(
                   (m) => m.parentId == member.parentId && m.id != member.id,
                 )
