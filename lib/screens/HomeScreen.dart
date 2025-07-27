@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
+import 'package:painal/apis/CheckUpdate.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
 import 'package:provider/provider.dart';
 import 'overview/OverviewScreen.dart';
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    checkForUpdate();
     _tabController = TabController(length: 4, vsync: this);
   }
 
