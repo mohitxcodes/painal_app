@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
 import 'package:painal/screens/vanshavali/widgets/add_member_drawer.dart';
@@ -32,29 +33,49 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
   FamilyMember? _currentMember;
   final List<FamilyMember> _navigationStack = [];
   bool _loading = true;
+  late final String _boxName;
   String? _error;
 
   @override
   void initState() {
     super.initState();
+    _boxName = 'familyBox_${widget.collectionName}';
     _loadFamilyData();
   }
 
-  Future<void> _loadFamilyData() async {
+  Future<void> _loadFamilyData({bool forceRefresh = false}) async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final snapshot =
-          await FirebaseFirestore.instance
-              .collection(widget.collectionName)
-              .get();
+      final box = await Hive.openBox<FamilyMember>(_boxName);
+
+      if (!forceRefresh && box.isNotEmpty) {
+        final data = box.values.toList();
+        for (var root in data.where((m) => m.parentId == null)) {
+          buildFamilyTreeFromFlatData(data, root.id);
+        }
+        setState(() {
+          _familyData = data;
+          _currentMember = data.firstWhere((m) => m.parentId == null);
+          _loading = false;
+        });
+        return;
+      }
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection(widget.collectionName)
+          .get();
       final data =
           snapshot.docs.map((doc) => FamilyMember.fromMap(doc.data())).toList();
       if (data.isNotEmpty) {
         for (var root in data.where((m) => m.parentId == null)) {
           buildFamilyTreeFromFlatData(data, root.id);
+        }
+        await box.clear();
+        for (var member in data) {
+          await box.put(member.id, member);
         }
         setState(() {
           _familyData = data;
@@ -102,7 +123,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
           parent: parent,
           familyData: _familyData!,
           collectionName: widget.collectionName,
-          onSaved: _loadFamilyData,
+          onSaved: () => _loadFamilyData(forceRefresh: true),
         );
       },
     );
@@ -119,7 +140,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         return EditMemberDrawer(
           member: member,
           collectionName: widget.collectionName,
-          onSaved: _loadFamilyData,
+          onSaved: () => _loadFamilyData(forceRefresh: true),
         );
       },
     );
@@ -133,7 +154,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         return DeleteConfirmationDialog(
           member: member,
           collectionName: widget.collectionName,
-          onDeleted: _loadFamilyData,
+          onDeleted: () => _loadFamilyData(forceRefresh: true),
         );
       },
     );
@@ -221,39 +242,46 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
     return Scaffold(
       appBar: AppBar(title: const Text('Family Tree')),
-      body: Row(
-        children: [
-          VanshavaliHeader(
-            onSearchPressed: widget.onSearchPressed,
-            totalMembers: widget.totalMembers,
-            heading: widget.heading,
-            hindiHeading: widget.hindiHeading,
-          ),
-          SizedBox(height: 20),
-          Container(
-            width: cardWidth,
-            margin: const EdgeInsets.only(top: 8, bottom: 18),
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.green[200]!, width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.green.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            VanshavaliHeader(
+              onSearchPressed: widget.onSearchPressed,
+              totalMembers: widget.totalMembers,
+              heading: widget.heading,
+              hindiHeading: widget.hindiHeading,
+            ),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Container(
+                width: cardWidth,
+                margin: const EdgeInsets.only(bottom: 24),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.green[200]!, width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
+                child: VanshavaliBody(
+                  currentMember: _currentMember!,
+                  navigationStack: _navigationStack,
+                  onNavigateBack: _navigateBack,
+                  onNavigateToChild: _navigateToChild,
+                  onCardTap: _showMemberDetails,
+                ),
+              ),
             ),
-            child: VanshavaliBody(
-              currentMember: _currentMember!,
-              navigationStack: _navigationStack,
-              onNavigateBack: _navigateBack,
-              onNavigateToChild: _navigateToChild,
-              onCardTap: _showMemberDetails,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

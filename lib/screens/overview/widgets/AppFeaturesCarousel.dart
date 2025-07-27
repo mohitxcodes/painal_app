@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class AppFeaturesCarousel extends StatefulWidget {
-  const AppFeaturesCarousel({Key? key}) : super(key: key);
+  const AppFeaturesCarousel({super.key});
 
   @override
   State<AppFeaturesCarousel> createState() => _AppFeaturesCarouselState();

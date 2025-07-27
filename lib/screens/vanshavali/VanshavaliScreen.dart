@@ -77,7 +77,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         final box = Hive.box<FamilyMember>('familyBox');
         DateTime? localTime;
         for (var member in box.values) {
-          if (member is FamilyMember && member.lastUpdated != null) {
+          if (member.lastUpdated != null) {
             final t = member.lastUpdated!;
             if (localTime == null || t.isAfter(localTime)) {
               localTime = t;
@@ -358,7 +358,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   Widget build(BuildContext context) {
     final userAuth = Provider.of<AuthProviderUser>(context);
     bool showBanner = _showUpdateBanner && !userAuth.isAdmin;
-    bool _fetchingBanner = false;
+    bool fetchingBanner = false;
     // Remove modal dialog logic
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
@@ -414,7 +414,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              _fetchingBanner
+                              fetchingBanner
                                   ? const SizedBox(
                                     width: 24,
                                     height: 24,
@@ -437,11 +437,11 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                                     ),
                                     onPressed: () async {
                                       setBannerState(
-                                        () => _fetchingBanner = true,
+                                        () => fetchingBanner = true,
                                       );
                                       await _refreshFromFirebase();
                                       setBannerState(
-                                        () => _fetchingBanner = false,
+                                        () => fetchingBanner = false,
                                       );
                                     },
                                     child: const Text(

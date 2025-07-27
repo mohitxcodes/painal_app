@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'widgets/CarouselWidget.dart';
 import 'widgets/AboutVillageWidget.dart';
 import 'widgets/CurrentWeatherWidget.dart';
 import 'widgets/LocationInfoWidget.dart';

@@ -96,7 +96,7 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    print("----------------------" + widget.collectionName);
+    print("----------------------${widget.collectionName}");
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       title: Row(

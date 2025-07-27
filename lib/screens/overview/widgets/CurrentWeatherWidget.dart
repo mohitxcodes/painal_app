@@ -56,9 +56,9 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
     Color weatherColor = Colors.green[700]!;
     if (weatherData != null) {
       final main = (weatherData!['weather'][0]['main'] as String).toLowerCase();
-      if (main.contains('rain'))
+      if (main.contains('rain')) {
         weatherColor = Colors.blue[700]!;
-      else if (main.contains('cloud'))
+      } else if (main.contains('cloud'))
         weatherColor = Colors.green[700]!;
       else if (main.contains('clear'))
         weatherColor = Colors.orange[700]!;
