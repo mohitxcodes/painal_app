@@ -29,7 +29,10 @@ FamilyMember? buildFamilyTreeFromFlatData(
 ) {
   final Map<int, FamilyMember> memberMap = {for (var m in flatData) m.id: m};
   for (var member in flatData) {
-    member.childMembers = member.children.map((id) => memberMap[id]!).toList();
+    member.childMembers = member.children
+        .map((id) => memberMap[id])
+        .whereType<FamilyMember>()
+        .toList();
   }
   return memberMap[rootId];
 }
@@ -93,17 +96,19 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     }
     // After checking main collection, also check other families
     try {
-      final famSnap = await FirebaseFirestore.instance.collection('families').get();
+      final famSnap =
+          await FirebaseFirestore.instance.collection('families').get();
       for (final doc in famSnap.docs) {
         final String? col = doc.data()['collectionName'];
         if (col == null || col.isEmpty) continue;
 
         // Get remote latest
-        final remoteSnap = await FirebaseFirestore.instance
-            .collection(col)
-            .orderBy('lastUpdated', descending: true)
-            .limit(1)
-            .get();
+        final remoteSnap =
+            await FirebaseFirestore.instance
+                .collection(col)
+                .orderBy('lastUpdated', descending: true)
+                .limit(1)
+                .get();
         if (remoteSnap.docs.isEmpty) continue;
         final Timestamp? ts = remoteSnap.docs.first.data()['lastUpdated'];
         if (ts == null) continue;
@@ -113,9 +118,10 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         DateTime? localLatest;
         final boxName = 'familyBox_${col}';
         if (await Hive.boxExists(boxName)) {
-          final box = Hive.isBoxOpen(boxName)
-              ? Hive.box<FamilyMember>(boxName)
-              : await Hive.openBox<FamilyMember>(boxName);
+          final box =
+              Hive.isBoxOpen(boxName)
+                  ? Hive.box<FamilyMember>(boxName)
+                  : await Hive.openBox<FamilyMember>(boxName);
           for (final m in box.values) {
             final lu = m.lastUpdated;
             if (lu != null) {
@@ -140,54 +146,76 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   }
 
   Future<void> _loadFamilyData({bool forceRefresh = false}) async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    if (mounted) {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+    }
+
     try {
       final box = Hive.box<FamilyMember>('familyBox');
       List<FamilyMember> data = [];
+
       if (!forceRefresh && box.isNotEmpty) {
         data = box.values.toList();
       } else {
         data = await fetchFamilyMembers();
         await box.clear();
-        for (var member in data) {
-          await box.put(member.id, member);
+        await box.putAll({for (var member in data) member.id: member});
+      }
+
+      if (data.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _error = 'No family data found.';
+            _loading = false;
+          });
+        }
+        return;
+      }
+
+      // Build family tree
+      final rootMembers = data.where((m) => m.parentId == null).toList();
+      if (rootMembers.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _error = 'No root family member found.';
+            _loading = false;
+          });
+        }
+        return;
+      }
+
+      for (var root in rootMembers) {
+        buildFamilyTreeFromFlatData(data, root.id);
+      }
+
+      // Find the most recent update time
+      DateTime? localTime;
+      for (var member in data) {
+        if (member.lastUpdated != null &&
+            (localTime == null || member.lastUpdated!.isAfter(localTime))) {
+          localTime = member.lastUpdated;
         }
       }
-      if (data.isNotEmpty) {
-        for (var root in data.where((m) => m.parentId == null)) {
-          buildFamilyTreeFromFlatData(data, root.id);
-        }
+
+      if (mounted) {
         setState(() {
           _familyData = data;
-          _currentMember = data.firstWhere((m) => m.parentId == null);
-          _loading = false;
-        });
-        // Update local lastUpdated
-        DateTime? localTime;
-        for (var member in data) {
-          if (member.lastUpdated != null) {
-            if (localTime == null || member.lastUpdated!.isAfter(localTime)) {
-              localTime = member.lastUpdated!;
-            }
-          }
-        }
-        setState(() {
+          _currentMember = rootMembers.first;
           _localLastUpdated = localTime;
-        });
-      } else {
-        setState(() {
-          _error = 'No family data found.';
           _loading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load data: $e';
-        _loading = false;
-      });
+    } catch (e, stackTrace) {
+      debugPrint('Error loading family data: $e\n$stackTrace');
+      if (mounted) {
+        setState(() {
+          _error = 'Failed to load data: ${e.toString()}';
+          _loading = false;
+        });
+      }
     }
     // After loading, check for remote updates again
     _checkForRemoteUpdates();
@@ -200,7 +228,9 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     await _refreshOtherFamilies();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('All family data refreshed!')), // unified message
+      const SnackBar(
+        content: Text('All family data refreshed!'),
+      ), // unified message
     );
     setState(() {
       _showUpdateBanner = false;
@@ -219,15 +249,17 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         final String? collectionName = data['collectionName'];
         if (collectionName == null || collectionName.isEmpty) continue;
 
-        final membersSnap = await FirebaseFirestore.instance
-            .collection(collectionName)
-            .get();
-        final members = membersSnap.docs
-            .map((d) => FamilyMember.fromMap(d.data()))
-            .toList();
+        final membersSnap =
+            await FirebaseFirestore.instance.collection(collectionName).get();
+        final members =
+            membersSnap.docs
+                .map((d) => FamilyMember.fromMap(d.data()))
+                .toList();
         if (members.isEmpty) continue;
 
-        final box = await Hive.openBox<FamilyMember>('familyBox_${collectionName}');
+        final box = await Hive.openBox<FamilyMember>(
+          'familyBox_${collectionName}',
+        );
         await box.clear();
         for (final member in members) {
           await box.put(member.id, member);
@@ -283,7 +315,8 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
 
     // more families caches
     try {
-      final famSnap = await FirebaseFirestore.instance.collection('families').get();
+      final famSnap =
+          await FirebaseFirestore.instance.collection('families').get();
       for (final doc in famSnap.docs) {
         final String? col = doc.data()['collectionName'];
         if (col == null || col.isEmpty) continue;
@@ -481,7 +514,56 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null) {
-      return Center(child: Text(_error!));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                _error!,
+                style: const TextStyle(fontSize: 16, color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 20),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return _loading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton.icon(
+                      onPressed: () async {
+                        setState(() => _loading = true);
+                        try {
+                          await _loadFamilyData(forceRefresh: true);
+                          if (mounted && _error != null) {
+                            setState(() => _loading = false);
+                          }
+                        } catch (e) {
+                          if (mounted) {
+                            setState(() {
+                              _error = 'Failed to load data: $e';
+                              _loading = false;
+                            });
+                          }
+                        }
+                      },
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
+                    );
+              },
+            ),
+          ],
+        ),
+      );
     }
     if (_familyData == null || _currentMember == null) {
       return const Center(child: Text('No data available.'));
