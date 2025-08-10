@@ -12,6 +12,7 @@ import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/screens/vanshavali/more-family/MoreFamilyScreen.dart';
+import 'dart:math' show max;
 
 Future<List<FamilyMember>> fetchFamilyMembers() async {
   final snapshot =
@@ -722,32 +723,75 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                           onCardTap: _showMemberDetails,
                         ),
                       ),
-                      SizedBox(
-                        width: cardWidth,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Colors.green.shade100,
-                              width: 2,
-                            ),
-                            foregroundColor: Colors.green.shade400,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const MoreFamilyScreen(),
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: max(16.0, (screenWidth - cardWidth) / 2 + 12),
+                          vertical: 8.0,
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const MoreFamilyScreen(),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            splashColor: Colors.green.withOpacity(0.1),
+                            highlightColor: Colors.green.withOpacity(0.05),
+                            child: Ink(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 16,
                               ),
-                            );
-                          },
-                          child: const Text(
-                            'View More Vanshavali',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.green.shade200,
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.green.withOpacity(0.05),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.family_restroom_rounded,
+                                    color: Colors.green,
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Flexible(
+                                    child: Text(
+                                      'View More Vanshavali',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.green,
+                                        letterSpacing: 0.2,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 16,
+                                    color: Colors.green.shade400,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
