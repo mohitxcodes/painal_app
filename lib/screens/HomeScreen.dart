@@ -16,6 +16,23 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class _IconTextTab extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _IconTextTab({super.key, required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tab(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Icon(icon, size: 18), const SizedBox(width: 6), Text(label)],
+      ),
+    );
+  }
+}
+
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
@@ -178,18 +195,6 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          tabs: const [
-            Tab(text: 'Home', icon: Icon(Icons.home)),
-            Tab(text: 'Vanshavali', icon: Icon(Icons.people)),
-            Tab(text: 'Book', icon: Icon(Icons.book)),
-            Tab(text: 'Gallery', icon: Icon(Icons.photo_library)),
-          ],
-        ),
       ),
       body: TabBarView(
         controller: _tabController,
@@ -199,6 +204,44 @@ class _HomeScreenState extends State<HomeScreen>
           BookScreen(),
           GalleryScreen(),
         ],
+      ),
+      bottomNavigationBar: Material(
+        elevation: 10,
+        color: Colors.white,
+        child: SafeArea(
+          top: false,
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0xFFE4E7EC))),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: 6,
+                vertical: 2,
+              ),
+              indicator: BoxDecoration(
+                color: const Color(0xFF1B5E20),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              indicatorSize: TabBarIndicatorSize.label,
+              indicatorPadding: EdgeInsets.zero,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.grey[700],
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+              unselectedLabelStyle: const TextStyle(fontSize: 13),
+              tabs: const [
+                _IconTextTab(icon: Icons.home_filled, label: 'Home'),
+                _IconTextTab(icon: Icons.family_restroom, label: 'Vanshavali'),
+                _IconTextTab(icon: Icons.menu_book_rounded, label: 'Explore'),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
