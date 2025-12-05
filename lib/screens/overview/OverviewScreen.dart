@@ -9,19 +9,24 @@ class OverviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // const CarouselWidget(),
-          const AboutVillageWidget(),
-          const SizedBox(height: 20),
-          const AppFeaturesCarousel(),
-          const SizedBox(height: 20),
-          const CurrentWeatherWidget(),
-          const SizedBox(height: 20),
-          const LocationInfoWidget(),
-          const SizedBox(height: 20),
-        ],
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+        ),
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: const [
+            AboutVillageWidget(),
+            CurrentWeatherWidget(),
+            SizedBox(height: 12),
+            LocationInfoWidget(),
+            SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }

@@ -53,85 +53,76 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProviderUser>(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: Center(
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/painal_logo.png'),
-                  fit: BoxFit.cover,
+    return Container(
+      decoration: const BoxDecoration(color: Color(0xFF0B3B2D)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          flexibleSpace: const SizedBox.shrink(),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Center(
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  image: const DecorationImage(
+                    image: AssetImage('assets/images/painal_round_logo.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        title: const Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: 'Painal',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 18,
+          title: const Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Painal',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: '  |  ',
-                style: TextStyle(
-                  color: Colors.white54,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
+                TextSpan(
+                  text: '  |  ',
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: 'पैनाल',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                  fontSize: 17,
+                TextSpan(
+                  text: 'पैनाल',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    fontSize: 17,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Colors.green[700],
-        elevation: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child:
-                authProvider.isAdmin
-                    ? OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.white, width: 1.2),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 0,
-                        ),
-                        minimumSize: const Size(0, 32),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                      onPressed: () {
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildActionIcon(
+                    icon:
+                        authProvider.isAdmin
+                            ? Icons.account_circle_rounded
+                            : Icons.login_rounded,
+                    onTap: () {
+                      if (authProvider.isAdmin) {
                         showDialog(
                           context: context,
                           barrierColor: Colors.black.withOpacity(0.18),
@@ -144,105 +135,144 @@ class _HomeScreenState extends State<HomeScreen>
                                 },
                               ),
                         );
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(
-                            Icons.account_circle,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 4),
-                          Text('My Account'),
-                        ],
-                      ),
-                    )
-                    : OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.white, width: 1.2),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 0,
-                        ),
-                        minimumSize: const Size(0, 32),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          letterSpacing: 0.1,
-                        ),
-                      ),
-                      onPressed: () {
+                      } else {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const LoginScreen(),
                           ),
                         );
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.login, size: 14, color: Colors.white),
-                          SizedBox(width: 2),
-                          Text('Login'),
-                        ],
-                      ),
-                    ),
-          ),
-        ],
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          OverviewScreen(),
-          VanshavaliScreen(),
-          BookScreen(),
-          GalleryScreen(),
-        ],
-      ),
-      bottomNavigationBar: Material(
-        elevation: 10,
-        color: Colors.white,
-        child: SafeArea(
-          top: false,
-          child: Container(
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Color(0xFFE4E7EC))),
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  _buildActionIcon(
+                    icon: Icons.settings,
+                    onTap: _openSettingsPanel,
+                  ),
+                ],
+              ),
             ),
-            child: TabBar(
-              controller: _tabController,
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              labelPadding: const EdgeInsets.symmetric(
-                horizontal: 6,
-                vertical: 2,
+          ],
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: const [
+            OverviewScreen(),
+            VanshavaliScreen(),
+            BookScreen(),
+            GalleryScreen(),
+          ],
+        ),
+        bottomNavigationBar: Material(
+          elevation: 0,
+          color: Colors.transparent,
+          child: SafeArea(
+            top: false,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.white.withOpacity(0.15)),
+                ),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0B3B2D), Color(0xFF134B30)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
-              indicator: BoxDecoration(
-                color: const Color(0xFF1B5E20),
-                borderRadius: BorderRadius.circular(12),
+              child: TabBar(
+                controller: _tabController,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                labelPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                indicator: BoxDecoration(
+                  color: Colors.white.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                indicatorSize: TabBarIndicatorSize.label,
+                indicatorPadding: EdgeInsets.zero,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white70,
+                labelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                unselectedLabelStyle: const TextStyle(fontSize: 13),
+                tabs: const [
+                  _IconTextTab(icon: Icons.home_filled, label: 'Home'),
+                  _IconTextTab(
+                    icon: Icons.family_restroom,
+                    label: 'Vanshavali',
+                  ),
+                  _IconTextTab(icon: Icons.menu_book_rounded, label: 'Explore'),
+                ],
               ),
-              indicatorSize: TabBarIndicatorSize.label,
-              indicatorPadding: EdgeInsets.zero,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.grey[700],
-              labelStyle: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
-              unselectedLabelStyle: const TextStyle(fontSize: 13),
-              tabs: const [
-                _IconTextTab(icon: Icons.home_filled, label: 'Home'),
-                _IconTextTab(icon: Icons.family_restroom, label: 'Vanshavali'),
-                _IconTextTab(icon: Icons.menu_book_rounded, label: 'Explore'),
-              ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildActionIcon({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    final borderRadius = BorderRadius.circular(12);
+    return Material(
+      color: Colors.white.withOpacity(0.18),
+      shape: RoundedRectangleBorder(borderRadius: borderRadius),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: borderRadius,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(icon, color: Colors.white, size: 20),
+        ),
+      ),
+    );
+  }
+
+  void _openSettingsPanel() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Settings',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 12),
+                ListTile(
+                  leading: Icon(Icons.palette_rounded),
+                  title: Text('Theme'),
+                  subtitle: Text('Light / Dark'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.notifications_active_rounded),
+                  title: Text('Notifications'),
+                  subtitle: Text('Manage alerts & updates'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

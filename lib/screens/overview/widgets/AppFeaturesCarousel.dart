@@ -77,173 +77,164 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    return Container(
-      color: Colors.green[50],
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green[700],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.star, color: Colors.white, size: 20),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'App Features',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 22,
-                  color: Colors.black,
-                  letterSpacing: 0.5,
-                  fontFamily: 'Montserrat',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 120,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: _features.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-                _startAutoAdvance();
-              },
-              itemBuilder: (context, i) {
-                final feature = _features[i];
-                return Center(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap:
-                        () =>
-                            _onFeatureTap(context, feature['route'] as String),
-                    splashColor: (feature['color'] as Color).withOpacity(0.08),
-                    highlightColor: (feature['color'] as Color).withOpacity(
-                      0.04,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 180,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: _features.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+              _startAutoAdvance();
+            },
+            itemBuilder: (context, i) {
+              final feature = _features[i];
+              return Center(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap:
+                      () => _onFeatureTap(context, feature['route'] as String),
+                  splashColor: Colors.white24,
+                  highlightColor: Colors.white10,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: width > 600 ? 420 : width - 32,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 16,
                     ),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: width > 600 ? 420 : width - 32,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.25),
+                        width: 1.2,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (feature['color'] as Color).withOpacity(
-                              0.08,
-                            ),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withOpacity(0.18),
+                          Colors.white.withOpacity(0.08),
                         ],
-                        border: Border.all(
-                          color: (feature['color'] as Color).withOpacity(0.13),
-                          width: 1.2,
-                        ),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: (feature['color'] as Color).withOpacity(
-                                0.13,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 60, bottom: 36),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                feature['subtitle'] as String,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white.withOpacity(0.72),
+                                  letterSpacing: 0.2,
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(8),
+                              const SizedBox(height: 4),
+                              Text(
+                                feature['title'] as String,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                feature['desc'] as String,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white.withOpacity(0.9),
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.2),
                             ),
                             child: Icon(
                               feature['icon'] as IconData,
-                              color: (feature['color'] as Color).withOpacity(
-                                0.7,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                feature['button'] as String,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                              size: 20,
-                            ),
+                              const SizedBox(width: 6),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      feature['title'] as String,
-                                      style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      feature['subtitle'] as String,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: feature['color'] as Color,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 7),
-                                Text(
-                                  feature['desc'] as String,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.black54,
-                                    height: 1.4,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_features.length, (index) {
-              final isActive = _currentPage == index;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                width: isActive ? 24 : 10,
-                height: 8,
-                decoration: BoxDecoration(
-                  color:
-                      isActive
-                          ? (_features[index]['color'] as Color)
-                          : Colors.grey[300],
-                  borderRadius: BorderRadius.circular(20),
                 ),
               );
-            }),
+            },
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(_features.length, (index) {
+            final isActive = _currentPage == index;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              width: isActive ? 24 : 10,
+              height: 8,
+              decoration: BoxDecoration(
+                color:
+                    isActive
+                        ? (_features[index]['color'] as Color)
+                        : Colors.grey[300],
+                borderRadius: BorderRadius.circular(20),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

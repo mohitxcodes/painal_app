@@ -64,49 +64,59 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
         weatherColor = Colors.orange[700]!;
     }
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.18),
+            Colors.white.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
         ],
-        border: Border.all(color: Colors.green.withOpacity(0.13)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: weatherColor.withOpacity(0.13),
-              borderRadius: BorderRadius.circular(8),
+            padding: const EdgeInsets.all(12),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white24,
             ),
-            child: Icon(_getWeatherIcon(), color: weatherColor, size: 28),
+            child: Icon(_getWeatherIcon(), color: Colors.white, size: 30),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 18),
           Expanded(
             child:
                 isLoading
                     ? Row(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
-                            color: weatherColor,
+                            color: Colors.white,
                             strokeWidth: 2.2,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                        Text(
                           'Loading...',
-                          style: TextStyle(fontSize: 12),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
                         ),
                       ],
                     )
@@ -115,15 +125,15 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                       children: [
                         Icon(
                           Icons.error_outline,
-                          color: Colors.red[400],
+                          color: Colors.orange[200],
                           size: 18,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             errorMessage,
-                            style: const TextStyle(
-                              color: Colors.red,
+                            style: TextStyle(
+                              color: Colors.orange[100],
                               fontSize: 11,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -140,18 +150,18 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                           children: [
                             Text(
                               '${weatherData!['main']['temp'].round()}°C',
-                              style: TextStyle(
-                                fontSize: 20,
+                              style: const TextStyle(
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold,
-                                color: weatherColor,
+                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(width: 8),
                             Text(
                               weatherData!['weather'][0]['main'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.black87,
+                                color: Colors.white.withOpacity(0.85),
                               ),
                             ),
                           ],
@@ -161,25 +171,29 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                           children: [
                             Icon(
                               Icons.water_drop,
-                              color: Colors.green,
+                              color: Colors.white.withOpacity(0.75),
                               size: 13,
                             ),
                             const SizedBox(width: 3),
                             Text(
                               'Humidity: ${weatherData!['main']['humidity']}%',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.black54,
+                                color: Colors.white.withOpacity(0.8),
                               ),
                             ),
                             const SizedBox(width: 10),
-                            Icon(Icons.air, color: Colors.green, size: 13),
+                            Icon(
+                              Icons.air,
+                              color: Colors.white.withOpacity(0.75),
+                              size: 13,
+                            ),
                             const SizedBox(width: 3),
                             Text(
                               'Wind: ${weatherData!['wind']['speed']} m/s',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.black54,
+                                color: Colors.white.withOpacity(0.8),
                               ),
                             ),
                           ],
@@ -188,20 +202,22 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
                     )
                     : Row(
                       children: [
-                        Icon(
-                          Icons.cloud_off,
-                          color: Colors.grey[400],
-                          size: 18,
-                        ),
+                        Icon(Icons.cloud_off, color: Colors.white70, size: 18),
                         const SizedBox(width: 8),
-                        const Text('No data', style: TextStyle(fontSize: 12)),
+                        Text(
+                          'No data',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                        ),
                       ],
                     ),
           ),
           const SizedBox(width: 10),
           IconButton(
             onPressed: fetchWeatherData,
-            icon: Icon(Icons.refresh, color: Colors.grey[700], size: 18),
+            icon: const Icon(Icons.refresh, color: Colors.white70, size: 18),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             tooltip: 'Refresh',
