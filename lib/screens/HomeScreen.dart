@@ -39,28 +39,60 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'Painal Village',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 18,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 12.0),
+          child: Center(
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                image: const DecorationImage(
+                  image: AssetImage('assets/images/painal_logo.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            Text(
-              'पैनाल गाँव',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
-            ),
-          ],
+          ),
+        ),
+        title: const Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'Painal',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+              TextSpan(
+                text: '  |  ',
+                style: TextStyle(
+                  color: Colors.white54,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+              ),
+              TextSpan(
+                text: 'पैनाल',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
         ),
         backgroundColor: Colors.green[700],
         elevation: 0,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 10.0, top: 6.0, bottom: 6.0),
+            padding: const EdgeInsets.only(right: 12.0),
             child:
                 authProvider.isAdmin
                     ? OutlinedButton(
@@ -68,13 +100,13 @@ class _HomeScreenState extends State<HomeScreen>
                         side: const BorderSide(color: Colors.white, width: 1.2),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
+                          horizontal: 12,
                           vertical: 0,
                         ),
                         minimumSize: const Size(0, 32),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.w600,
@@ -110,17 +142,17 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     )
                     : OutlinedButton(
-                      style: ElevatedButton.styleFrom(
-                        side: BorderSide(color: Colors.white, width: 1.2),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white, width: 1.2),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
+                          horizontal: 12,
                           vertical: 0,
                         ),
                         minimumSize: const Size(0, 32),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.w600,
