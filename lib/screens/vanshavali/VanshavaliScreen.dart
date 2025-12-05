@@ -30,10 +30,11 @@ FamilyMember? buildFamilyTreeFromFlatData(
 ) {
   final Map<int, FamilyMember> memberMap = {for (var m in flatData) m.id: m};
   for (var member in flatData) {
-    member.childMembers = member.children
-        .map((id) => memberMap[id])
-        .whereType<FamilyMember>()
-        .toList();
+    member.childMembers =
+        member.children
+            .map((id) => memberMap[id])
+            .whereType<FamilyMember>()
+            .toList();
   }
   return memberMap[rootId];
 }
@@ -117,7 +118,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
 
         // Get local latest
         DateTime? localLatest;
-        final boxName = 'familyBox_${col}';
+        final boxName = 'familyBox_$col';
         if (await Hive.boxExists(boxName)) {
           final box =
               Hive.isBoxOpen(boxName)
@@ -259,7 +260,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         if (members.isEmpty) continue;
 
         final box = await Hive.openBox<FamilyMember>(
-          'familyBox_${collectionName}',
+          'familyBox_$collectionName',
         );
         await box.clear();
         for (final member in members) {
@@ -321,7 +322,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       for (final doc in famSnap.docs) {
         final String? col = doc.data()['collectionName'];
         if (col == null || col.isEmpty) continue;
-        final boxName = 'familyBox_${col}';
+        final boxName = 'familyBox_$col';
         Box<FamilyMember> box;
         if (Hive.isBoxOpen(boxName)) {
           box = Hive.box<FamilyMember>(boxName);
@@ -726,7 +727,10 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                       Container(
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
-                          horizontal: max(16.0, (screenWidth - cardWidth) / 2 + 12),
+                          horizontal: max(
+                            16.0,
+                            (screenWidth - cardWidth) / 2 + 12,
+                          ),
                           vertical: 8.0,
                         ),
                         child: Material(
@@ -735,7 +739,8 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => const MoreFamilyScreen(),
+                                  builder:
+                                      (context) => const MoreFamilyScreen(),
                                 ),
                               );
                             },

@@ -9,9 +9,9 @@ class AboutVillageWidget extends StatefulWidget {
 
 class _AboutVillageWidgetState extends State<AboutVillageWidget> {
   final List<String> images = [
-    'assets/images/painal01.jpeg',
-    'assets/images/painal02.jpeg',
-    'assets/images/painal01.jpeg',
+    'assets/images/banner_01.png',
+    'assets/images/banner_02.png',
+    'assets/images/banner_03.png',
   ];
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -55,7 +55,7 @@ class _AboutVillageWidgetState extends State<AboutVillageWidget> {
         children: [
           // Carousel of images at the top
           SizedBox(
-            height: 120,
+            height: 150,
             child: Stack(
               children: [
                 PageView.builder(
@@ -71,7 +71,7 @@ class _AboutVillageWidgetState extends State<AboutVillageWidget> {
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
                         images[index],
-                        height: 120,
+                        height: 150,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),

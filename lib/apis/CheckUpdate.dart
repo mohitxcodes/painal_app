@@ -1,17 +1,21 @@
+import 'package:flutter/services.dart';
 import 'package:in_app_update/in_app_update.dart';
 
-Future<void> checkForUpdate() async {
-  try {
-    final updateInfo = await InAppUpdate.checkForUpdate();
-    if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
-      if (updateInfo.immediateUpdateAllowed) {
-        await InAppUpdate.performImmediateUpdate();
-      } else if (updateInfo.flexibleUpdateAllowed) {
-        await InAppUpdate.startFlexibleUpdate();
-        await InAppUpdate.completeFlexibleUpdate();
+class UpdateService {
+  /// Forces an immediate update from Google Play if available.
+  static Future<void> checkForImmediateUpdate() async {
+    try {
+      AppUpdateInfo updateInfo = await InAppUpdate.checkForUpdate();
+
+      if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable &&
+          updateInfo.immediateUpdateAllowed) {
+        await InAppUpdate.performImmediateUpdate().catchError((e) {
+          // Close the app if update is canceled or fails
+          SystemNavigator.pop();
+        });
       }
+    } catch (e) {
+      print("Update check failed: $e");
     }
-  } catch (e) {
-    print("Update check failed: $e");
   }
 }
