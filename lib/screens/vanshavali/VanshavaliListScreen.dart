@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
-import 'package:painal/screens/vanshavali/more-family/MoreFamilyScreen.dart';
+import 'package:painal/screens/vanshavali/more-family/AddFamilyDrawer.dart';
+import 'package:painal/screens/vanshavali/more-family/FamilyTreeScreen.dart';
 import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
-import 'package:painal/screens/vanshavali/widgets/vanshavali_header.dart';
+import 'package:provider/provider.dart';
+import 'package:painal/apis/AuthProviderUser.dart';
+
+// Main family data
+Map<String, dynamic> mainFamily = {
+  'id': 'main_family',
+  'name': 'Main Family',
+  'relation': 'Primary Family Tree',
+  'collection': 'familyMembers', // Default collection for main family
+  'icon': Icons.family_restroom_rounded,
+  'isMain': true,
+  'members': 0, // This will be updated after fetching
+  'head': 'Head of Family',
+  'profilePhoto': '', // Can be updated if you have a main family photo
+};
+
+// List to store fetched families
+List<Map<String, dynamic>> familyMembers = [];
 
 class VanshavaliListScreen extends StatefulWidget {
   const VanshavaliListScreen({super.key});
@@ -18,21 +37,41 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  bool _isLoading = true;
+  String _errorMessage = '';
 
   // Search related
   final TextEditingController _searchController = TextEditingController();
   final List<FamilyMember> _familyData = []; // Will be populated if needed
 
+  // Add family drawer
+  void _openAddFamilyDrawer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder:
+          (context) => AddFamilyDrawer(
+            onSaved: () {
+              Navigator.of(context).pop();
+              _fetchFamilies(); // Refetch families after adding a new one
+            },
+          ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
       vsync: this,
+      duration: const Duration(milliseconds: 800),
     );
     _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
       vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -48,6 +87,101 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
     _fadeController.forward();
     _slideController.forward();
+
+    // Fetch families when the widget initializes
+    _fetchFamilies();
+  }
+
+  Future<void> _fetchFamilies() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      // Fetch all families from the 'families' root collection
+      final familiesSnapshot =
+          await FirebaseFirestore.instance.collection('families').get();
+
+      final List<Map<String, dynamic>> fetchedFamilies = [];
+
+      for (final doc in familiesSnapshot.docs) {
+        final data = doc.data();
+        final collectionName = data['collectionName'] as String?;
+        if (collectionName == null) continue;
+
+        // Fetch the head member from the family collection
+        final membersSnapshot =
+            await FirebaseFirestore.instance
+                .collection(collectionName)
+                .limit(1)
+                .get();
+
+        final head =
+            membersSnapshot.docs.isNotEmpty
+                ? membersSnapshot.docs.first.data()
+                : {};
+
+        // Count total members
+        final membersCountSnapshot =
+            await FirebaseFirestore.instance.collection(collectionName).get();
+
+        fetchedFamilies.add({
+          'id': doc.id,
+          'collection': collectionName,
+          'name': data['name'] ?? collectionName,
+          'head': head['name'] ?? data['headName'] ?? 'Head',
+          'members': membersCountSnapshot.docs.length,
+          'profilePhoto': head['profilePhoto'] ?? data['profilePhoto'] ?? '',
+          'relation': data['relation'] ?? 'Family Branch',
+          'isMain': false,
+        });
+      }
+
+      // Fetch main family member count
+      final mainFamilySnapshot =
+          await FirebaseFirestore.instance
+              .collection(mainFamily['collection'] ?? 'family')
+              .get();
+      final mainFamilyCount = mainFamilySnapshot.docs.length;
+
+      if (mounted) {
+        setState(() {
+          // Find or initialize Main Family
+          final mainFamilyIndex = familyMembers.indexWhere(
+            (f) => f['isMain'] == true,
+          );
+
+          Map<String, dynamic> currentMainFamily;
+          if (mainFamilyIndex != -1) {
+            currentMainFamily = familyMembers[mainFamilyIndex];
+          } else {
+            // Use a copy of the global mainFamily to avoid issues
+            currentMainFamily = Map<String, dynamic>.from(mainFamily);
+          }
+
+          // Update member count with actual count from DB
+          currentMainFamily['members'] = mainFamilyCount;
+
+          // Rebuild list: [Main Family, ... Fetched Families]
+          familyMembers = [
+            currentMainFamily,
+            ...fetchedFamilies.where((f) => f['isMain'] != true),
+          ];
+
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to load families. Please try again.';
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   // Show search dialog
@@ -77,6 +211,13 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProviderUser>(context);
+    final totalMembers = familyMembers.fold<int>(
+      0,
+      (sum, family) =>
+          sum + (family['members'] is int ? family['members'] as int : 0),
+    );
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -91,290 +232,172 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           backgroundColor: Colors.transparent,
           elevation: 0,
           automaticallyImplyLeading: false,
-          title: VanshavaliHeader(
-            heading: 'Vanshavali',
-            hindiHeading: '(वंशावली - परिवार वृक्ष)',
-            totalMembers: 0, // Not used in this screen
+          toolbarHeight: 110, // Increased height for custom header
+          title: _VanshavaliListHeader(
             onSearchPressed: _showSearchDialog,
+            totalMembers: totalMembers,
+            familyCount: familyMembers.length,
           ),
         ),
-        body: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              child: Column(
-                children: [
-                  _buildCreativeFeatureCard(
-                    icon: Icons.family_restroom_rounded,
-                    title: 'Main Family',
-                    subtitle: 'Primary family lineage',
-                    description: 'Explore the main village family tree',
-                    color: Colors.white,
-                    onTap:
-                        () => _navigateWithAnimation(const VanshavaliScreen()),
-                    delay: 0,
-                    bgIcon: Icons.home_rounded,
+        floatingActionButton:
+            authProvider.isAdmin
+                ? FloatingActionButton.extended(
+                  onPressed: _openAddFamilyDrawer,
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Family'),
+                  elevation: 2,
+                )
+                : null,
+        body:
+            _isLoading
+                ? const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                )
+                : _errorMessage.isNotEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _errorMessage,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _fetchFamilies,
+                        child: const Text('Retry'),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.diversity_3_rounded,
-                    title: 'More Vanshavali',
-                    subtitle: 'Extended family branches',
-                    description: 'Discover additional family trees',
-                    color: Colors.white,
-                    onTap:
-                        () => _navigateWithAnimation(const MoreFamilyScreen()),
-                    delay: 100,
-                    bgIcon: Icons.groups_rounded,
+                )
+                : RefreshIndicator(
+                  onRefresh: _fetchFamilies,
+                  color: Colors.white,
+                  backgroundColor: Colors.green[700],
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemCount: familyMembers.length,
+                    itemBuilder: (context, index) {
+                      final family = familyMembers[index];
+                      final isMainFamily = family['isMain'] == true;
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 4,
+                        ),
+                        color: Colors.white.withOpacity(0.08),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        elevation: 0,
+                        child: ListTile(
+                          onTap:
+                              isMainFamily
+                                  ? () => _navigateWithAnimation(
+                                    const VanshavaliScreen(),
+                                  )
+                                  : () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => FamilyTreeScreen(
+                                              onSearchPressed: () {},
+                                              collectionName:
+                                                  family['collection'],
+                                              heading: family['name'],
+                                              hindiHeading:
+                                                  '(वंशावली - परिवार वृक्ष)',
+                                              totalMembers: family['members'],
+                                            ),
+                                      ),
+                                    );
+                                  },
+                          leading: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color:
+                                  isMainFamily
+                                      ? Colors.green.withOpacity(0.2)
+                                      : Colors.blue.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              isMainFamily
+                                  ? Icons.family_restroom_rounded
+                                  : Icons.people_alt_rounded,
+                              color:
+                                  isMainFamily
+                                      ? Colors.green[300]
+                                      : Colors.blue[300],
+                              size: 28,
+                            ),
+                          ),
+                          title: Text(
+                            family['name'] ?? 'Unnamed Family',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            isMainFamily
+                                ? '${family['head']} • ${family['members']} members'
+                                : '${family['head'] ?? 'Family'} • ${family['members']} members',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 14,
+                            color: Colors.white.withOpacity(0.5),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.history_edu_rounded,
-                    title: 'Family History',
-                    subtitle: 'Ancestral records',
-                    description: 'Browse historical family documents',
-                    color: Colors.white,
-                    onTap: () => _showComingSoon('Family History Archives'),
-                    delay: 200,
-                    isComingSoon: true,
-                    bgIcon: Icons.menu_book_rounded,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.photo_album_rounded,
-                    title: 'Family Gallery',
-                    subtitle: 'Visual memories',
-                    description: 'View family photos and memories',
-                    color: Colors.white,
-                    onTap: () => _showComingSoon('Family Photo Gallery'),
-                    delay: 300,
-                    isComingSoon: true,
-                    bgIcon: Icons.collections_rounded,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.location_on_rounded,
-                    title: 'Family Locations',
-                    subtitle: 'Ancestral places',
-                    description: 'Map important family locations',
-                    color: Colors.white,
-                    onTap: () => _showComingSoon('Family Location Map'),
-                    delay: 400,
-                    isComingSoon: true,
-                    bgIcon: Icons.place_rounded,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+                ),
       ),
     );
   }
 
-  Widget _buildCreativeFeatureCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String description,
-    required Color color,
-    required VoidCallback onTap,
-    required int delay,
-    bool isComingSoon = false,
-    required IconData bgIcon,
-  }) {
-    return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 500 + delay),
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: 0.9 + (value * 0.1),
-          child: Opacity(
-            opacity: value,
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(24),
-                splashColor: color.withOpacity(0.2),
-                highlightColor: color.withOpacity(0.1),
-                child: Container(
-                  height: 110,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
-                      width: 1.5,
-                    ),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.1),
-                        Colors.white.withOpacity(0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Background Icon
-                      Positioned(
-                        right: -10,
-                        bottom: -10,
-                        child: Icon(
-                          bgIcon,
-                          color: Colors.white.withOpacity(0.05),
-                          size: 80,
-                        ),
-                      ),
-
-                      // Main Content
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 20,
-                        ),
-                        child: Row(
-                          children: [
-                            // Icon Container
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withOpacity(0.15),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Icon(icon, color: Colors.white, size: 28),
-                            ),
-                            const SizedBox(width: 20),
-
-                            // Text Content
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        title,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: 0.3,
-                                        ),
-                                      ),
-                                      if (isComingSoon) ...[
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 3,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                color.withOpacity(0.3),
-                                                color.withOpacity(0.1),
-                                              ],
-                                            ),
-                                            border: Border.all(
-                                              color: color.withOpacity(0.3),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            'Coming',
-                                            style: TextStyle(
-                                              color: Colors.white.withOpacity(
-                                                0.9,
-                                              ),
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    subtitle,
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.8),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    description,
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.6),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Arrow Icon
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.white.withOpacity(0.7),
-                              size: 18,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   void _navigateWithAnimation(Widget screen) {
-    Navigator.of(context).push(
+    Navigator.push(
+      context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => screen,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeInOutCubic),
-            ),
-            child: FadeTransition(opacity: animation, child: child),
-          );
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(position: offsetAnimation, child: child);
         },
-        transitionDuration: const Duration(milliseconds: 300),
       ),
     );
   }
@@ -387,10 +410,10 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
                 color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.upcoming_rounded,
                 color: Colors.white,
                 size: 16,
@@ -405,6 +428,88 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
+    );
+  }
+}
+
+class _VanshavaliListHeader extends StatelessWidget {
+  final VoidCallback onSearchPressed;
+  final int totalMembers;
+  final int familyCount;
+
+  const _VanshavaliListHeader({
+    required this.onSearchPressed,
+    required this.totalMembers,
+    required this.familyCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Vanshavali',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const Text(
+                    '(वंशावली - परिवार वृक्ष)',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8), // Add some spacing before the button
+            const Spacer(),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
+                color: Colors.white.withOpacity(0.18),
+              ),
+              child: IconButton(
+                onPressed: onSearchPressed,
+                tooltip: 'Search Family Member',
+                icon: const Icon(Icons.search, color: Colors.white, size: 24),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.15)),
+          ),
+          child: Text(
+            '$familyCount families • $totalMembers total members',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

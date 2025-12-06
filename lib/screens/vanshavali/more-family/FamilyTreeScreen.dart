@@ -64,9 +64,10 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         return;
       }
 
-      final snapshot = await FirebaseFirestore.instance
-          .collection(widget.collectionName)
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection(widget.collectionName)
+              .get();
       final data =
           snapshot.docs.map((doc) => FamilyMember.fromMap(doc.data())).toList();
       if (data.isNotEmpty) {
@@ -165,9 +166,9 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
     final parent =
         member.parentId != null
             ? _familyData!.firstWhere(
-                (m) => m.id == member.parentId,
-                orElse: () => member,
-              )
+              (m) => m.id == member.parentId,
+              orElse: () => member,
+            )
             : null;
     final children = member.childMembers;
     final siblings =
@@ -240,47 +241,69 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
     final double maxContentWidth = 900;
     final double cardWidth =
         contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Family Tree')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            VanshavaliHeader(
-              onSearchPressed: widget.onSearchPressed,
-              totalMembers: widget.totalMembers,
-              heading: widget.heading,
-              hindiHeading: widget.hindiHeading,
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: Container(
-                width: cardWidth,
-                margin: const EdgeInsets.only(bottom: 24),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.green[200]!, width: 1.2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.green.withOpacity(0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: VanshavaliBody(
-                  currentMember: _currentMember!,
-                  navigationStack: _navigationStack,
-                  onNavigateBack: _navigateBack,
-                  onNavigateToChild: _navigateToChild,
-                  onCardTap: _showMemberDetails,
-                ),
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(240),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+              child: VanshavaliHeader(
+                onSearchPressed: widget.onSearchPressed,
+                totalMembers: widget.totalMembers,
+                heading: widget.heading,
+                hindiHeading: widget.hindiHeading,
               ),
             ),
-          ],
+          ),
+        ),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                Container(
+                  width: cardWidth,
+                  margin: const EdgeInsets.only(top: 8, bottom: 24),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white.withOpacity(0.25)),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.white.withOpacity(0.18),
+                        Colors.white.withOpacity(0.08),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 20,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: VanshavaliBody(
+                    currentMember: _currentMember!,
+                    navigationStack: _navigationStack,
+                    onNavigateBack: _navigateBack,
+                    onNavigateToChild: _navigateToChild,
+                    onCardTap: _showMemberDetails,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

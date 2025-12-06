@@ -11,8 +11,6 @@ import 'package:painal/screens/vanshavali/widgets/vanshavali_header.dart';
 import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
-import 'package:painal/screens/vanshavali/more-family/MoreFamilyScreen.dart';
-import 'dart:math' show max;
 
 Future<List<FamilyMember>> fetchFamilyMembers() async {
   final snapshot =
@@ -683,23 +681,9 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                       onSearchPressed: _showSearchDialog,
                       heading: 'Vanshavali',
                       hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                      onRefresh: _refreshFromFirebase,
+                      showRefresh: userAuth.isAdmin,
                     ),
-                    if (userAuth.isAdmin)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.refresh,
-                              color: Colors.green,
-                            ),
-                            onPressed: _refreshFromFirebase,
-                            color: Colors.green[700],
-                            tooltip: 'Refresh',
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),

@@ -115,8 +115,10 @@ class _SearchDialogState extends State<SearchDialog> {
           style:
               highlightStyle ??
               const TextStyle(
-                backgroundColor: Color(0x33FFEB3B),
-                color: Colors.green,
+                backgroundColor: Color(
+                  0xFFFBC02D,
+                ), // Darker yellow for contrast
+                color: Colors.black, // Black text on yellow highlight
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -133,32 +135,49 @@ class _SearchDialogState extends State<SearchDialog> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Backdrop Blur
         BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-          child: Container(color: Colors.transparent),
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          child: Container(color: Colors.black.withOpacity(0.3)),
         ),
         Center(
           child: Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(24),
             ),
             insetPadding: const EdgeInsets.symmetric(
-              horizontal: 24,
+              horizontal: 20,
               vertical: 40,
             ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
             child: Container(
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.green.withOpacity(0.4),
-                  width: 2,
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
                 ),
-                borderRadius: BorderRadius.circular(18),
-                color: Colors.white,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF0B3B2D), // Deep Green
+                    Color(0xFF1F6B3A), // Light Green
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
                   maxWidth: 400,
-                  maxHeight: 500,
+                  maxHeight: 600,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -167,10 +186,15 @@ class _SearchDialogState extends State<SearchDialog> {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.green[50],
+                        color: Colors.white.withOpacity(0.05),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
                         ),
                       ),
                       child: Column(
@@ -178,8 +202,8 @@ class _SearchDialogState extends State<SearchDialog> {
                           Row(
                             children: [
                               Icon(
-                                Icons.search,
-                                color: Colors.green[700],
+                                Icons.person_search_rounded,
+                                color: Colors.white.withOpacity(0.9),
                                 size: 24,
                               ),
                               const SizedBox(width: 12),
@@ -188,7 +212,8 @@ class _SearchDialogState extends State<SearchDialog> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                             ],
@@ -196,29 +221,43 @@ class _SearchDialogState extends State<SearchDialog> {
                           const SizedBox(height: 16),
                           TextField(
                             autofocus: true,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                            cursorColor: Colors.white,
                             decoration: InputDecoration(
-                              hintText: 'Search by name, Hindi name...',
+                              hintText: 'Search by name, ID...',
+                              hintStyle: TextStyle(
+                                color: Colors.white.withOpacity(0.5),
+                              ),
                               prefixIcon: Icon(
-                                Icons.person_search,
-                                color: Colors.green[600],
+                                Icons.search,
+                                color: Colors.white.withOpacity(0.7),
                               ),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide(
-                                  color: Colors.green[300]!,
+                                  color: Colors.white.withOpacity(0.2),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: Colors.white.withOpacity(0.2),
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide(
-                                  color: Colors.green[600]!,
-                                  width: 2,
+                                  color: Colors.white.withOpacity(0.5),
+                                  width: 1.5,
                                 ),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: Colors.black.withOpacity(0.2),
                               contentPadding: const EdgeInsets.symmetric(
-                                vertical: 12,
+                                vertical: 14,
                                 horizontal: 16,
                               ),
                             ),
@@ -227,287 +266,28 @@ class _SearchDialogState extends State<SearchDialog> {
                         ],
                       ),
                     ),
-                    // Results
+
+                    // Results List
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child:
-                            query.isEmpty
-                                ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.family_restroom,
-                                        color: Colors.green[200],
-                                        size: 64,
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Text(
-                                        'Start typing to search',
-                                        style: TextStyle(
-                                          color: Colors.green[700],
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      const Text(
-                                        'Search by English name, Hindi name...',
-                                        style: TextStyle(
-                                          color: Colors.black45,
-                                          fontSize: 14,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                : results.isEmpty
-                                ? Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.sentiment_dissatisfied,
-                                        color: Colors.grey[400],
-                                        size: 48,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        'No results found',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Try different keywords',
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                : ListView.separated(
-                                  itemCount: results.length,
-                                  separatorBuilder:
-                                      (_, __) => const Divider(
-                                        height: 1,
-                                        color: Color(0xFFE8E8E8),
-                                      ),
-                                  itemBuilder: (context, idx) {
-                                    final member = results[idx];
-                                    final parent =
-                                        member.parentId != null
-                                            ? widget.familyData.firstWhere(
-                                              (m) => m.id == member.parentId,
-                                              orElse:
-                                                  () => FamilyMember(
-                                                    id: -1,
-                                                    name: 'Unknown',
-                                                    hindiName: '',
-                                                    birthYear: '',
-                                                    children: [],
-                                                    profilePhoto: '',
-                                                  ),
-                                            )
-                                            : null;
-                                    final children = member.childMembers;
-
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: Colors.green.withOpacity(0.2),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          onTap: () {
-                                            Navigator.of(context).pop();
-                                            widget.onMemberSelected(member);
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(16),
-                                            child: Row(
-                                              children: [
-                                                // Profile Image
-                                                GestureDetector(
-                                                  onTap:
-                                                      member
-                                                              .profilePhoto
-                                                              .isNotEmpty
-                                                          ? () =>
-                                                              _showProfileImage(
-                                                                context,
-                                                                member
-                                                                    .profilePhoto,
-                                                                member.name,
-                                                              )
-                                                          : null,
-                                                  child: Hero(
-                                                    tag:
-                                                        'search_profile_${member.name}',
-                                                    child: Container(
-                                                      width: 50,
-                                                      height: 50,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        color:
-                                                            Colors.green[100],
-                                                        border: Border.all(
-                                                          color:
-                                                              Colors
-                                                                  .green[300]!,
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                      child:
-                                                          member
-                                                                  .profilePhoto
-                                                                  .isNotEmpty
-                                                              ? ClipOval(
-                                                                child: Image.network(
-                                                                  member
-                                                                      .profilePhoto,
-                                                                  fit:
-                                                                      BoxFit
-                                                                          .cover,
-                                                                  errorBuilder:
-                                                                      (
-                                                                        context,
-                                                                        error,
-                                                                        stackTrace,
-                                                                      ) => Icon(
-                                                                        Icons
-                                                                            .person,
-                                                                        color:
-                                                                            Colors.green[600],
-                                                                        size:
-                                                                            24,
-                                                                      ),
-                                                                ),
-                                                              )
-                                                              : Icon(
-                                                                Icons.person,
-                                                                color:
-                                                                    Colors
-                                                                        .green[600],
-                                                                size: 24,
-                                                              ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 16),
-                                                // Member Info
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      // Name
-                                                      _highlightText(
-                                                        member.name,
-                                                        query,
-                                                        style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 16,
-                                                          color: Colors.black87,
-                                                        ),
-                                                      ),
-
-                                                      const SizedBox(height: 2),
-                                                      // Hindi Name
-                                                      _highlightText(
-                                                        member.hindiName,
-                                                        query,
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          color:
-                                                              Colors.green[700],
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                      if (parent != null &&
-                                                          parent.id != -1) ...[
-                                                        const SizedBox(
-                                                          height: 4,
-                                                        ),
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                horizontal: 8,
-                                                                vertical: 2,
-                                                              ),
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                Colors.blue[50],
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  8,
-                                                                ),
-                                                          ),
-                                                          child: Text(
-                                                            'Father: ${parent.name}',
-                                                            style: TextStyle(
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors
-                                                                      .blue[600],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w800,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                                // Arrow
-                                                Icon(
-                                                  Icons.arrow_forward_ios,
-                                                  size: 16,
-                                                  color: Colors.green[600],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                      ),
+                      child:
+                          query.isEmpty
+                              ? _buildEmptyState()
+                              : results.isEmpty
+                              ? _buildNoResultsState()
+                              : _buildResultsList(),
                     ),
+
                     // Footer
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.grey[50],
+                        color: Colors.black.withOpacity(0.1),
+                        border: Border(
+                          top: BorderSide(color: Colors.white.withOpacity(0.1)),
+                        ),
                         borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(16),
+                          bottomLeft: Radius.circular(24),
+                          bottomRight: Radius.circular(24),
                         ),
                       ),
                       child: Row(
@@ -515,37 +295,39 @@ class _SearchDialogState extends State<SearchDialog> {
                         children: [
                           if (results.isNotEmpty)
                             Text(
-                              '${results.length} result${results.length == 1 ? '' : 's'} found',
+                              '${results.length} result${results.length == 1 ? '' : 's'}',
                               style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
-                            ),
+                            )
+                          else
+                            const SizedBox(),
                           Material(
-                            color: Colors.green[700],
-                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
                             child: InkWell(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                               onTap: () => Navigator.of(context).pop(),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 8,
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(
-                                      Icons.close,
+                                    const Icon(
+                                      Icons.close_rounded,
                                       color: Colors.white,
                                       size: 16,
                                     ),
-                                    SizedBox(width: 6),
+                                    const SizedBox(width: 8),
                                     Text(
                                       'Close',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.white.withOpacity(0.9),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -565,6 +347,222 @@ class _SearchDialogState extends State<SearchDialog> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.family_restroom_rounded,
+            color: Colors.white.withOpacity(0.2),
+            size: 64,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Start typing to search',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Find family members by name or ID',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoResultsState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off_rounded,
+            color: Colors.white.withOpacity(0.2),
+            size: 48,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'No results found',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Try different keywords',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultsList() {
+    return ListView.separated(
+      padding: const EdgeInsets.all(20),
+      itemCount: results.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (context, idx) {
+        final member = results[idx];
+        final parent =
+            member.parentId != null
+                ? widget.familyData.firstWhere(
+                  (m) => m.id == member.parentId,
+                  orElse:
+                      () => FamilyMember(
+                        id: -1,
+                        name: 'Unknown',
+                        hindiName: '',
+                        birthYear: '',
+                        children: [],
+                        profilePhoto: '',
+                      ),
+                )
+                : null;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.of(context).pop();
+                widget.onMemberSelected(member);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    // Profile Image
+                    GestureDetector(
+                      onTap:
+                          member.profilePhoto.isNotEmpty
+                              ? () => _showProfileImage(
+                                context,
+                                member.profilePhoto,
+                                member.name,
+                              )
+                              : null,
+                      child: Hero(
+                        tag: 'search_profile_${member.name}',
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.1),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1.5,
+                            ),
+                          ),
+                          child:
+                              member.profilePhoto.isNotEmpty
+                                  ? ClipOval(
+                                    child: Image.network(
+                                      member.profilePhoto,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) => Icon(
+                                            Icons.person,
+                                            color: Colors.white.withOpacity(
+                                              0.7,
+                                            ),
+                                            size: 24,
+                                          ),
+                                    ),
+                                  )
+                                  : Icon(
+                                    Icons.person,
+                                    color: Colors.white.withOpacity(0.7),
+                                    size: 24,
+                                  ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Member Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _highlightText(
+                            member.name,
+                            query,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          _highlightText(
+                            member.hindiName,
+                            query,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          if (parent != null && parent.id != -1) ...[
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                'Father: ${parent.name}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: Colors.white.withOpacity(0.3),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
