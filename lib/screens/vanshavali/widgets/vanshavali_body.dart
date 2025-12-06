@@ -28,12 +28,13 @@ class VanshavaliBody extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: onNavigateBack,
-              icon: const Icon(Icons.arrow_back, color: Colors.black87),
-              label: const Text(
-                'Back',
-                style: TextStyle(color: Colors.black87),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
               ),
+              onPressed: onNavigateBack,
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+              label: const Text('Back'),
             ),
           ),
         // Main member card always full width
@@ -50,7 +51,7 @@ class VanshavaliBody extends StatelessWidget {
           Container(
             width: 2,
             height: 32,
-            color: Colors.green[200],
+            color: Colors.white.withOpacity(0.4),
             margin: const EdgeInsets.symmetric(vertical: 4),
           ),
           // Children row scrollable inside the bordered area
@@ -72,15 +73,16 @@ class VanshavaliBody extends StatelessWidget {
                           child:
                               child.childMembers.isNotEmpty
                                   ? Material(
-                                    color: Colors.green[700],
+                                    color: Colors.white.withOpacity(0.2),
                                     shape: const CircleBorder(),
                                     child: InkWell(
                                       customBorder: const CircleBorder(),
                                       onTap: () => onNavigateToChild(child),
+                                      splashColor: Colors.white24,
                                       child: const Padding(
                                         padding: EdgeInsets.all(6.0),
                                         child: Icon(
-                                          Icons.arrow_downward,
+                                          Icons.arrow_downward_rounded,
                                           color: Colors.white,
                                           size: 16,
                                         ),
@@ -88,7 +90,7 @@ class VanshavaliBody extends StatelessWidget {
                                     ),
                                   )
                                   : Material(
-                                    color: Colors.red[200],
+                                    color: Colors.white.withOpacity(0.12),
                                     shape: const CircleBorder(),
                                     child: InkWell(
                                       customBorder: const CircleBorder(),
@@ -103,12 +105,12 @@ class VanshavaliBody extends StatelessWidget {
                                             duration: Duration(seconds: 2),
                                           ),
                                         );
-                                      }, // Disabled navigation
+                                      },
                                       child: const Padding(
                                         padding: EdgeInsets.all(6.0),
                                         child: Icon(
-                                          Icons.close,
-                                          color: Colors.white,
+                                          Icons.close_rounded,
+                                          color: Colors.white70,
                                           size: 16,
                                         ),
                                       ),

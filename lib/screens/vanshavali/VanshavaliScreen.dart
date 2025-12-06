@@ -572,242 +572,273 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     }
     final totalMembers = _familyData!.length;
     final double horizontalPadding = 12 + 12;
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(240),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-            child: SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  if (showBanner)
-                    StatefulBuilder(
-                      builder: (context, setBannerState) {
-                        return Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade100,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.orange.shade300,
-                              width: 1.2,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(240),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+              child: SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    if (showBanner)
+                      StatefulBuilder(
+                        builder: (context, setBannerState) {
+                          return Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 10),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 16,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.warning_amber_rounded,
-                                color: Colors.orange,
-                                size: 28,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.25),
                               ),
-                              const SizedBox(width: 10),
-                              const Expanded(
-                                child: Text(
-                                  'Family data has changed. Please get the latest data.',
-                                  style: TextStyle(fontWeight: FontWeight.w600),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.16),
+                                  Colors.white.withOpacity(0.06),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.orange.shade200,
+                                  size: 28,
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              fetchingBanner
-                                  ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.orange,
-                                    ),
-                                  )
-                                  : ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 10,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      setBannerState(
-                                        () => fetchingBanner = true,
-                                      );
-                                      await _refreshFromFirebase();
-                                      setBannerState(
-                                        () => fetchingBanner = false,
-                                      );
-                                    },
-                                    child: const Text(
-                                      'Get Latest Data',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'Family data has changed. Please get the latest data.',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white.withOpacity(0.9),
                                     ),
                                   ),
-                            ],
-                          ),
-                        );
-                      },
+                                ),
+                                const SizedBox(width: 10),
+                                fetchingBanner
+                                    ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                    : ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange
+                                            .withOpacity(0.9),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 10,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        setBannerState(
+                                          () => fetchingBanner = true,
+                                        );
+                                        await _refreshFromFirebase();
+                                        setBannerState(
+                                          () => fetchingBanner = false,
+                                        );
+                                      },
+                                      child: const Text(
+                                        'Get Latest Data',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    VanshavaliHeader(
+                      totalMembers: totalMembers,
+                      onSearchPressed: _showSearchDialog,
+                      heading: 'Vanshavali',
+                      hindiHeading: '(वंशावली - परिवार वृक्ष)',
                     ),
-                  VanshavaliHeader(
-                    totalMembers: totalMembers,
-                    onSearchPressed: _showSearchDialog,
-                    heading: 'Vanshavali',
-                    hindiHeading: '(वंशावली - परिवार वृक्ष)',
-                  ),
-                  if (userAuth.isAdmin)
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-                        child: IconButton(
-                          icon: const Icon(Icons.refresh, color: Colors.green),
-                          onPressed: _refreshFromFirebase,
-                          color: Colors.green[700],
-                          tooltip: 'Refresh',
+                    if (userAuth.isAdmin)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 8.0, right: 8.0),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.refresh,
+                              color: Colors.green,
+                            ),
+                            onPressed: _refreshFromFirebase,
+                            color: Colors.green[700],
+                            tooltip: 'Refresh',
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final double screenWidth = MediaQuery.of(context).size.width;
-          final double contentWidth = screenWidth - horizontalPadding;
-          final double maxContentWidth = 900;
-          final double cardWidth =
-              contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: screenWidth,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        width: cardWidth,
-                        margin: const EdgeInsets.only(top: 8, bottom: 18),
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: Colors.green[200]!,
-                            width: 1.2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.green.withOpacity(0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final double screenWidth = MediaQuery.of(context).size.width;
+            final double contentWidth = screenWidth - horizontalPadding;
+            final double maxContentWidth = 900;
+            final double cardWidth =
+                contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: screenWidth,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: cardWidth,
+                          margin: const EdgeInsets.only(top: 8, bottom: 18),
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.25),
                             ),
-                          ],
-                        ),
-                        child: VanshavaliBody(
-                          currentMember: _currentMember!,
-                          navigationStack: _navigationStack,
-                          onNavigateBack: _navigateBack,
-                          onNavigateToChild: _navigateToChild,
-                          onCardTap: _showMemberDetails,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: max(
-                            16.0,
-                            (screenWidth - cardWidth) / 2 + 12,
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withOpacity(0.18),
+                                Colors.white.withOpacity(0.08),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 20,
+                                offset: const Offset(0, 12),
+                              ),
+                            ],
                           ),
-                          vertical: 8.0,
+                          child: VanshavaliBody(
+                            currentMember: _currentMember!,
+                            navigationStack: _navigationStack,
+                            onNavigateBack: _navigateBack,
+                            onNavigateToChild: _navigateToChild,
+                            onCardTap: _showMemberDetails,
+                          ),
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => const MoreFamilyScreen(),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            splashColor: Colors.green.withOpacity(0.1),
-                            highlightColor: Colors.green.withOpacity(0.05),
-                            child: Ink(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.green.shade200,
-                                  width: 1.5,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green.withOpacity(0.05),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: max(
+                              16.0,
+                              (screenWidth - cardWidth) / 2 + 12,
+                            ),
+                            vertical: 8.0,
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const MoreFamilyScreen(),
                                   ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.family_restroom_rounded,
-                                    color: Colors.green,
-                                    size: 22,
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              splashColor: Colors.green.withOpacity(0.1),
+                              highlightColor: Colors.green.withOpacity(0.05),
+                              child: Ink(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 16,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
                                   ),
-                                  const SizedBox(width: 12),
-                                  const Flexible(
-                                    child: Text(
-                                      'View More Vanshavali',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green,
-                                        letterSpacing: 0.2,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.white.withOpacity(0.16),
+                                      Colors.white.withOpacity(0.06),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.family_restroom_rounded,
+                                      color: Colors.white,
+                                      size: 22,
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(
-                                    Icons.arrow_forward_ios_rounded,
-                                    size: 16,
-                                    color: Colors.green.shade400,
-                                  ),
-                                ],
+                                    const SizedBox(width: 12),
+                                    const Flexible(
+                                      child: Text(
+                                        'View More Vanshavali',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          letterSpacing: 0.2,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 16,
+                                      color: Colors.white.withOpacity(0.8),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

@@ -14,25 +14,32 @@ class FamilyMemberCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.green[1],
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.green[100]!, width: 1.2),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withOpacity(0.22), width: 1.2),
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withOpacity(0.18),
+              Colors.white.withOpacity(0.07),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.green.withOpacity(0.07),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 18,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundColor: Colors.green[100],
+                backgroundColor: Colors.white.withOpacity(0.2),
                 backgroundImage:
                     member.profilePhoto.isNotEmpty
                         ? NetworkImage(member.profilePhoto)
@@ -41,7 +48,7 @@ class FamilyMemberCard extends StatelessWidget {
                     member.profilePhoto.isEmpty
                         ? const Icon(
                           Icons.person,
-                          color: Colors.green,
+                          color: Colors.white,
                           size: 28,
                         )
                         : null,
@@ -52,16 +59,23 @@ class FamilyMemberCard extends StatelessWidget {
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
               Text(
                 member.name,
-                style: const TextStyle(fontSize: 13, color: Colors.green),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.white.withOpacity(0.85),
+                  letterSpacing: 0.2,
+                ),
               ),
               Text(
                 'Born: ${member.birthYear}',
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.7),
+                ),
               ),
               const SizedBox(height: 18), // Space for navigation button
             ],
