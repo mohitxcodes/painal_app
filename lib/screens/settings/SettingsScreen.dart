@@ -1,0 +1,349 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:painal/apis/AuthProviderUser.dart';
+import 'package:painal/screens/login/LoginScreen.dart';
+import 'package:painal/screens/login/widgets/AccountDrawer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProviderUser>(context);
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          title: const Text(
+            'Settings',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              letterSpacing: 0.2,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Account Section
+              _buildAccountCard(authProvider, context),
+              const SizedBox(height: 20),
+              // About Section
+              _buildAboutCard(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccountCard(
+    AuthProviderUser authProvider,
+    BuildContext context,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.18),
+            Colors.white.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.2),
+                ),
+                child: Icon(
+                  authProvider.isAdmin
+                      ? Icons.admin_panel_settings_rounded
+                      : Icons.person_outline_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Account',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      authProvider.isAdmin
+                          ? (authProvider.user?.email ?? 'Admin')
+                          : 'Guest User',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (authProvider.isAdmin) ...[
+            _buildAccountActionTile(
+              leading: Icons.account_circle_rounded,
+              title: 'Account Details',
+              subtitle: 'View and manage your account',
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black.withOpacity(0.18),
+                  builder:
+                      (context) => AccountDrawer(
+                        email: authProvider.user?.email ?? '',
+                        onLogout: () async {
+                          await FirebaseAuth.instance.signOut();
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
+                      ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildAccountActionTile(
+              leading: Icons.logout_rounded,
+              title: 'Sign Out',
+              subtitle: 'Sign out from your account',
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                if (context.mounted) Navigator.of(context).pop();
+              },
+              isDestructive: true,
+            ),
+          ] else ...[
+            _buildAccountActionTile(
+              leading: Icons.login_rounded,
+              title: 'Sign In',
+              subtitle: 'Sign in to access admin features',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountActionTile({
+    required IconData leading,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          splashColor: Colors.white.withOpacity(0.1),
+          highlightColor: Colors.white.withOpacity(0.05),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color:
+                    isDestructive
+                        ? Colors.red.withOpacity(0.3)
+                        : Colors.white.withOpacity(0.15),
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.white.withOpacity(0.12),
+                  Colors.white.withOpacity(0.04),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color:
+                        isDestructive
+                            ? Colors.red.withOpacity(0.2)
+                            : Colors.white.withOpacity(0.15),
+                  ),
+                  child: Icon(
+                    leading,
+                    color: isDestructive ? Colors.red.shade200 : Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isDestructive
+                                  ? Colors.red.shade200
+                                  : Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white.withOpacity(0.75),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white.withOpacity(0.6),
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAboutCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.18),
+            Colors.white.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.2),
+                ),
+                child: const Icon(
+                  Icons.info_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Text(
+                'About',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildAccountActionTile(
+            leading: Icons.info_outline_rounded,
+            title: 'App Version',
+            subtitle: '1.0.0',
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _buildAccountActionTile(
+            leading: Icons.help_outline_rounded,
+            title: 'Help & Support',
+            subtitle: 'Get help with the app',
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,13 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
-import 'package:provider/provider.dart';
 import 'overview/OverviewScreen.dart';
 import 'book/BookScreen.dart';
 import 'gallery/GalleryScreen.dart';
-import 'package:painal/screens/login/LoginScreen.dart';
-import 'package:painal/screens/login/widgets/AccountDrawer.dart';
+import 'package:painal/screens/settings/SettingsScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,8 +47,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProviderUser>(context);
-
     return Container(
       decoration: const BoxDecoration(color: Color(0xFF0B3B2D)),
       child: Scaffold(
@@ -113,43 +107,15 @@ class _HomeScreenState extends State<HomeScreen>
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 12.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildActionIcon(
-                    icon:
-                        authProvider.isAdmin
-                            ? Icons.account_circle_rounded
-                            : Icons.login_rounded,
-                    onTap: () {
-                      if (authProvider.isAdmin) {
-                        showDialog(
-                          context: context,
-                          barrierColor: Colors.black.withOpacity(0.18),
-                          builder:
-                              (context) => AccountDrawer(
-                                email: authProvider.user?.email ?? '',
-                                onLogout: () async {
-                                  await FirebaseAuth.instance.signOut();
-                                  if (mounted) Navigator.of(context).pop();
-                                },
-                              ),
-                        );
-                      } else {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  _buildActionIcon(
-                    icon: Icons.settings,
-                    onTap: _openSettingsPanel,
-                  ),
-                ],
+              child: _buildActionIcon(
+                icon: Icons.settings,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -235,44 +201,6 @@ class _HomeScreenState extends State<HomeScreen>
           child: Icon(icon, color: Colors.white, size: 20),
         ),
       ),
-    );
-  }
-
-  void _openSettingsPanel() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Settings',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 12),
-                ListTile(
-                  leading: Icon(Icons.palette_rounded),
-                  title: Text('Theme'),
-                  subtitle: Text('Light / Dark'),
-                ),
-                ListTile(
-                  leading: Icon(Icons.notifications_active_rounded),
-                  title: Text('Notifications'),
-                  subtitle: Text('Manage alerts & updates'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
