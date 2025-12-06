@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:painal/screens/book/BookScreen.dart';
-import 'package:painal/screens/gallery/GalleryScreen.dart';
+import 'package:painal/models/FamilyMember.dart';
+import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
+import 'package:painal/screens/vanshavali/more-family/MoreFamilyScreen.dart';
+import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
+import 'package:painal/screens/vanshavali/widgets/vanshavali_header.dart';
 
-class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({super.key});
+class VanshavaliListScreen extends StatefulWidget {
+  const VanshavaliListScreen({super.key});
 
   @override
-  State<ExploreScreen> createState() => _ExploreScreenState();
+  State<VanshavaliListScreen> createState() => _VanshavaliListScreenState();
 }
 
-class _ExploreScreenState extends State<ExploreScreen>
+class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+
+  // Search related
+  final TextEditingController _searchController = TextEditingController();
+  final List<FamilyMember> _familyData = []; // Will be populated if needed
 
   @override
   void initState() {
@@ -43,8 +50,26 @@ class _ExploreScreenState extends State<ExploreScreen>
     _slideController.forward();
   }
 
+  // Show search dialog
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SearchDialog(
+          familyData: _familyData,
+          onMemberSelected: (member) {
+            Navigator.pop(context);
+            // You can add navigation to member details here if needed
+            _showComingSoon('Member Details');
+          },
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
+    _searchController.dispose();
     _fadeController.dispose();
     _slideController.dispose();
     super.dispose();
@@ -65,22 +90,12 @@ class _ExploreScreenState extends State<ExploreScreen>
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          centerTitle: true,
-          title: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Row(
-              children: [
-                const Text(
-                  'Explore Heritage',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
+          automaticallyImplyLeading: false,
+          title: VanshavaliHeader(
+            heading: 'Vanshavali',
+            hindiHeading: '(वंशावली - परिवार वृक्ष)',
+            totalMembers: 0, // Not used in this screen
+            onSearchPressed: _showSearchDialog,
           ),
         ),
         body: FadeTransition(
@@ -93,75 +108,63 @@ class _ExploreScreenState extends State<ExploreScreen>
               child: Column(
                 children: [
                   _buildCreativeFeatureCard(
-                    icon: Icons.auto_stories_rounded,
-                    title: 'Sacred Texts',
-                    subtitle: 'Ancient manuscripts & wisdom',
-                    description:
-                        'Explore digitized sacred books and historical documents',
+                    icon: Icons.family_restroom_rounded,
+                    title: 'Main Family',
+                    subtitle: 'Primary family lineage',
+                    description: 'Explore the main village family tree',
                     color: Colors.white,
-                    onTap: () => _navigateWithAnimation(const BookScreen()),
+                    onTap:
+                        () => _navigateWithAnimation(const VanshavaliScreen()),
                     delay: 0,
-                    bgIcon: Icons.book_rounded,
+                    bgIcon: Icons.home_rounded,
                   ),
                   const SizedBox(height: 16),
                   _buildCreativeFeatureCard(
-                    icon: Icons.photo_library_rounded,
-                    title: 'Memory Gallery',
-                    subtitle: 'Visual journey through time',
-                    description: 'Captured moments from generations past',
+                    icon: Icons.diversity_3_rounded,
+                    title: 'More Vanshavali',
+                    subtitle: 'Extended family branches',
+                    description: 'Discover additional family trees',
                     color: Colors.white,
-                    onTap: () => _navigateWithAnimation(const GalleryScreen()),
+                    onTap:
+                        () => _navigateWithAnimation(const MoreFamilyScreen()),
                     delay: 100,
-                    bgIcon: Icons.image_rounded,
+                    bgIcon: Icons.groups_rounded,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCreativeFeatureCard(
+                    icon: Icons.history_edu_rounded,
+                    title: 'Family History',
+                    subtitle: 'Ancestral records',
+                    description: 'Browse historical family documents',
+                    color: Colors.white,
+                    onTap: () => _showComingSoon('Family History Archives'),
+                    delay: 200,
+                    isComingSoon: true,
+                    bgIcon: Icons.menu_book_rounded,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCreativeFeatureCard(
+                    icon: Icons.photo_album_rounded,
+                    title: 'Family Gallery',
+                    subtitle: 'Visual memories',
+                    description: 'View family photos and memories',
+                    color: Colors.white,
+                    onTap: () => _showComingSoon('Family Photo Gallery'),
+                    delay: 300,
+                    isComingSoon: true,
+                    bgIcon: Icons.collections_rounded,
                   ),
                   const SizedBox(height: 16),
                   _buildCreativeFeatureCard(
                     icon: Icons.location_on_rounded,
-                    title: 'Village Map',
-                    subtitle: 'Interactive heritage sites',
-                    description: 'Navigate through sacred places and landmarks',
+                    title: 'Family Locations',
+                    subtitle: 'Ancestral places',
+                    description: 'Map important family locations',
                     color: Colors.white,
-                    onTap: () => _showComingSoon('Interactive Village Map'),
-                    delay: 200,
-                    isComingSoon: true,
-                    bgIcon: Icons.map_rounded,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.timeline_rounded,
-                    title: 'Time Portal',
-                    subtitle: 'Journey through history',
-                    description: 'Experience the evolution of our village',
-                    color: Colors.white,
-                    onTap: () => _showComingSoon('Historical Timeline'),
-                    delay: 300,
-                    isComingSoon: true,
-                    bgIcon: Icons.history_rounded,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.record_voice_over_rounded,
-                    title: 'Oral Stories',
-                    subtitle: 'Voices from ancestors',
-                    description:
-                        'Listen to tales passed down through generations',
-                    color: Colors.white,
-                    onTap: () => _showComingSoon('Oral History Archive'),
+                    onTap: () => _showComingSoon('Family Location Map'),
                     delay: 400,
                     isComingSoon: true,
-                    bgIcon: Icons.mic_rounded,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildCreativeFeatureCard(
-                    icon: Icons.people_rounded,
-                    title: 'Family Tree',
-                    subtitle: 'Connect your lineage',
-                    description: 'Discover your ancestral connections',
-                    color: Colors.white,
-                    onTap: () => _showComingSoon('Genealogy Explorer'),
-                    delay: 500,
-                    isComingSoon: true,
-                    bgIcon: Icons.family_restroom_rounded,
+                    bgIcon: Icons.place_rounded,
                   ),
                 ],
               ),
