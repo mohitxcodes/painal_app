@@ -307,35 +307,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     });
   }
 
-  Future<List<FamilyMember>> _getAllFamilyMembers() async {
-    List<FamilyMember> all = [];
-    // main vanshavali cache
-    final mainBox = Hive.box<FamilyMember>('familyBox');
-    all.addAll(mainBox.values);
-
-    // more families caches
-    try {
-      final famSnap =
-          await FirebaseFirestore.instance.collection('families').get();
-      for (final doc in famSnap.docs) {
-        final String? col = doc.data()['collectionName'];
-        if (col == null || col.isEmpty) continue;
-        final boxName = 'familyBox_$col';
-        Box<FamilyMember> box;
-        if (Hive.isBoxOpen(boxName)) {
-          box = Hive.box<FamilyMember>(boxName);
-        } else if (await Hive.boxExists(boxName)) {
-          box = await Hive.openBox<FamilyMember>(boxName);
-        } else {
-          // no cache yet
-          continue;
-        }
-        all.addAll(box.values);
-      }
-    } catch (_) {}
-    return all;
-  }
-
   void _showSearchDialog() {
     if (_familyData == null || _familyData!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

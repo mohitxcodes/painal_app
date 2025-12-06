@@ -43,7 +43,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
   // Search related
   final TextEditingController _searchController = TextEditingController();
-  final List<FamilyMember> _familyData = []; // Will be populated if needed
 
   // Add family drawer
   void _openAddFamilyDrawer() {
@@ -178,12 +177,33 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
         });
       }
 
-      // Fetch main family member count
+      // Fetch main family member count and head
       final mainFamilySnapshot =
           await FirebaseFirestore.instance
-              .collection(mainFamily['collection'] ?? 'family')
+              .collection(mainFamily['collection'] ?? 'familyMembers')
               .get();
       final mainFamilyCount = mainFamilySnapshot.docs.length;
+
+      // Find main family head
+      String mainFamilyHeadName = mainFamily['head'] ?? 'Head of Family';
+      String mainFamilyDisplayName = mainFamily['name'] ?? 'Main Family';
+
+      try {
+        if (mainFamilySnapshot.docs.isNotEmpty) {
+          final headDoc = mainFamilySnapshot.docs.firstWhere(
+            (doc) => doc.data()['parentId'] == null,
+            orElse: () => mainFamilySnapshot.docs.first,
+          );
+          final String? name = headDoc.data()['name'];
+          if (name != null && name.isNotEmpty) {
+            mainFamilyHeadName = name;
+            // User requested showing head name. Appending 'Family' for consistency.
+            mainFamilyDisplayName = '$name Family';
+          }
+        }
+      } catch (e) {
+        debugPrint('Error finding main family head: $e');
+      }
 
       if (mounted) {
         setState(() {
@@ -200,16 +220,21 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
             currentMainFamily = Map<String, dynamic>.from(mainFamily);
           }
 
-          // Update member count with actual count from DB
+          // Update member count and name with actual data from DB
           currentMainFamily['members'] = mainFamilyCount;
 
-          // Rebuild list: [Main Family, ... Fetched Families]
-          final newList = [
-            currentMainFamily,
-            ...fetchedFamilies.where((f) => f['isMain'] != true),
-          ];
+          // CRITICAL: Ensure we overwrite the name if we found a better one
+          if (mainFamilyDisplayName != 'Main Family') {
+            currentMainFamily['name'] = mainFamilyDisplayName;
+          }
+          currentMainFamily['head'] = mainFamilyHeadName;
 
-          familyMembers = newList;
+          // Rebuild list: [Main Family, ... Fetched Families]
+          // Filter out any existing main family entry from fetched list to avoid duplication
+          final otherFamilies =
+              fetchedFamilies.where((f) => f['isMain'] != true).toList();
+
+          familyMembers = [currentMainFamily, ...otherFamilies];
           _isLoading = false;
         });
 
@@ -420,90 +445,250 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                       final family = familyMembers[index];
                       final isMainFamily = family['isMain'] == true;
 
-                      return Card(
+                      // Formatting Helper
+                      String formatFamilyName(String name) {
+                        return name
+                            .replaceAll('_', ' ')
+                            .split(' ')
+                            .map(
+                              (word) =>
+                                  word.isNotEmpty
+                                      ? '${word[0].toUpperCase()}${word.substring(1)}'
+                                      : '',
+                            )
+                            .join(' ');
+                      }
+
+                      final displayName = formatFamilyName(
+                        family['name'] ?? 'Unnamed Family',
+                      );
+
+                      return Container(
                         margin: const EdgeInsets.symmetric(
                           vertical: 8,
                           horizontal: 4,
                         ),
-                        color: Colors.white.withOpacity(0.08),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: Colors.white.withOpacity(0.1),
+                        decoration: BoxDecoration(
+                          color:
+                              isMainFamily
+                                  ? const Color(0xFFFBC02D).withOpacity(0.15)
+                                  : Colors.white.withOpacity(0.08),
+                          gradient: LinearGradient(
+                            colors:
+                                isMainFamily
+                                    ? [
+                                      const Color(0xFFFBC02D).withOpacity(0.2),
+                                      const Color(0xFFFBC02D).withOpacity(0.05),
+                                    ]
+                                    : [
+                                      Colors.white.withOpacity(0.12),
+                                      Colors.white.withOpacity(0.05),
+                                    ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color:
+                                isMainFamily
+                                    ? const Color(0xFFFBC02D).withOpacity(0.4)
+                                    : Colors.white.withOpacity(0.15),
                             width: 1,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        elevation: 0,
-                        child: ListTile(
-                          onTap:
-                              isMainFamily
-                                  ? () => _navigateWithAnimation(
-                                    const VanshavaliScreen(),
-                                  )
-                                  : () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => FamilyTreeScreen(
-                                              onSearchPressed: () {},
-                                              collectionName:
-                                                  family['collection'],
-                                              heading: family['name'],
-                                              hindiHeading:
-                                                  '(वंशावली - परिवार वृक्ष)',
-                                              totalMembers: family['members'],
-                                            ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap:
+                                isMainFamily
+                                    ? () => _navigateWithAnimation(
+                                      const VanshavaliScreen(),
+                                    )
+                                    : () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => FamilyTreeScreen(
+                                                onSearchPressed: () {},
+                                                collectionName:
+                                                    family['collection'],
+                                                heading: displayName,
+                                                hindiHeading:
+                                                    '(वंशावली - परिवार वृक्ष)',
+                                                totalMembers: family['members'],
+                                              ),
+                                        ),
+                                      );
+                                    },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 46,
+                                    height: 46,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors:
+                                            isMainFamily
+                                                ? [
+                                                  const Color(0xFFFBC02D),
+                                                  const Color(0xFFF57F17),
+                                                ]
+                                                : [
+                                                  Colors.blue.shade300,
+                                                  Colors.blue.shade600,
+                                                ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
                                       ),
-                                    );
-                                  },
-                          leading: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color:
-                                  isMainFamily
-                                      ? Colors.green.withOpacity(0.2)
-                                      : Colors.blue.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: (isMainFamily
+                                                  ? Colors.orange
+                                                  : Colors.blue)
+                                              .withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      isMainFamily
+                                          ? Icons.family_restroom_rounded
+                                          : Icons.diversity_3_rounded,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                displayName,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.5,
+                                                  shadows: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 4,
+                                                      offset: const Offset(
+                                                        0,
+                                                        2,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            if (isMainFamily)
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(
+                                                    0xFFFBC02D,
+                                                  ).withOpacity(0.2),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  border: Border.all(
+                                                    color: const Color(
+                                                      0xFFFBC02D,
+                                                    ),
+                                                  ),
+                                                ),
+                                                child: const Text(
+                                                  'MAIN',
+                                                  style: TextStyle(
+                                                    color: Color(0xFFFBC02D),
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 1,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.person_rounded,
+                                              size: 14,
+                                              color: Colors.white.withOpacity(
+                                                0.7,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              family['head'] ?? 'Unknown Head',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(
+                                                  0.9,
+                                                ),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Container(
+                                              width: 4,
+                                              height: 4,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(
+                                                  0.4,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              '${family['members']} Members',
+                                              style: TextStyle(
+                                                color: Colors.white.withOpacity(
+                                                  0.7,
+                                                ),
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 16,
+                                    color: Colors.white.withOpacity(0.4),
+                                  ),
+                                ],
+                              ),
                             ),
-                            child: Icon(
-                              isMainFamily
-                                  ? Icons.family_restroom_rounded
-                                  : Icons.people_alt_rounded,
-                              color:
-                                  isMainFamily
-                                      ? Colors.green[300]
-                                      : Colors.blue[300],
-                              size: 28,
-                            ),
-                          ),
-                          title: Text(
-                            family['name'] ?? 'Unnamed Family',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          subtitle: Text(
-                            isMainFamily
-                                ? '${family['head']} • ${family['members']} members'
-                                : '${family['head'] ?? 'Family'} • ${family['members']} members',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 13,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          trailing: Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 14,
-                            color: Colors.white.withOpacity(0.5),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
                           ),
                         ),
                       );
@@ -532,35 +717,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
           return SlideTransition(position: offsetAnimation, child: child);
         },
-      ),
-    );
-  }
-
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.upcoming_rounded,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text('$feature - Coming Soon!'),
-          ],
-        ),
-        backgroundColor: Colors.white.withOpacity(0.95),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
   }
