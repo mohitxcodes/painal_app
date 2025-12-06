@@ -4,6 +4,7 @@ import 'overview/OverviewScreen.dart';
 import 'book/BookScreen.dart';
 import 'gallery/GalleryScreen.dart';
 import 'package:painal/screens/settings/SettingsScreen.dart';
+import 'package:painal/screens/explore/ExploreScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -125,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen>
           children: const [
             OverviewScreen(),
             VanshavaliScreen(),
-            BookScreen(),
+            ExploreScreen(),
             GalleryScreen(),
           ],
         ),
