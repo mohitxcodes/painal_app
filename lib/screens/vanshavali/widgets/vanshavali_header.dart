@@ -35,7 +35,7 @@ class VanshavaliHeader extends StatelessWidget {
                   Text(
                     heading,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                       letterSpacing: -0.5,

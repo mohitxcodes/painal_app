@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:painal/models/FamilyMember.dart';
+import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
 import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
 import 'package:painal/screens/vanshavali/widgets/add_member_drawer.dart';
 import 'package:painal/screens/vanshavali/widgets/edit_member_drawer.dart';
@@ -102,6 +103,53 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
       _navigationStack.add(_currentMember!);
       _currentMember = child;
     });
+  }
+
+  void _navigateToMember(FamilyMember member) {
+    if (_familyData == null) return;
+    List<FamilyMember> stack = [];
+    FamilyMember? current = member;
+
+    // Build stack from child to root
+    while (current?.parentId != null) {
+      final parent = _familyData!.firstWhere(
+        (m) => m.id == current!.parentId,
+        orElse: () => current!,
+      );
+      if (parent.id == current!.id) break; // Breaker for circular or root
+      stack.insert(0, parent);
+      current = parent;
+    }
+
+    // Update state to navigate
+    setState(() {
+      _navigationStack
+        ..clear()
+        ..addAll(stack);
+      _currentMember = member;
+    });
+  }
+
+  void _showSearchDialog() {
+    if (_familyData == null || _familyData!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No family data available for search.')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.2),
+      builder:
+          (context) => SearchDialog(
+            familyData: _familyData,
+            onMemberSelected: (member) {
+              Navigator.of(context).pop(); // Close dialog
+              _navigateToMember(member);
+            },
+          ),
+    );
   }
 
   void _navigateBack() {
@@ -253,12 +301,12 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(240),
+          preferredSize: const Size.fromHeight(200),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
               child: VanshavaliHeader(
-                onSearchPressed: widget.onSearchPressed,
+                onSearchPressed: _showSearchDialog,
                 totalMembers: widget.totalMembers,
                 heading: widget.heading,
                 hindiHeading: widget.hindiHeading,
@@ -272,7 +320,7 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
               children: [
                 Container(
                   width: cardWidth,
-                  margin: const EdgeInsets.only(top: 8, bottom: 24),
+                  margin: const EdgeInsets.only(bottom: 24),
                   padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),

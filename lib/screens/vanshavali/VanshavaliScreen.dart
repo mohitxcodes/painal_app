@@ -336,21 +336,20 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     return all;
   }
 
-  void _showSearchDialog() async {
-    final members = await _getAllFamilyMembers();
-    if (members.isEmpty) {
+  void _showSearchDialog() {
+    if (_familyData == null || _familyData!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No family data available for search.')),
       );
       return;
     }
-    if (_familyData == null) return;
+
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.2),
       builder:
           (context) => SearchDialog(
-            familyData: members,
+            familyData: _familyData,
             onMemberSelected: (member) => _navigateToMember(member),
           ),
     );

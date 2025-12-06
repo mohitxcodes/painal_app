@@ -4,13 +4,15 @@ import 'dart:ui';
 import 'package:photo_view/photo_view.dart';
 
 class SearchDialog extends StatefulWidget {
-  final List<FamilyMember> familyData;
+  final List<FamilyMember>? familyData;
   final void Function(FamilyMember) onMemberSelected;
+  final Future<List<FamilyMember>> Function(String query)? onSearch;
 
   const SearchDialog({
     super.key,
-    required this.familyData,
+    this.familyData,
     required this.onMemberSelected,
+    this.onSearch,
   });
 
   @override
@@ -20,25 +22,59 @@ class SearchDialog extends StatefulWidget {
 class _SearchDialogState extends State<SearchDialog> {
   String query = '';
   List<FamilyMember> results = [];
+  bool isLoading = false;
 
-  void updateResults(String value) {
+  Future<void> updateResults(String value) async {
     setState(() {
       query = value;
-      if (query.isEmpty) {
-        results = [];
-      } else {
-        final isNumeric = int.tryParse(query) != null;
-        results =
-            widget.familyData.where((m) {
-              final matchesName = m.name.toLowerCase().contains(
-                query.toLowerCase(),
-              );
-              final matchesHindi = m.hindiName.contains(query);
-              final matchesId = isNumeric && m.id.toString().contains(query);
-              return matchesName || matchesHindi || matchesId;
-            }).toList();
-      }
     });
+
+    if (query.isEmpty) {
+      setState(() {
+        results = [];
+        isLoading = false;
+      });
+      return;
+    }
+
+    if (widget.onSearch != null) {
+      // Async Global Search
+      setState(() {
+        isLoading = true;
+      });
+      try {
+        final searchResults = await widget.onSearch!(query);
+        if (mounted) {
+          setState(() {
+            results = searchResults;
+            isLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            results = [];
+            isLoading = false;
+          });
+        }
+      }
+    } else {
+      // Local Search (Existing logic)
+      if (widget.familyData != null) {
+        final isNumeric = int.tryParse(query) != null;
+        setState(() {
+          results =
+              widget.familyData!.where((m) {
+                final matchesName = m.name.toLowerCase().contains(
+                  query.toLowerCase(),
+                );
+                final matchesHindi = m.hindiName.contains(query);
+                final matchesId = isNumeric && m.id.toString().contains(query);
+                return matchesName || matchesHindi || matchesId;
+              }).toList();
+        });
+      }
+    }
   }
 
   void _showProfileImage(
@@ -270,7 +306,13 @@ class _SearchDialogState extends State<SearchDialog> {
                     // Results List
                     Expanded(
                       child:
-                          query.isEmpty
+                          isLoading
+                              ? const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                              : query.isEmpty
                               ? _buildEmptyState()
                               : results.isEmpty
                               ? _buildNoResultsState()
@@ -422,8 +464,8 @@ class _SearchDialogState extends State<SearchDialog> {
       itemBuilder: (context, idx) {
         final member = results[idx];
         final parent =
-            member.parentId != null
-                ? widget.familyData.firstWhere(
+            widget.familyData != null && member.parentId != null
+                ? widget.familyData!.firstWhere(
                   (m) => m.id == member.parentId,
                   orElse:
                       () => FamilyMember(

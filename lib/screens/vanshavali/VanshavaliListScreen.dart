@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
 import 'package:painal/screens/vanshavali/more-family/AddFamilyDrawer.dart';
@@ -56,7 +57,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           (context) => AddFamilyDrawer(
             onSaved: () {
               Navigator.of(context).pop();
-              _fetchFamilies(); // Refetch families after adding a new one
+              Navigator.of(context).pop();
+              _loadFamilies(forceRefresh: true); // Refetch after adding new
             },
           ),
     );
@@ -88,17 +90,53 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     _fadeController.forward();
     _slideController.forward();
 
-    // Fetch families when the widget initializes
-    _fetchFamilies();
+    // Load families from cache first, then fetch background update if needed
+    _loadFamilies();
   }
 
-  Future<void> _fetchFamilies() async {
+  Future<void> _loadFamilies({bool forceRefresh = false}) async {
     if (!mounted) return;
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+    // 1. Try to load from Cache first (unless forcing refresh)
+    if (!forceRefresh) {
+      try {
+        var box = await Hive.openBox('vanshavali_list_cache');
+        if (box.isNotEmpty) {
+          final cachedData = box.get('families');
+          if (cachedData != null) {
+            final List<dynamic> decoded = cachedData;
+            final List<Map<String, dynamic>> cachedList =
+                decoded.map((e) => Map<String, dynamic>.from(e)).toList();
+
+            setState(() {
+              familyMembers = cachedList;
+              _isLoading = false;
+            });
+            // Optional: Still fetch in background to keep data fresh
+            _fetchFamiliesFromFirestore(updateCache: true);
+            return;
+          }
+        }
+      } catch (e) {
+        print("Cache load error: $e");
+        // Proceed to fetch from firestore if cache fails
+      }
+    }
+
+    // 2. If no cache or force refresh, fetch from Firestore
+    await _fetchFamiliesFromFirestore(updateCache: true);
+  }
+
+  Future<void> _fetchFamiliesFromFirestore({bool updateCache = true}) async {
+    if (!mounted) return;
+
+    // Only show loading if we don't have data yet
+    if (familyMembers.isEmpty) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
+    }
 
     try {
       // Fetch all families from the 'families' root collection
@@ -155,7 +193,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           );
 
           Map<String, dynamic> currentMainFamily;
-          if (mainFamilyIndex != -1) {
+          if (familyMembers.isNotEmpty && mainFamilyIndex != -1) {
             currentMainFamily = familyMembers[mainFamilyIndex];
           } else {
             // Use a copy of the global mainFamily to avoid issues
@@ -166,13 +204,24 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           currentMainFamily['members'] = mainFamilyCount;
 
           // Rebuild list: [Main Family, ... Fetched Families]
-          familyMembers = [
+          final newList = [
             currentMainFamily,
             ...fetchedFamilies.where((f) => f['isMain'] != true),
           ];
 
+          familyMembers = newList;
           _isLoading = false;
         });
+
+        // 3. Save to Cache
+        if (updateCache) {
+          try {
+            var box = await Hive.openBox('vanshavali_list_cache');
+            await box.put('families', familyMembers);
+          } catch (e) {
+            print("Cache save error: $e");
+          }
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -190,15 +239,100 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
       context: context,
       builder: (BuildContext context) {
         return SearchDialog(
-          familyData: _familyData,
+          // No local familyData provided for global search
+          onSearch: _globalSearch,
           onMemberSelected: (member) {
             Navigator.pop(context);
-            // You can add navigation to member details here if needed
-            _showComingSoon('Member Details');
+            // Navigate based on collection
+            final isMain =
+                member.collectionName ==
+                (mainFamily['collection'] ?? 'familyMembers');
+
+            if (isMain) {
+              _navigateWithAnimation(const VanshavaliScreen());
+            } else {
+              // Find family details for the screen title
+              final family = familyMembers.firstWhere(
+                (f) => f['collection'] == member.collectionName,
+                orElse: () => {},
+              );
+
+              final heading = family['name'] ?? 'Family Tree';
+              final totalMembers = family['members'] ?? 0;
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder:
+                      (context) => FamilyTreeScreen(
+                        onSearchPressed:
+                            () {}, // Search inside tree not needed immediately or can trigger local search
+                        collectionName: member.collectionName!,
+                        heading: heading,
+                        hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                        totalMembers: totalMembers is int ? totalMembers : 0,
+                      ),
+                ),
+              );
+            }
           },
         );
       },
     );
+  }
+
+  Future<List<FamilyMember>> _globalSearch(String query) async {
+    if (query.length < 2) return [];
+
+    final List<Future<List<FamilyMember>>> futures = [];
+
+    // Search in all known collections
+    for (var family in familyMembers) {
+      final collectionName = family['collection'] as String?;
+      if (collectionName != null) {
+        futures.add(_searchInCollection(collectionName, query));
+      }
+    }
+
+    final results = await Future.wait(futures);
+    // Flatten results
+    return results.expand((i) => i).toList();
+  }
+
+  Future<List<FamilyMember>> _searchInCollection(
+    String collectionName,
+    String query,
+  ) async {
+    try {
+      // Create a query for name prefix match
+      // Note: Firestore text search is limited. This is a basic prefix match.
+      // For more advanced search, Algolia or similar is recommended.
+      // We check both name and hindiName manual filtering or multiple queries if needed.
+      // Here we fetch a subset or try to match exactly/prefix.
+      // For simplicity and cost, we might do client side filtering if lists are small,
+      // but user asked for "whole data". Assuming reasonable size, we query.
+
+      // Queries
+      final nameQuery =
+          FirebaseFirestore.instance
+              .collection(collectionName)
+              .where('name', isGreaterThanOrEqualTo: query)
+              .where('name', isLessThan: '$query\uf8ff')
+              .limit(5)
+              .get();
+
+      // We can't do OR query easily across fields without Composite Indexes or multiple queries.
+      // We will execute name query first.
+      final snapshot = await nameQuery;
+
+      return snapshot.docs.map((doc) {
+        final member = FamilyMember.fromMap(doc.data());
+        member.collectionName = collectionName;
+        return member;
+      }).toList();
+    } catch (e) {
+      print('Error searching $collectionName: $e');
+      return [];
+    }
   }
 
   @override
@@ -266,14 +400,14 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: _fetchFamilies,
+                        onPressed: () => _loadFamilies(forceRefresh: true),
                         child: const Text('Retry'),
                       ),
                     ],
                   ),
                 )
                 : RefreshIndicator(
-                  onRefresh: _fetchFamilies,
+                  onRefresh: () => _loadFamilies(forceRefresh: true),
                   color: Colors.white,
                   backgroundColor: Colors.green[700],
                   child: ListView.builder(

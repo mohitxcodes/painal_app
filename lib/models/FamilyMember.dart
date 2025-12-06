@@ -32,6 +32,9 @@ class FamilyMember {
   @HiveField(8)
   final DateTime? lastUpdated;
 
+  // Transient field for global search (not persisted)
+  String? collectionName;
+
   FamilyMember({
     required this.id,
     required this.name,
@@ -41,6 +44,7 @@ class FamilyMember {
     this.parentId,
     required this.profilePhoto,
     this.lastUpdated,
+    this.collectionName,
   });
 
   factory FamilyMember.fromMap(Map<String, dynamic> data) {
