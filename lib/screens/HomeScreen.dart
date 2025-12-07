@@ -122,18 +122,20 @@ class _HomeScreenState extends State<HomeScreen>
               child: Container(
                 height: 60,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF0B3B2D).withOpacity(0.9),
-                      const Color(0xFF1F6B3A).withOpacity(0.9),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
+                  color: const Color(0xFF0B3B2D).withValues(alpha: 0.8),
+
+                  //
+                  // gradient: LinearGradient(
+                  //   colors: [
+                  //     const Color(0xFF1F6B3A).withValues(alpha: 0.9),
+                  //   ],
+                  //   begin: Alignment.topCenter,
+                  //   end: Alignment.bottomCenter,
+                  // ),
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -143,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen>
                   controller: _tabController,
                   dividerColor: Colors.transparent,
                   indicator: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
@@ -190,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen>
   }) {
     final borderRadius = BorderRadius.circular(12);
     return Material(
-      color: Colors.white.withOpacity(0.18),
+      color: Colors.white.withValues(alpha: 0.18),
       shape: RoundedRectangleBorder(borderRadius: borderRadius),
       child: InkWell(
         onTap: onTap,

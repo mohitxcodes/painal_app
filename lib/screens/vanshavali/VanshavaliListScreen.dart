@@ -382,7 +382,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+          colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+          stops: [0.0, 1.0],
         ),
       ),
       child: Scaffold(
