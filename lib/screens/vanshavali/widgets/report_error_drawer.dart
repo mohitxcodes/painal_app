@@ -113,7 +113,13 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(28),
                 child: Container(
-                  decoration: const BoxDecoration(color: Colors.white),
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+                    ),
+                  ),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(
@@ -128,14 +134,8 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                               width: 48,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: Colors.grey[300],
+                                color: Colors.white.withOpacity(0.3),
                                 borderRadius: BorderRadius.circular(4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
-                                    blurRadius: 2,
-                                  ),
-                                ],
                               ),
                             ),
                           ),
@@ -150,13 +150,13 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.red[50],
+                                  color: Colors.red.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 padding: const EdgeInsets.all(8),
                                 child: const Icon(
                                   Icons.report_gmailerrorred_outlined,
-                                  color: Colors.red,
+                                  color: Colors.redAccent,
                                   size: 28,
                                 ),
                               ),
@@ -170,7 +170,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                       style: theme.textTheme.titleLarge
                                           ?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.red[700],
+                                            color: Colors.white,
                                             fontSize: 22,
                                             letterSpacing: 0.1,
                                           ),
@@ -180,7 +180,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                       'Help us keep the family tree accurate.',
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
-                                            color: Colors.grey[700],
+                                            color: Colors.white70,
                                             fontWeight: FontWeight.w500,
                                           ),
                                     ),
@@ -201,7 +201,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                 children: [
                                   const Icon(
                                     Icons.person,
-                                    color: Colors.green,
+                                    color: Colors.white70,
                                     size: 20,
                                   ),
                                   const SizedBox(width: 8),
@@ -215,7 +215,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                           : widget.memberName,
                                       style: theme.textTheme.bodyLarge
                                           ?.copyWith(
-                                            color: Colors.black87,
+                                            color: Colors.white,
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16,
                                           ),
@@ -229,7 +229,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                         '(${widget.memberName})',
                                         style: theme.textTheme.bodyMedium
                                             ?.copyWith(
-                                              color: Colors.grey[700],
+                                              color: Colors.white60,
                                               fontWeight: FontWeight.w400,
                                             ),
                                       ),
@@ -243,7 +243,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                   children: [
                                     const Icon(
                                       Icons.cake,
-                                      color: Colors.green,
+                                      color: Colors.white70,
                                       size: 18,
                                     ),
                                     const SizedBox(width: 8),
@@ -251,7 +251,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                       widget.memberDob!,
                                       style: theme.textTheme.bodyMedium
                                           ?.copyWith(
-                                            color: Colors.black87,
+                                            color: Colors.white,
                                             fontWeight: FontWeight.w500,
                                           ),
                                     ),
@@ -269,7 +269,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                             'What is wrong?',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: Colors.green[800],
+                              color: Colors.white,
                               fontSize: 16,
                             ),
                           ),
@@ -315,8 +315,10 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                             children: [
                               OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red,
-                                  side: const BorderSide(color: Colors.red),
+                                  foregroundColor: Colors.white70,
+                                  side: BorderSide(
+                                    color: Colors.white.withOpacity(0.3),
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -340,11 +342,14 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor:
                                       canSubmit && !_submitting
-                                          ? Colors.green[700]
-                                          : Colors.green[200],
+                                          ? Colors.white.withOpacity(0.15)
+                                          : Colors.white.withOpacity(0.05),
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color: Colors.white.withOpacity(0.2),
+                                    ),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 22,
@@ -353,7 +358,7 @@ class _ReportErrorDrawerState extends State<ReportErrorDrawer> {
                                   textStyle: const TextStyle(
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  elevation: canSubmit && !_submitting ? 2 : 0,
+                                  elevation: 0,
                                 ),
                                 icon:
                                     _submitting
@@ -415,22 +420,15 @@ class _CustomCheckboxTile extends StatelessWidget {
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        color: checked ? Colors.green[50] : Colors.grey[100],
+        color:
+            checked
+                ? Colors.green.withOpacity(0.15)
+                : Colors.white.withOpacity(0.08),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: checked ? Colors.green[300]! : Colors.grey[300]!,
+          color: checked ? Colors.green[400]! : Colors.white.withOpacity(0.15),
           width: checked ? 1.6 : 1.0,
         ),
-        boxShadow:
-            checked
-                ? [
-                  BoxShadow(
-                    color: Colors.green.withOpacity(0.07),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-                : [],
       ),
       child: Column(
         children: [
@@ -443,13 +441,15 @@ class _CustomCheckboxTile extends StatelessWidget {
                 children: [
                   Icon(
                     icon,
-                    color: checked ? Colors.green[700] : Colors.grey[600],
+                    color: checked ? Colors.white : Colors.white54,
                     size: 22,
                   ),
                   Checkbox(
                     value: checked,
                     onChanged: (val) => onChanged(val ?? false),
-                    activeColor: Colors.green,
+                    activeColor: Colors.white,
+                    checkColor: Colors.green[800],
+                    side: const BorderSide(color: Colors.white60, width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
@@ -460,7 +460,7 @@ class _CustomCheckboxTile extends StatelessWidget {
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         fontSize: 15.5,
-                        color: checked ? Colors.green[900] : Colors.black87,
+                        color: checked ? Colors.white : Colors.white70,
                       ),
                     ),
                   ),
@@ -481,18 +481,32 @@ class _CustomCheckboxTile extends StatelessWidget {
                 autofocus: true,
                 decoration: InputDecoration(
                   labelText: inputHint,
+                  labelStyle: const TextStyle(color: Colors.white70),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
                   ),
-                  prefixIcon: Icon(icon, color: Colors.green[700]),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.3),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.white),
+                  ),
+                  prefixIcon: Icon(icon, color: Colors.white70),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: Colors.white.withOpacity(0.1),
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 14,
                     horizontal: 12,
                   ),
                 ),
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
                 textInputAction: TextInputAction.next,
               ),
             ),

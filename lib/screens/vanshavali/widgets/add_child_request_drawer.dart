@@ -101,7 +101,11 @@ class _AddChildRequestDrawerState extends State<AddChildRequestDrawer> {
                 ),
                 title: Column(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green, size: 48),
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.green[700],
+                      size: 48,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Request Sent!',
@@ -119,7 +123,10 @@ class _AddChildRequestDrawerState extends State<AddChildRequestDrawer> {
                   children: [
                     Text(
                       'Your request to add "$name" as a child of "${widget.parentName}" has been sent.',
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
@@ -196,138 +203,211 @@ class _AddChildRequestDrawerState extends State<AddChildRequestDrawer> {
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(24),
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 28,
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Center(
-                        child: Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 38,
-                              backgroundColor: Colors.green[100],
-                              backgroundImage:
-                                  _uploadedImageUrl != null &&
-                                          _uploadedImageUrl!.isNotEmpty
-                                      ? NetworkImage(_uploadedImageUrl!)
-                                      : null,
-                              child:
-                                  _uploadedImageUrl == null ||
-                                          _uploadedImageUrl!.isEmpty
-                                      ? const Icon(
-                                        Icons.person,
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 28,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Center(
+                          child: Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 38,
+                                backgroundColor: Colors.white.withOpacity(0.1),
+                                backgroundImage:
+                                    _uploadedImageUrl != null &&
+                                            _uploadedImageUrl!.isNotEmpty
+                                        ? NetworkImage(_uploadedImageUrl!)
+                                        : null,
+                                child:
+                                    _uploadedImageUrl == null ||
+                                            _uploadedImageUrl!.isEmpty
+                                        ? const Icon(
+                                          Icons.person,
+                                          color: Colors.white70,
+                                          size: 38,
+                                        )
+                                        : null,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Material(
+                                  color: Colors.white,
+                                  shape: const CircleBorder(),
+                                  elevation: 2,
+                                  child: InkWell(
+                                    customBorder: const CircleBorder(),
+                                    onTap: _pickAndUploadImage,
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Icon(
+                                        Icons.edit,
+                                        size: 20,
                                         color: Colors.green,
-                                        size: 38,
-                                      )
-                                      : null,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Material(
-                                color: Colors.white,
-                                shape: const CircleBorder(),
-                                elevation: 2,
-                                child: InkWell(
-                                  customBorder: const CircleBorder(),
-                                  onTap: _pickAndUploadImage,
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(4.0),
-                                    child: Icon(
-                                      Icons.edit,
-                                      size: 20,
-                                      color: Colors.green,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        TextField(
+                          controller: nameController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'English Name',
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      TextField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          labelText: 'English Name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          prefixIcon: const Icon(Icons.person),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: hindiNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Hindi Name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          prefixIcon: const Icon(Icons.person_outline),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: dobController,
-                        decoration: InputDecoration(
-                          labelText: 'Date of Birth (optional)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          prefixIcon: const Icon(Icons.cake),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green[700],
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
                             ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: Colors.white),
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.person,
+                              color: Colors.white70,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: hindiNameController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Hindi Name',
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: Colors.white),
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.person_outline,
+                              color: Colors.white70,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: dobController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Date of Birth (optional)',
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(color: Colors.white),
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.cake,
+                              color: Colors.white70,
+                            ),
+                            filled: true,
+                            fillColor: Colors.white.withOpacity(0.1),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white.withOpacity(0.2),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: Colors.white.withOpacity(0.2),
+                                ),
+                              ),
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              elevation: 0,
+                            ),
+                            icon:
+                                _loading
+                                    ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                    : const Icon(Icons.send),
+                            label: const Text('Send Request'),
+                            onPressed: _loading ? null : _submit,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          icon: const Icon(Icons.close, size: 18),
+                          label: const Text('Cancel'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white70,
                             textStyle: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          icon:
-                              _loading
-                                  ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2.5,
-                                    ),
-                                  )
-                                  : const Icon(Icons.send),
-                          label: const Text('Send Request'),
-                          onPressed: _loading ? null : _submit,
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton.icon(
-                        icon: const Icon(Icons.close, size: 18),
-                        label: const Text('Cancel'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
