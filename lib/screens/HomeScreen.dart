@@ -1,7 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:painal/screens/vanshavali/VanshavaliListScreen.dart';
 import 'overview/OverviewScreen.dart';
-import 'book/BookScreen.dart';
 import 'gallery/GalleryScreen.dart';
 import 'package:painal/screens/settings/SettingsScreen.dart';
 import 'package:painal/screens/explore/ExploreScreen.dart';
@@ -13,23 +13,6 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _IconTextTab extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _IconTextTab({super.key, required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Tab(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [Icon(icon, size: 18), const SizedBox(width: 6), Text(label)],
-      ),
-    );
-  }
-}
-
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
@@ -37,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -127,56 +110,72 @@ class _HomeScreenState extends State<HomeScreen>
             OverviewScreen(),
             VanshavaliListScreen(),
             ExploreScreen(),
-            GalleryScreen(),
           ],
         ),
-        bottomNavigationBar: Material(
-          elevation: 0,
-          color: Colors.transparent,
-          child: SafeArea(
-            top: false,
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.white.withOpacity(0.15)),
-                ),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF0B3B2D), Color(0xFF134B30)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: TabBar(
-                controller: _tabController,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                labelPadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                indicator: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                indicatorSize: TabBarIndicatorSize.label,
-                indicatorPadding: EdgeInsets.zero,
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
-                labelStyle: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                unselectedLabelStyle: const TextStyle(fontSize: 13),
-                tabs: const [
-                  _IconTextTab(icon: Icons.home_filled, label: 'Home'),
-                  _IconTextTab(
-                    icon: Icons.family_restroom,
-                    label: 'Vanshavali',
+        extendBody: true,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF0B3B2D).withOpacity(0.9),
+                      const Color(0xFF1F6B3A).withOpacity(0.9),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  _IconTextTab(icon: Icons.menu_book_rounded, label: 'Explore'),
-                ],
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  dividerColor: Colors.transparent,
+                  indicator: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicatorPadding: const EdgeInsets.all(4),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white60,
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 12,
+                  ),
+                  tabs: const [
+                    Tab(
+                      icon: Icon(Icons.home_rounded),
+                      text: 'Home',
+                      iconMargin: EdgeInsets.only(bottom: 2),
+                    ),
+                    Tab(
+                      icon: Icon(Icons.family_restroom_rounded),
+                      text: 'Vanshavali',
+                      iconMargin: EdgeInsets.only(bottom: 2),
+                    ),
+                    Tab(
+                      icon: Icon(Icons.explore_rounded),
+                      text: 'Explore',
+                      iconMargin: EdgeInsets.only(bottom: 2),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
