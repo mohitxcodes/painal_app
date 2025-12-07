@@ -24,7 +24,7 @@ class OverviewScreen extends StatelessWidget {
             CurrentWeatherWidget(),
             SizedBox(height: 12),
             LocationInfoWidget(),
-            SizedBox(height: 12),
+            SizedBox(height: 100),
           ],
         ),
       ),

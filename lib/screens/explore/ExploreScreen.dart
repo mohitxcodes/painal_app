@@ -90,7 +90,12 @@ class _ExploreScreenState extends State<ExploreScreen>
             position: _slideAnimation,
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              padding: const EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 20,
+                bottom: 100,
+              ),
               child: Column(
                 children: [
                   _buildCreativeFeatureCard(
