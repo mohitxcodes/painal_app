@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -22,6 +23,7 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
           'Explore your family tree, lineage, and discover relationships across generations.',
       'button': 'View Tree',
       'color': Colors.green[700],
+      'bgIcon': Icons.family_restroom_rounded,
     },
     {
       'icon': Icons.menu_book,
@@ -31,6 +33,7 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
           'Read the digital book of Painal village, featuring its history & culture',
       'button': 'Read Book',
       'color': Colors.orange[700],
+      'bgIcon': Icons.import_contacts_rounded,
     },
     {
       'icon': Icons.photo_library,
@@ -40,6 +43,7 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
           'Browse a curated gallery of photos and memories from the village.',
       'button': 'Open Gallery',
       'color': Colors.blue[700],
+      'bgIcon': Icons.collections_rounded,
     },
   ];
 
@@ -94,119 +98,148 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
             itemBuilder: (context, i) {
               final feature = _features[i];
               return Center(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap:
-                      () => _onFeatureTap(context, feature['route'] as String),
-                  splashColor: Colors.white24,
-                  highlightColor: Colors.white10,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: width > 600 ? 420 : width - 32,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.25),
-                        width: 1.2,
-                      ),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withOpacity(0.18),
-                          Colors.white.withOpacity(0.08),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24),
+                      onTap:
+                          () => _onFeatureTap(
+                            context,
+                            feature['route'] as String,
+                          ),
+                      splashColor: Colors.white.withValues(alpha: 0.1),
+                      highlightColor: Colors.white.withValues(alpha: 0.05),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: width > 600 ? 420 : width - 32,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 18,
                         ),
-                      ],
-                    ),
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 60, bottom: 36),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                feature['subtitle'] as String,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white.withOpacity(0.72),
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                feature['title'] as String,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                feature['desc'] as String,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white.withOpacity(0.9),
-                                  height: 1.45,
-                                ),
-                              ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            width: 1.2,
+                          ),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withValues(alpha: 0.15),
+                              Colors.white.withValues(alpha: 0.05),
                             ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                        ),
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.12),
+                              blurRadius: 20,
+                              offset: const Offset(0, 12),
                             ),
-                            child: Icon(
-                              feature['icon'] as IconData,
-                              color: Colors.white,
-                              size: 22,
-                            ),
-                          ),
+                          ],
                         ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                feature['button'] as String,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                        child: Stack(
+                          clipBehavior: Clip.hardEdge,
+                          children: [
+                            // Background Icon Effect
+                            Positioned(
+                              right: -10,
+                              top: -10,
+                              child: Icon(
+                                feature['bgIcon'] as IconData,
+                                color: Colors.white.withValues(alpha: 0.10),
+                                size: 100,
+                              ),
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                right: 60,
+                                bottom: 36,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    feature['subtitle'] as String,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.72,
+                                      ),
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    feature['title'] as String,
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    feature['desc'] as String,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: (feature['color'] as Color).withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  border: Border.all(
+                                    color: (feature['color'] as Color)
+                                        .withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      feature['button'] as String,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Icon(
+                                      Icons.arrow_forward_rounded,
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.arrow_forward_rounded,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

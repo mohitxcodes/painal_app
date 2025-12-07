@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -53,176 +54,193 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Color weatherColor = Colors.green[700]!;
-    if (weatherData != null) {
-      final main = (weatherData!['weather'][0]['main'] as String).toLowerCase();
-      if (main.contains('rain')) {
-        weatherColor = Colors.blue[700]!;
-      } else if (main.contains('cloud'))
-        weatherColor = Colors.green[700]!;
-      else if (main.contains('clear'))
-        weatherColor = Colors.orange[700]!;
-    }
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.18),
-            Colors.white.withOpacity(0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white24,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.15),
+                Colors.white.withValues(alpha: 0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: Icon(_getWeatherIcon(), color: Colors.white, size: 30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-          const SizedBox(width: 18),
-          Expanded(
-            child:
-                isLoading
-                    ? Row(
-                      children: [
-                        const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.2,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          'Loading...',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                      ],
-                    )
-                    : errorMessage.isNotEmpty
-                    ? Row(
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: Colors.orange[200],
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            errorMessage,
-                            style: TextStyle(
-                              color: Colors.orange[100],
-                              fontSize: 11,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    )
-                    : weatherData != null
-                    ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.1),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Icon(_getWeatherIcon(), color: Colors.white, size: 32),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child:
+                    isLoading
+                        ? Row(
                           children: [
-                            Text(
-                              '${weatherData!['main']['temp'].round()}°C',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                color: Colors.white70,
+                                strokeWidth: 2,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Text(
-                              weatherData!['weather'][0]['main'],
+                              'Loading...',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
+                        )
+                        : errorMessage.isNotEmpty
+                        ? Row(
                           children: [
                             Icon(
-                              Icons.water_drop,
-                              color: Colors.white.withOpacity(0.75),
-                              size: 13,
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              'Humidity: ${weatherData!['main']['humidity']}%',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
+                              Icons.error_outline_rounded,
+                              color: Colors.orange[300],
+                              size: 20,
                             ),
                             const SizedBox(width: 10),
-                            Icon(
-                              Icons.air,
-                              color: Colors.white.withOpacity(0.75),
-                              size: 13,
+                            Expanded(
+                              child: Text(
+                                errorMessage,
+                                style: TextStyle(
+                                  color: Colors.orange[100],
+                                  fontSize: 12,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                            const SizedBox(width: 3),
+                          ],
+                        )
+                        : weatherData != null
+                        ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  '${weatherData!['main']['temp'].round()}°',
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  (weatherData!['weather'][0]['main'] as String)
+                                      .toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.water_drop_rounded,
+                                  color: Colors.blue[100],
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${weatherData!['main']['humidity']}%',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Icon(
+                                  Icons.air_rounded,
+                                  color: Colors.white70,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${weatherData!['wind']['speed']} m/s',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                        : Row(
+                          children: [
+                            Icon(
+                              Icons.cloud_off_rounded,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
                             Text(
-                              'Wind: ${weatherData!['wind']['speed']} m/s',
+                              'No weather data',
                               style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 13,
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    )
-                    : Row(
-                      children: [
-                        Icon(Icons.cloud_off, color: Colors.white70, size: 18),
-                        const SizedBox(width: 8),
-                        Text(
-                          'No data',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                      ],
-                    ),
+              ),
+              const SizedBox(width: 10),
+              IconButton(
+                onPressed: fetchWeatherData,
+                icon: const Icon(Icons.refresh_rounded),
+                color: Colors.white70,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                tooltip: 'Refresh Weather',
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.white.withValues(alpha: 0.1),
+                  padding: const EdgeInsets.all(8),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          IconButton(
-            onPressed: fetchWeatherData,
-            icon: const Icon(Icons.refresh, color: Colors.white70, size: 18),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            tooltip: 'Refresh',
-          ),
-        ],
+        ),
       ),
     );
   }

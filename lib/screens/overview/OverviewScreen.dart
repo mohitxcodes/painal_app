@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'widgets/AboutVillageWidget.dart';
 import 'widgets/CurrentWeatherWidget.dart';
 import 'widgets/LocationInfoWidget.dart';
-import 'widgets/AppFeaturesCarousel.dart';
 
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
@@ -14,7 +13,8 @@ class OverviewScreen extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+          colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+          stops: [0.0, 1.0],
         ),
       ),
       child: SingleChildScrollView(
