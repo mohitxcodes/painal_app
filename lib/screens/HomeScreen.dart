@@ -45,12 +45,12 @@ class _HomeScreenState extends State<HomeScreen>
             padding: const EdgeInsets.only(left: 12.0),
             child: Center(
               child: Container(
-                width: 40,
-                height: 40,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
+                  shape: BoxShape.circle,
                   image: const DecorationImage(
-                    image: AssetImage('assets/images/painal_round_logo.png'),
+                    image: AssetImage('assets/logo/painal_logo_dark.png'),
                     fit: BoxFit.cover,
                   ),
                 ),
