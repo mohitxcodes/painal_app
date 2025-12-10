@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         extendBody: true,
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 20, left: 16, right: 16),
+          padding: const EdgeInsets.only(bottom: 40, left: 16, right: 16),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(30),
             child: BackdropFilter(

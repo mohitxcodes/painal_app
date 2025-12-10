@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/screens/login/LoginScreen.dart';
-import 'package:painal/screens/login/widgets/AccountDrawer.dart';
+import 'package:painal/screens/reports/ReportsScreen.dart';
+import 'package:painal/screens/requests/RequestsScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -139,21 +140,27 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 20),
           if (authProvider.isAdmin) ...[
             _buildAccountActionTile(
-              leading: Icons.account_circle_rounded,
-              title: 'Account Details',
-              subtitle: 'View and manage your account',
+              leading: Icons.list_alt_rounded,
+              title: 'View Requests',
+              subtitle: 'Manage pending requests',
               onTap: () {
-                showDialog(
-                  context: context,
-                  barrierColor: Colors.black.withOpacity(0.18),
-                  builder:
-                      (context) => AccountDrawer(
-                        email: authProvider.user?.email ?? '',
-                        onLogout: () async {
-                          await FirebaseAuth.instance.signOut();
-                          if (context.mounted) Navigator.of(context).pop();
-                        },
-                      ),
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const RequestsScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildAccountActionTile(
+              leading: Icons.report_gmailerrorred_rounded,
+              title: 'View Reports',
+              subtitle: 'Check reported issues',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ReportsScreen(),
+                  ),
                 );
               },
             ),
