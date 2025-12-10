@@ -79,6 +79,15 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         : 'familyBox_${widget.collectionName}';
   }
 
+  Future<Box<FamilyMember>> _getBox() async {
+    final boxName = _getBoxName();
+    if (Hive.isBoxOpen(boxName)) {
+      return Hive.box<FamilyMember>(boxName);
+    } else {
+      return await Hive.openBox<FamilyMember>(boxName);
+    }
+  }
+
   Future<void> _checkForRemoteUpdates() async {
     bool updateNeeded = false;
     // Get the latest lastUpdated from Firestore
@@ -96,7 +105,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           _remoteLastUpdated = remoteTime;
         });
         // Compare with local
-        final box = Hive.box<FamilyMember>(_getBoxName());
+        final box = await _getBox();
         DateTime? localTime;
         for (var member in box.values) {
           if (member.lastUpdated != null) {
@@ -172,7 +181,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     }
 
     try {
-      final box = Hive.box<FamilyMember>(_getBoxName());
+      final box = await _getBox();
       List<FamilyMember> data = [];
 
       if (!forceRefresh && box.isNotEmpty) {
@@ -491,59 +500,129 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     final userAuth = Provider.of<AuthProviderUser>(context);
     bool showBanner = _showUpdateBanner && !userAuth.isAdmin;
     bool fetchingBanner = false;
-    // Remove modal dialog logic
+
+    // Wrap loading and error states with background gradient
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_error != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                _error!,
-                style: const TextStyle(fontSize: 16, color: Colors.red),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 20),
-            StatefulBuilder(
-              builder: (context, setState) {
-                return _loading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton.icon(
-                      onPressed: () async {
-                        setState(() => _loading = true);
-                        try {
-                          await _loadFamilyData(forceRefresh: true);
-                          if (mounted && _error != null) {
-                            setState(() => _loading = false);
-                          }
-                        } catch (e) {
-                          if (mounted) {
-                            setState(() {
-                              _error = 'Failed to load data: $e';
-                              _loading = false;
-                            });
-                          }
-                        }
-                      },
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                      ),
-                    );
+      return Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                // Pop all routes until we're back at the list or root
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
             ),
-          ],
+            title: Text(
+              widget.heading,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+          ),
+          body: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    if (_error != null) {
+      return Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                // Pop all routes until we're back at the list or root
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
+            title: Text(
+              widget.heading,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(fontSize: 16, color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                StatefulBuilder(
+                  builder: (context, setState) {
+                    return _loading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton.icon(
+                          onPressed: () async {
+                            setState(() => _loading = true);
+                            try {
+                              await _loadFamilyData(forceRefresh: true);
+                              if (mounted && _error != null) {
+                                setState(() => _loading = false);
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                setState(() {
+                                  _error = 'Failed to load data: $e';
+                                  _loading = false;
+                                });
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                        );
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       );
     }
@@ -563,171 +642,207 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(240),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-              child: SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    if (showBanner)
-                      StatefulBuilder(
-                        builder: (context, setBannerState) {
-                          return Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.only(bottom: 10),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 16,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.25),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              // Pop all routes until we're back at the list or root
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+          title: Text(
+            widget.heading,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Column(
+          children: [
+            // Header section
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      if (showBanner)
+                        StatefulBuilder(
+                          builder: (context, setBannerState) {
+                            return Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 16,
                               ),
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.white.withOpacity(0.16),
-                                  Colors.white.withOpacity(0.06),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.warning_amber_rounded,
-                                  color: Colors.orange.shade200,
-                                  size: 28,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.25),
                                 ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    'Family data has changed. Please get the latest data.',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white.withOpacity(0.9),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.white.withOpacity(0.16),
+                                    Colors.white.withOpacity(0.06),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Colors.orange.shade200,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      'Family data has changed. Please get the latest data.',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.9),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                fetchingBanner
-                                    ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                    : ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange
-                                            .withOpacity(0.9),
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 10,
+                                  const SizedBox(width: 10),
+                                  fetchingBanner
+                                      ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: Colors.white,
                                         ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
+                                      )
+                                      : ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.orange
+                                              .withOpacity(0.9),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 10,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          setBannerState(
+                                            () => fetchingBanner = true,
+                                          );
+                                          await _refreshFromFirebase();
+                                          setBannerState(
+                                            () => fetchingBanner = false,
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Get Latest Data',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                       ),
-                                      onPressed: () async {
-                                        setBannerState(
-                                          () => fetchingBanner = true,
-                                        );
-                                        await _refreshFromFirebase();
-                                        setBannerState(
-                                          () => fetchingBanner = false,
-                                        );
-                                      },
-                                      child: const Text(
-                                        'Get Latest Data',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    VanshavaliHeader(
-                      totalMembers: totalMembers,
-                      heading: widget.heading,
-                      hindiHeading: widget.hindiHeading,
-                      onRefresh: _refreshFromFirebase,
-                      showRefresh: userAuth.isAdmin,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final double screenWidth = MediaQuery.of(context).size.width;
-            final double contentWidth = screenWidth - horizontalPadding;
-            final double maxContentWidth = 900;
-            final double cardWidth =
-                contentWidth > maxContentWidth ? maxContentWidth : contentWidth;
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: screenWidth,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: cardWidth,
-                          margin: const EdgeInsets.only(top: 8, bottom: 18),
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.25),
-                            ),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withOpacity(0.18),
-                                Colors.white.withOpacity(0.08),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
-                                blurRadius: 20,
-                                offset: const Offset(0, 12),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: VanshavaliBody(
-                            currentMember: _currentMember!,
-                            navigationStack: _navigationStack,
-                            onNavigateBack: _navigateBack,
-                            onNavigateToChild: _navigateToChild,
-                            onCardTap: _showMemberDetails,
-                          ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
+                      VanshavaliHeader(
+                        totalMembers: totalMembers,
+                        heading: widget.heading,
+                        hindiHeading: widget.hindiHeading,
+                        onRefresh: _refreshFromFirebase,
+                        showRefresh: userAuth.isAdmin,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          },
+            ),
+            // Body section
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final double screenWidth = MediaQuery.of(context).size.width;
+                  final double contentWidth = screenWidth - horizontalPadding;
+                  final double maxContentWidth = 900;
+                  final double cardWidth =
+                      contentWidth > maxContentWidth
+                          ? maxContentWidth
+                          : contentWidth;
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: screenWidth,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Container(
+                                width: cardWidth,
+                                margin: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 18,
+                                ),
+                                padding: const EdgeInsets.fromLTRB(
+                                  10,
+                                  10,
+                                  10,
+                                  20,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.25),
+                                  ),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.white.withOpacity(0.18),
+                                      Colors.white.withOpacity(0.08),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 12),
+                                    ),
+                                  ],
+                                ),
+                                child: VanshavaliBody(
+                                  currentMember: _currentMember!,
+                                  navigationStack: _navigationStack,
+                                  onNavigateBack: _navigateBack,
+                                  onNavigateToChild: _navigateToChild,
+                                  onCardTap: _showMemberDetails,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

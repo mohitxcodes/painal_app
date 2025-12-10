@@ -15,9 +15,6 @@ Map<String, dynamic> mainFamily = {
   'isMain': true,
 };
 
-// List to store fetched families
-List<Map<String, dynamic>> familyMembers = [];
-
 class VanshavaliListScreen extends StatefulWidget {
   const VanshavaliListScreen({super.key});
 
@@ -26,12 +23,18 @@ class VanshavaliListScreen extends StatefulWidget {
 }
 
 class _VanshavaliListScreenState extends State<VanshavaliListScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // List to store fetched families
+  List<Map<String, dynamic>> familyMembers = [];
+
   bool _isLoading = true;
   String _errorMessage = '';
 
   // Search related
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -382,6 +385,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required by AutomaticKeepAliveClientMixin
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
