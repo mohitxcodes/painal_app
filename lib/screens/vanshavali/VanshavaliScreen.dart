@@ -653,7 +653,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
             },
           ),
           title: Text(
-            widget.heading,
+            'Vanshavali',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,

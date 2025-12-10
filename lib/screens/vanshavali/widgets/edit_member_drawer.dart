@@ -98,7 +98,7 @@ class _EditMemberDrawerState extends State<EditMemberDrawer> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+          colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
         ),
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -107,7 +107,7 @@ class _EditMemberDrawerState extends State<EditMemberDrawer> {
           left: 20,
           right: 20,
           top: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 80,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

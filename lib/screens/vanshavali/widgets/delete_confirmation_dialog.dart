@@ -105,7 +105,7 @@ class _DeleteConfirmationDialogState extends State<DeleteConfirmationDialog> {
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+            colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
           ),
           borderRadius: BorderRadius.circular(18),
         ),
