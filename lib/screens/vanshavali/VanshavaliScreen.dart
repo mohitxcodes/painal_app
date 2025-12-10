@@ -422,7 +422,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           member: member,
           collectionName: widget.collectionName,
           onSaved: () async {
-            await _loadFamilyData();
+            await _loadFamilyData(forceRefresh: true);
             final editedMemberInData = _familyData?.firstWhere(
               (m) => m.id == member.id,
               orElse: () => _familyData!.first,
@@ -449,7 +449,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           familyData: _familyData!,
           collectionName: widget.collectionName,
           onSaved: () async {
-            await _loadFamilyData();
+            await _loadFamilyData(forceRefresh: true);
             final parentInData = _familyData?.firstWhere(
               (m) => m.id == parent.id,
               orElse: () => _familyData!.first,
@@ -472,7 +472,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           member: member,
           collectionName: widget.collectionName,
           onDeleted: () async {
-            await _loadFamilyData();
+            await _loadFamilyData(forceRefresh: true);
             // After deletion, go to root if current member was deleted
             if (_currentMember?.id == member.id) {
               final root = _familyData?.firstWhere(
