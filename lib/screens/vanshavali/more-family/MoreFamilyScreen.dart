@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:painal/screens/vanshavali/more-family/AddFamilyDrawer.dart';
-import 'package:painal/screens/vanshavali/more-family/FamilyTreeScreen.dart';
+import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
 
@@ -13,7 +13,6 @@ class MoreFamilyScreen extends StatefulWidget {
 }
 
 class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
-
   Future<List<Map<String, dynamic>>> fetchFamilies() async {
     // Fetch all families from the 'families' root collection
     final familiesSnapshot =
@@ -84,7 +83,8 @@ class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: families.length + 1,
-                separatorBuilder: (context, index) => const SizedBox(height: 16),
+                separatorBuilder:
+                    (context, index) => const SizedBox(height: 16),
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     // Add Family button at the top
@@ -180,7 +180,10 @@ class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
                         ),
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.green, width: 2),
+                            side: const BorderSide(
+                              color: Colors.green,
+                              width: 2,
+                            ),
                             foregroundColor: Colors.green,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -194,13 +197,12 @@ class _MoreFamilyScreenState extends State<MoreFamilyScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder:
-                                    (context) => FamilyTreeScreen(
-                                  onSearchPressed: () {},
-                                  collectionName: family['collection'],
-                                  heading: 'Vanshavali',
-                                  hindiHeading: '(वंशावली - परिवार वृक्ष)',
-                                  totalMembers: family['members'],
-                                ),
+                                    (context) => VanshavaliScreen(
+                                      collectionName: family['collection'],
+                                      heading: 'Vanshavali',
+                                      hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                                      isMainFamily: false,
+                                    ),
                               ),
                             );
                           },

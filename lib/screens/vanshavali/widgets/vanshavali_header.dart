@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class VanshavaliHeader extends StatelessWidget {
   final int totalMembers;
-  final VoidCallback onSearchPressed;
   final VoidCallback? onRefresh;
   final bool showRefresh;
   final String heading;
@@ -13,7 +12,6 @@ class VanshavaliHeader extends StatelessWidget {
     required this.heading,
     required this.hindiHeading,
     required this.totalMembers,
-    required this.onSearchPressed,
     this.onRefresh,
     this.showRefresh = false,
   });
@@ -124,46 +122,24 @@ class VanshavaliHeader extends StatelessWidget {
               ),
             ),
 
-            // Action Bar
-            Container(
-              margin: const EdgeInsets.only(left: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
-                color: Colors.white.withOpacity(0.12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: onSearchPressed,
-                    tooltip: 'Search Family Member',
-                    icon: const Icon(Icons.search_rounded, color: Colors.white),
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(12),
-                    ),
+            // Action Bar (Refresh only)
+            if (showRefresh)
+              Container(
+                margin: const EdgeInsets.only(left: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  color: Colors.white.withOpacity(0.12),
+                ),
+                child: IconButton(
+                  onPressed: onRefresh,
+                  tooltip: 'Refresh Data',
+                  icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                  style: IconButton.styleFrom(
+                    padding: const EdgeInsets.all(12),
                   ),
-                  if (showRefresh) ...[
-                    Container(
-                      height: 24,
-                      width: 1,
-                      color: Colors.white.withOpacity(0.2),
-                    ),
-                    IconButton(
-                      onPressed: onRefresh,
-                      tooltip: 'Refresh Data',
-                      icon: const Icon(
-                        Icons.refresh_rounded,
-                        color: Colors.white,
-                      ),
-                      style: IconButton.styleFrom(
-                        padding: const EdgeInsets.all(12),
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
-            ),
           ],
         ),
       ],

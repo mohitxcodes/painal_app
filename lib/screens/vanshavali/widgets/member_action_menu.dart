@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:painal/screens/vanshavali/widgets/add_child_request_drawer.dart';
+// import 'package:painal/screens/vanshavali/widgets/add_child_request_drawer.dart';
 
 class MemberActionMenu extends StatelessWidget {
   final VoidCallback onAddChild;
@@ -26,7 +26,7 @@ class MemberActionMenu extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF0B3B2D), Color(0xFF1F6B3A)],
+              colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
             ),
             borderRadius: BorderRadius.all(Radius.circular(18)),
           ),
@@ -40,45 +40,45 @@ class MemberActionMenu extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ListTile(
-                  leading: const Icon(
-                    Icons.person_add_alt_1,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                  title: const Text(
-                    'Add as Child',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17,
-                      color: Colors.white,
-                    ),
-                  ),
-                  subtitle: Text(
-                    'Request to add a child for $parentName. You will be asked to provide details for the new child.',
-                    style: const TextStyle(fontSize: 13, color: Colors.white70),
-                  ),
-                  onTap: () async {
-                    Navigator.of(context).pop();
-                    await showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder:
-                          (context) => AddChildRequestDrawer(
-                            parentId: parentId,
-                            parentName: parentName,
-                          ),
-                    );
-                  },
-                ),
-                Divider(
-                  height: 0,
-                  thickness: 1,
-                  indent: 12,
-                  endIndent: 12,
-                  color: Colors.white.withOpacity(0.2),
-                ),
+                // ListTile(
+                //   leading: const Icon(
+                //     Icons.person_add_alt_1,
+                //     color: Colors.white,
+                //     size: 28,
+                //   ),
+                //   title: const Text(
+                //     'Add as Child',
+                //     style: TextStyle(
+                //       fontWeight: FontWeight.w600,
+                //       fontSize: 17,
+                //       color: Colors.white,
+                //     ),
+                //   ),
+                //   subtitle: Text(
+                //     'Request to add a child for $parentName. You will be asked to provide details for the new child.',
+                //     style: const TextStyle(fontSize: 13, color: Colors.white70),
+                //   ),
+                //   onTap: () async {
+                //     Navigator.of(context).pop();
+                //     await showModalBottomSheet(
+                //       context: context,
+                //       isScrollControlled: true,
+                //       backgroundColor: Colors.transparent,
+                //       builder:
+                //           (context) => AddChildRequestDrawer(
+                //             parentId: parentId,
+                //             parentName: parentName,
+                //           ),
+                //     );
+                //   },
+                // ),
+                // Divider(
+                //   height: 0,
+                //   thickness: 1,
+                //   indent: 12,
+                //   endIndent: 12,
+                //   color: Colors.white.withOpacity(0.2),
+                // ),
                 ListTile(
                   leading: const Icon(
                     Icons.report_gmailerrorred_outlined,

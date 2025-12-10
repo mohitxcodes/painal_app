@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:painal/models/FamilyMember.dart';
-import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
 import 'package:painal/screens/vanshavali/widgets/MemberInfoDrawer.dart';
 import 'package:painal/screens/vanshavali/widgets/edit_member_drawer.dart';
 import 'package:painal/screens/vanshavali/widgets/add_member_drawer.dart';
@@ -12,10 +11,10 @@ import 'package:painal/screens/vanshavali/widgets/vanshavali_body.dart';
 import 'package:provider/provider.dart';
 import 'package:painal/apis/AuthProviderUser.dart';
 
-Future<List<FamilyMember>> fetchFamilyMembers() async {
+Future<List<FamilyMember>> fetchFamilyMembers(String collectionName) async {
   final snapshot =
       await FirebaseFirestore.instance
-          .collection('familyMembers')
+          .collection(collectionName)
           .orderBy('id') // Optional: for sorted results
           .get();
 
@@ -38,8 +37,20 @@ FamilyMember? buildFamilyTreeFromFlatData(
 }
 
 class VanshavaliScreen extends StatefulWidget {
+  final String collectionName;
+  final String heading;
+  final String hindiHeading;
   final int? initialMemberId;
-  const VanshavaliScreen({super.key, this.initialMemberId});
+  final bool isMainFamily;
+
+  const VanshavaliScreen({
+    super.key,
+    this.collectionName = 'familyMembers',
+    this.heading = 'Vanshavali',
+    this.hindiHeading = '(वंशावली - परिवार वृक्ष)',
+    this.initialMemberId,
+    this.isMainFamily = true,
+  });
 
   @override
   State<VanshavaliScreen> createState() => _VanshavaliScreenState();
@@ -62,12 +73,18 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     _checkForRemoteUpdates();
   }
 
+  String _getBoxName() {
+    return widget.isMainFamily
+        ? 'familyBox'
+        : 'familyBox_${widget.collectionName}';
+  }
+
   Future<void> _checkForRemoteUpdates() async {
     bool updateNeeded = false;
     // Get the latest lastUpdated from Firestore
     final snapshot =
         await FirebaseFirestore.instance
-            .collection('familyMembers')
+            .collection(widget.collectionName)
             .orderBy('lastUpdated', descending: true)
             .limit(1)
             .get();
@@ -79,7 +96,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           _remoteLastUpdated = remoteTime;
         });
         // Compare with local
-        final box = Hive.box<FamilyMember>('familyBox');
+        final box = Hive.box<FamilyMember>(_getBoxName());
         DateTime? localTime;
         for (var member in box.values) {
           if (member.lastUpdated != null) {
@@ -155,13 +172,13 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     }
 
     try {
-      final box = Hive.box<FamilyMember>('familyBox');
+      final box = Hive.box<FamilyMember>(_getBoxName());
       List<FamilyMember> data = [];
 
       if (!forceRefresh && box.isNotEmpty) {
         data = box.values.toList();
       } else {
-        data = await fetchFamilyMembers();
+        data = await fetchFamilyMembers(widget.collectionName);
         await box.clear();
         await box.putAll({for (var member in data) member.id: member});
       }
@@ -323,25 +340,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
     });
   }
 
-  void _showSearchDialog() {
-    if (_familyData == null || _familyData!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No family data available for search.')),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.2),
-      builder:
-          (context) => SearchDialog(
-            familyData: _familyData,
-            onMemberSelected: (member) => _navigateToMember(member),
-          ),
-    );
-  }
-
   void _showMemberDetails(FamilyMember member) {
     if (_familyData == null) return;
 
@@ -413,7 +411,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       builder: (context) {
         return EditMemberDrawer(
           member: member,
-          collectionName: 'familyMembers',
+          collectionName: widget.collectionName,
           onSaved: () async {
             await _loadFamilyData();
             final editedMemberInData = _familyData?.firstWhere(
@@ -440,7 +438,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         return AddMemberDrawer(
           parent: parent,
           familyData: _familyData!,
-          collectionName: 'familyMembers',
+          collectionName: widget.collectionName,
           onSaved: () async {
             await _loadFamilyData();
             final parentInData = _familyData?.firstWhere(
@@ -463,7 +461,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       builder: (context) {
         return DeleteConfirmationDialog(
           member: member,
-          collectionName: 'familyMembers',
+          collectionName: widget.collectionName,
           onDeleted: () async {
             await _loadFamilyData();
             // After deletion, go to root if current member was deleted
@@ -663,9 +661,8 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
                       ),
                     VanshavaliHeader(
                       totalMembers: totalMembers,
-                      onSearchPressed: _showSearchDialog,
-                      heading: 'Vanshavali',
-                      hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                      heading: widget.heading,
+                      hindiHeading: widget.hindiHeading,
                       onRefresh: _refreshFromFirebase,
                       showRefresh: userAuth.isAdmin,
                     ),

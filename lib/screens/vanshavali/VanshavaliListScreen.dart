@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
-import 'package:painal/screens/vanshavali/more-family/FamilyTreeScreen.dart';
 import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
 
 // Main family data
 Map<String, dynamic> mainFamily = {
   'id': 'main_family',
-  'name': 'Main Family',
+  'name': 'Primary Family',
   'relation': 'Primary Family Tree',
   'collection': 'familyMembers', // Default collection for main family
   'icon': Icons.family_restroom_rounded,
@@ -217,7 +216,10 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
             if (isMain) {
               _navigateWithAnimation(
-                VanshavaliScreen(initialMemberId: member.id),
+                VanshavaliScreen(
+                  initialMemberId: member.id,
+                  isMainFamily: true,
+                ),
               );
             } else {
               // Find family details for the screen title
@@ -227,20 +229,14 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
               );
 
               final heading = family['name'] ?? 'Family Tree';
-              final memberCount = (family['members'] as int?) ?? 0;
 
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder:
-                      (context) => FamilyTreeScreen(
-                        onSearchPressed:
-                            () {}, // Search inside tree not needed immediately or can trigger local search
-                        collectionName: member.collectionName!,
-                        heading: heading,
-                        hindiHeading: '(वंशावली - परिवार वृक्ष)',
-                        totalMembers: memberCount,
-                        initialMemberId: member.id,
-                      ),
+              _navigateWithAnimation(
+                VanshavaliScreen(
+                  collectionName: member.collectionName!,
+                  heading: heading,
+                  hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                  initialMemberId: member.id,
+                  isMainFamily: false,
                 ),
               );
             }
@@ -447,25 +443,18 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                             onTap:
                                 isMainFamily
                                     ? () => _navigateWithAnimation(
-                                      VanshavaliScreen(
-                                        initialMemberId: null,
+                                      const VanshavaliScreen(
+                                        isMainFamily: true,
                                       ), // Ensure fresh nav
                                     )
                                     : () {
-                                      final memberCount =
-                                          (family['members'] as int?) ?? 0;
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) => FamilyTreeScreen(
-                                                onSearchPressed: () {},
-                                                collectionName:
-                                                    family['collection'],
-                                                heading: displayName,
-                                                hindiHeading:
-                                                    '(वंशावली - परिवार वृक्ष)',
-                                                totalMembers: memberCount,
-                                              ),
+                                      _navigateWithAnimation(
+                                        VanshavaliScreen(
+                                          collectionName: family['collection'],
+                                          heading: displayName,
+                                          hindiHeading:
+                                              '(वंशावली - परिवार वृक्ष)',
+                                          isMainFamily: false,
                                         ),
                                       );
                                     },

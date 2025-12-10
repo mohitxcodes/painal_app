@@ -326,7 +326,6 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
               child: VanshavaliHeader(
-                onSearchPressed: _showSearchDialog,
                 totalMembers: widget.totalMembers,
                 heading: widget.heading,
                 hindiHeading: widget.hindiHeading,
