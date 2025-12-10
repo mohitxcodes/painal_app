@@ -463,21 +463,30 @@ class _SearchDialogState extends State<SearchDialog> {
       separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, idx) {
         final member = results[idx];
-        final parent =
-            widget.familyData != null && member.parentId != null
-                ? widget.familyData!.firstWhere(
-                  (m) => m.id == member.parentId,
-                  orElse:
-                      () => FamilyMember(
-                        id: -1,
-                        name: 'Unknown',
-                        hindiName: '',
-                        birthYear: '',
-                        children: [],
-                        profilePhoto: '',
-                      ),
-                )
-                : null;
+
+        // Check if we have parent info (either from familyData or from parentName field)
+        String? fatherName;
+        if (member.parentName != null && member.parentName!.isNotEmpty) {
+          // Use the populated parent name from global search
+          fatherName = member.parentName;
+        } else if (widget.familyData != null && member.parentId != null) {
+          // Fallback to lookup from familyData for local search
+          final parent = widget.familyData!.firstWhere(
+            (m) => m.id == member.parentId,
+            orElse:
+                () => FamilyMember(
+                  id: -1,
+                  name: '',
+                  hindiName: '',
+                  birthYear: '',
+                  children: [],
+                  profilePhoto: '',
+                ),
+          );
+          if (parent.id != -1) {
+            fatherName = parent.name;
+          }
+        }
 
         return Container(
           decoration: BoxDecoration(
@@ -569,7 +578,7 @@ class _SearchDialogState extends State<SearchDialog> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          if (parent != null && parent.id != -1) ...[
+                          if (fatherName != null && fatherName.isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -581,7 +590,7 @@ class _SearchDialogState extends State<SearchDialog> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                'Father: ${parent.name}',
+                                'Father: $fatherName',
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: Colors.white.withOpacity(0.7),

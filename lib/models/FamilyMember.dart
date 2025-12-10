@@ -34,6 +34,8 @@ class FamilyMember {
 
   // Transient field for global search (not persisted)
   String? collectionName;
+  String? parentName;
+  String? parentHindiName;
 
   FamilyMember({
     required this.id,
@@ -45,6 +47,8 @@ class FamilyMember {
     required this.profilePhoto,
     this.lastUpdated,
     this.collectionName,
+    this.parentName,
+    this.parentHindiName,
   });
 
   factory FamilyMember.fromMap(Map<String, dynamic> data) {

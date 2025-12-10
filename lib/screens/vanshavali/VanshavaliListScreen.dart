@@ -269,22 +269,89 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     String query,
   ) async {
     try {
-      // Create a query for name prefix match
-      final nameQuery =
-          FirebaseFirestore.instance
-              .collection(collectionName)
-              .where('name', isGreaterThanOrEqualTo: query)
-              .where('name', isLessThan: '$query\uf8ff')
-              .limit(5)
-              .get();
+      // Fetch all members from collection (with caching this is fast)
+      final snapshot =
+          await FirebaseFirestore.instance.collection(collectionName).get();
 
-      final snapshot = await nameQuery;
+      final allMembers =
+          snapshot.docs.map((doc) {
+            final member = FamilyMember.fromMap(doc.data());
+            member.collectionName = collectionName;
+            return member;
+          }).toList();
 
-      return snapshot.docs.map((doc) {
-        final member = FamilyMember.fromMap(doc.data());
-        member.collectionName = collectionName;
-        return member;
-      }).toList();
+      // Filter locally for case-insensitive substring search
+      final lowerQuery = query.toLowerCase();
+      final isNumeric = int.tryParse(query) != null;
+
+      final results =
+          allMembers.where((member) {
+            // Search in English name (case-insensitive)
+            final matchesEnglishName = member.name.toLowerCase().contains(
+              lowerQuery,
+            );
+
+            // Search in Hindi name (case-insensitive)
+            final matchesHindiName = member.hindiName.toLowerCase().contains(
+              lowerQuery,
+            );
+
+            // Search by ID
+            final matchesId = isNumeric && member.id.toString().contains(query);
+
+            // Search in father's name if available
+            bool matchesFatherName = false;
+            if (member.parentId != null) {
+              final parent = allMembers.firstWhere(
+                (m) => m.id == member.parentId,
+                orElse:
+                    () => FamilyMember(
+                      id: -1,
+                      name: '',
+                      hindiName: '',
+                      birthYear: '',
+                      children: [],
+                      profilePhoto: '',
+                    ),
+              );
+              if (parent.id != -1) {
+                matchesFatherName =
+                    parent.name.toLowerCase().contains(lowerQuery) ||
+                    parent.hindiName.toLowerCase().contains(lowerQuery);
+              }
+            }
+
+            return matchesEnglishName ||
+                matchesHindiName ||
+                matchesId ||
+                matchesFatherName;
+          }).toList();
+
+      // Populate parent names for display
+      for (var member in results) {
+        if (member.parentId != null) {
+          final parent = allMembers.firstWhere(
+            (m) => m.id == member.parentId,
+            orElse:
+                () => FamilyMember(
+                  id: -1,
+                  name: '',
+                  hindiName: '',
+                  birthYear: '',
+                  children: [],
+                  profilePhoto: '',
+                ),
+          );
+          if (parent.id != -1) {
+            member.parentName = parent.name;
+            member.parentHindiName = parent.hindiName;
+          }
+        }
+      }
+
+      return results
+          .take(10)
+          .toList(); // Limit to top 10 results per collection
     } catch (e) {
       print('Error searching $collectionName: $e');
       return [];
