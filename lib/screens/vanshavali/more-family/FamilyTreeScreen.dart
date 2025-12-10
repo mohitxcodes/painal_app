@@ -16,6 +16,7 @@ class FamilyTreeScreen extends StatefulWidget {
   final String heading;
   final String hindiHeading;
   final VoidCallback onSearchPressed;
+  final int? initialMemberId;
   const FamilyTreeScreen({
     super.key,
     required this.collectionName,
@@ -23,6 +24,7 @@ class FamilyTreeScreen extends StatefulWidget {
     required this.hindiHeading,
     required this.totalMembers,
     required this.onSearchPressed,
+    this.initialMemberId,
   });
 
   @override
@@ -95,6 +97,23 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
         _error = 'Failed to load data: $e';
         _loading = false;
       });
+    }
+
+    // Handle deep link if requested
+    if (widget.initialMemberId != null &&
+        !forceRefresh &&
+        _familyData != null) {
+      try {
+        final targetMember = _familyData!.firstWhere(
+          (m) => m.id == widget.initialMemberId,
+        );
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _navigateToMember(targetMember);
+          _showMemberDetails(targetMember);
+        });
+      } catch (_) {
+        // Member not found in list
+      }
     }
   }
 

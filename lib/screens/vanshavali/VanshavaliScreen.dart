@@ -38,7 +38,8 @@ FamilyMember? buildFamilyTreeFromFlatData(
 }
 
 class VanshavaliScreen extends StatefulWidget {
-  const VanshavaliScreen({super.key});
+  final int? initialMemberId;
+  const VanshavaliScreen({super.key, this.initialMemberId});
 
   @override
   State<VanshavaliScreen> createState() => _VanshavaliScreenState();
@@ -207,6 +208,21 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           _localLastUpdated = localTime;
           _loading = false;
         });
+
+        // Handle deep link if requested
+        if (widget.initialMemberId != null && !forceRefresh) {
+          try {
+            final targetMember = _familyData!.firstWhere(
+              (m) => m.id == widget.initialMemberId,
+            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _navigateToMember(targetMember);
+              _showMemberDetails(targetMember);
+            });
+          } catch (_) {
+            // Member not found or invalid
+          }
+        }
       }
     } catch (e, stackTrace) {
       debugPrint('Error loading family data: $e\n$stackTrace');
@@ -328,9 +344,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
 
   void _showMemberDetails(FamilyMember member) {
     if (_familyData == null) return;
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-    }
+
     final parent =
         member.parentId != null
             ? _familyData!.firstWhere(

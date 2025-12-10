@@ -23,6 +23,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
 
   Future<void> fetchWeatherData() async {
     try {
+      if (!mounted) return;
       setState(() {
         isLoading = true;
         errorMessage = '';
@@ -32,6 +33,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
       const url =
           'https://api.openweathermap.org/data/2.5/weather?q=$city,IN&appid=$apiKey&units=metric';
       final response = await http.get(Uri.parse(url));
+      if (!mounted) return;
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
@@ -45,6 +47,7 @@ class _CurrentWeatherWidgetState extends State<CurrentWeatherWidget> {
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         errorMessage = 'Network error: $e';
         isLoading = false;

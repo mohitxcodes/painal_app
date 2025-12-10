@@ -3,11 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:painal/models/FamilyMember.dart';
 import 'package:painal/screens/vanshavali/VanshavaliScreen.dart';
-import 'package:painal/screens/vanshavali/more-family/AddFamilyDrawer.dart';
 import 'package:painal/screens/vanshavali/more-family/FamilyTreeScreen.dart';
 import 'package:painal/screens/vanshavali/widgets/search_dialog.dart';
-import 'package:provider/provider.dart';
-import 'package:painal/apis/AuthProviderUser.dart';
 
 // Main family data
 Map<String, dynamic> mainFamily = {
@@ -17,9 +14,6 @@ Map<String, dynamic> mainFamily = {
   'collection': 'familyMembers', // Default collection for main family
   'icon': Icons.family_restroom_rounded,
   'isMain': true,
-  'members': 0, // This will be updated after fetching
-  'head': 'Head of Family',
-  'profilePhoto': '', // Can be updated if you have a main family photo
 };
 
 // List to store fetched families
@@ -34,63 +28,23 @@ class VanshavaliListScreen extends StatefulWidget {
 
 class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _slideController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
   bool _isLoading = true;
   String _errorMessage = '';
 
   // Search related
   final TextEditingController _searchController = TextEditingController();
 
-  // Add family drawer
-  void _openAddFamilyDrawer() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder:
-          (context) => AddFamilyDrawer(
-            onSaved: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-              _loadFamilies(forceRefresh: true); // Refetch after adding new
-            },
-          ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _slideController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
-
-    _fadeController.forward();
-    _slideController.forward();
-
     // Load families from cache first, then fetch background update if needed
     _loadFamilies();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadFamilies({bool forceRefresh = false}) async {
@@ -129,7 +83,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
   Future<void> _fetchFamiliesFromFirestore({bool updateCache = true}) async {
     if (!mounted) return;
 
-    // Only show loading if we don't have data yet
     if (familyMembers.isEmpty) {
       setState(() {
         _isLoading = true;
@@ -138,9 +91,25 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     }
 
     try {
-      // Fetch all families from the 'families' root collection
-      final familiesSnapshot =
-          await FirebaseFirestore.instance.collection('families').get();
+      // 1. Fetch Main Family Config
+      final mainFamilyIndex = familyMembers.indexWhere(
+        (f) => f['isMain'] == true,
+      );
+
+      Map<String, dynamic> currentMainFamily;
+      if (mainFamilyIndex != -1) {
+        currentMainFamily = familyMembers[mainFamilyIndex];
+      } else {
+        currentMainFamily = Map<String, dynamic>.from(mainFamily);
+      }
+
+      // 2. Fetch List of ALL Families
+      final familiesSnapshot = await FirebaseFirestore.instance
+          .collection('families')
+          .get()
+          .timeout(const Duration(seconds: 10));
+
+      if (!mounted) return;
 
       final List<Map<String, dynamic>> fetchedFamilies = [];
 
@@ -149,112 +118,85 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
         final collectionName = data['collectionName'] as String?;
         if (collectionName == null) continue;
 
-        // Fetch the head member from the family collection
-        final membersSnapshot =
-            await FirebaseFirestore.instance
-                .collection(collectionName)
-                .limit(1)
-                .get();
-
-        final head =
-            membersSnapshot.docs.isNotEmpty
-                ? membersSnapshot.docs.first.data()
-                : {};
-
-        // Count total members
-        final membersCountSnapshot =
-            await FirebaseFirestore.instance.collection(collectionName).get();
-
         fetchedFamilies.add({
           'id': doc.id,
           'collection': collectionName,
           'name': data['name'] ?? collectionName,
-          'head': head['name'] ?? data['headName'] ?? 'Head',
-          'members': membersCountSnapshot.docs.length,
-          'profilePhoto': head['profilePhoto'] ?? data['profilePhoto'] ?? '',
           'relation': data['relation'] ?? 'Family Branch',
           'isMain': false,
+          'members': 0, // Placeholder, will be fetched below
         });
       }
 
-      // Fetch main family member count and head
-      final mainFamilySnapshot =
-          await FirebaseFirestore.instance
-              .collection(mainFamily['collection'] ?? 'familyMembers')
-              .get();
-      final mainFamilyCount = mainFamilySnapshot.docs.length;
+      // 3. Fetch member counts for all families in parallel
+      final List<Future<void>> countFutures = [];
 
-      // Find main family head
-      String mainFamilyHeadName = mainFamily['head'] ?? 'Head of Family';
-      String mainFamilyDisplayName = mainFamily['name'] ?? 'Main Family';
+      // Main family count
+      countFutures.add(
+        FirebaseFirestore.instance
+            .collection(currentMainFamily['collection'] ?? 'familyMembers')
+            .count()
+            .get()
+            .then((snapshot) {
+              if (mounted) {
+                currentMainFamily['members'] = snapshot.count ?? 0;
+              }
+            })
+            .catchError((e) {
+              debugPrint('Error fetching main family count: $e');
+              currentMainFamily['members'] = 0;
+            }),
+      );
 
-      try {
-        if (mainFamilySnapshot.docs.isNotEmpty) {
-          final headDoc = mainFamilySnapshot.docs.firstWhere(
-            (doc) => doc.data()['parentId'] == null,
-            orElse: () => mainFamilySnapshot.docs.first,
-          );
-          final String? name = headDoc.data()['name'];
-          if (name != null && name.isNotEmpty) {
-            mainFamilyHeadName = name;
-            // User requested showing head name. Appending 'Family' for consistency.
-            mainFamilyDisplayName = '$name Family';
-          }
-        }
-      } catch (e) {
-        debugPrint('Error finding main family head: $e');
+      // Other families counts
+      for (final family in fetchedFamilies) {
+        final collectionName = family['collection'] as String;
+        countFutures.add(
+          FirebaseFirestore.instance
+              .collection(collectionName)
+              .count()
+              .get()
+              .then((snapshot) {
+                if (mounted) {
+                  family['members'] = snapshot.count ?? 0;
+                }
+              })
+              .catchError((e) {
+                debugPrint('Error fetching count for $collectionName: $e');
+                family['members'] = 0;
+              }),
+        );
       }
 
-      if (mounted) {
-        setState(() {
-          // Find or initialize Main Family
-          final mainFamilyIndex = familyMembers.indexWhere(
-            (f) => f['isMain'] == true,
-          );
+      // Wait for all counts to complete
+      await Future.wait(countFutures);
 
-          Map<String, dynamic> currentMainFamily;
-          if (familyMembers.isNotEmpty && mainFamilyIndex != -1) {
-            currentMainFamily = familyMembers[mainFamilyIndex];
-          } else {
-            // Use a copy of the global mainFamily to avoid issues
-            currentMainFamily = Map<String, dynamic>.from(mainFamily);
-          }
+      if (!mounted) return;
 
-          // Update member count and name with actual data from DB
-          currentMainFamily['members'] = mainFamilyCount;
+      // 4. Render and Update Cache
+      setState(() {
+        final otherFamilies =
+            fetchedFamilies.where((f) => f['isMain'] != true).toList();
+        familyMembers = [currentMainFamily, ...otherFamilies];
+        _isLoading = false;
+      });
 
-          // CRITICAL: Ensure we overwrite the name if we found a better one
-          if (mainFamilyDisplayName != 'Main Family') {
-            currentMainFamily['name'] = mainFamilyDisplayName;
-          }
-          currentMainFamily['head'] = mainFamilyHeadName;
-
-          // Rebuild list: [Main Family, ... Fetched Families]
-          // Filter out any existing main family entry from fetched list to avoid duplication
-          final otherFamilies =
-              fetchedFamilies.where((f) => f['isMain'] != true).toList();
-
-          familyMembers = [currentMainFamily, ...otherFamilies];
-          _isLoading = false;
-        });
-
-        // 3. Save to Cache
-        if (updateCache) {
-          try {
-            var box = await Hive.openBox('vanshavali_list_cache');
-            await box.put('families', familyMembers);
-          } catch (e) {
-            print("Cache save error: $e");
-          }
+      if (updateCache) {
+        try {
+          var box = await Hive.openBox('vanshavali_list_cache');
+          await box.put('families', familyMembers);
+        } catch (e) {
+          print("Cache save error: $e");
         }
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && familyMembers.isEmpty) {
         setState(() {
-          _errorMessage = 'Failed to load families. Please try again.';
+          _errorMessage = 'Failed to load family list.';
           _isLoading = false;
         });
       }
+      debugPrint("Error fetching families: $e");
     }
   }
 
@@ -274,7 +216,9 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                 (mainFamily['collection'] ?? 'familyMembers');
 
             if (isMain) {
-              _navigateWithAnimation(const VanshavaliScreen());
+              _navigateWithAnimation(
+                VanshavaliScreen(initialMemberId: member.id),
+              );
             } else {
               // Find family details for the screen title
               final family = familyMembers.firstWhere(
@@ -283,7 +227,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
               );
 
               final heading = family['name'] ?? 'Family Tree';
-              final totalMembers = family['members'] ?? 0;
+              final memberCount = (family['members'] as int?) ?? 0;
 
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -294,7 +238,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                         collectionName: member.collectionName!,
                         heading: heading,
                         hindiHeading: '(वंशावली - परिवार वृक्ष)',
-                        totalMembers: totalMembers is int ? totalMembers : 0,
+                        totalMembers: memberCount,
+                        initialMemberId: member.id,
                       ),
                 ),
               );
@@ -329,14 +274,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
   ) async {
     try {
       // Create a query for name prefix match
-      // Note: Firestore text search is limited. This is a basic prefix match.
-      // For more advanced search, Algolia or similar is recommended.
-      // We check both name and hindiName manual filtering or multiple queries if needed.
-      // Here we fetch a subset or try to match exactly/prefix.
-      // For simplicity and cost, we might do client side filtering if lists are small,
-      // but user asked for "whole data". Assuming reasonable size, we query.
-
-      // Queries
       final nameQuery =
           FirebaseFirestore.instance
               .collection(collectionName)
@@ -345,8 +282,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
               .limit(5)
               .get();
 
-      // We can't do OR query easily across fields without Composite Indexes or multiple queries.
-      // We will execute name query first.
       final snapshot = await nameQuery;
 
       return snapshot.docs.map((doc) {
@@ -360,23 +295,30 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     }
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _fadeController.dispose();
-    _slideController.dispose();
-    super.dispose();
+  void _navigateWithAnimation(Widget screen) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => screen,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(position: offsetAnimation, child: child);
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProviderUser>(context);
-    final totalMembers = familyMembers.fold<int>(
-      0,
-      (sum, family) =>
-          sum + (family['members'] is int ? family['members'] as int : 0),
-    );
-
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -392,24 +334,16 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           backgroundColor: Colors.transparent,
           elevation: 0,
           automaticallyImplyLeading: false,
-          toolbarHeight: 110, // Increased height for custom header
+          toolbarHeight: 100,
           title: _VanshavaliListHeader(
             onSearchPressed: _showSearchDialog,
-            totalMembers: totalMembers,
             familyCount: familyMembers.length,
+            totalMembers: familyMembers.fold<int>(
+              0,
+              (sum, family) => sum + ((family['members'] as int?) ?? 0),
+            ),
           ),
         ),
-        // floatingActionButton:
-        //     authProvider.isAdmin
-        //         ? FloatingActionButton.extended(
-        //           onPressed: _openAddFamilyDrawer,
-        //           backgroundColor: Colors.green,
-        //           foregroundColor: Colors.white,
-        //           icon: const Icon(Icons.add),
-        //           label: const Text('Add Family'),
-        //           elevation: 2,
-        //         )
-        //         : null,
         body:
             _isLoading
                 ? const Center(
@@ -513,9 +447,13 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                             onTap:
                                 isMainFamily
                                     ? () => _navigateWithAnimation(
-                                      const VanshavaliScreen(),
+                                      VanshavaliScreen(
+                                        initialMemberId: null,
+                                      ), // Ensure fresh nav
                                     )
                                     : () {
+                                      final memberCount =
+                                          (family['members'] as int?) ?? 0;
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
                                           builder:
@@ -526,7 +464,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                                                 heading: displayName,
                                                 hindiHeading:
                                                     '(वंशावली - परिवार वृक्ष)',
-                                                totalMembers: family['members'],
+                                                totalMembers: memberCount,
                                               ),
                                         ),
                                       );
@@ -534,13 +472,13 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
-                                vertical: 16,
+                                vertical: 20, // Increased vertical padding
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    width: 46,
-                                    height: 46,
+                                    width: 48,
+                                    height: 48,
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors:
@@ -581,6 +519,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Row(
                                           children: [
@@ -589,7 +529,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                                                 displayName,
                                                 style: TextStyle(
                                                   color: Colors.white,
-                                                  fontSize: 16,
+                                                  fontSize:
+                                                      18, // Increased size
                                                   fontWeight: FontWeight.bold,
                                                   letterSpacing: 0.5,
                                                   shadows: [
@@ -637,11 +578,11 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                                               ),
                                           ],
                                         ),
-                                        const SizedBox(height: 6),
+                                        const SizedBox(height: 4),
                                         Row(
                                           children: [
                                             Icon(
-                                              Icons.person_rounded,
+                                              Icons.people_outline,
                                               size: 14,
                                               color: Colors.white.withOpacity(
                                                 0.7,
@@ -649,34 +590,13 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                                             ),
                                             const SizedBox(width: 4),
                                             Text(
-                                              family['head'] ?? 'Unknown Head',
-                                              style: TextStyle(
-                                                color: Colors.white.withOpacity(
-                                                  0.9,
-                                                ),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Container(
-                                              width: 4,
-                                              height: 4,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(
-                                                  0.4,
-                                                ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Text(
-                                              '${family['members']} Members',
+                                              '${family['members'] ?? 0} Members',
                                               style: TextStyle(
                                                 color: Colors.white.withOpacity(
                                                   0.7,
                                                 ),
                                                 fontSize: 13,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                           ],
@@ -701,39 +621,17 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
       ),
     );
   }
-
-  void _navigateWithAnimation(Widget screen) {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => screen,
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOut;
-
-          var tween = Tween(
-            begin: begin,
-            end: end,
-          ).chain(CurveTween(curve: curve));
-          var offsetAnimation = animation.drive(tween);
-
-          return SlideTransition(position: offsetAnimation, child: child);
-        },
-      ),
-    );
-  }
 }
 
 class _VanshavaliListHeader extends StatelessWidget {
   final VoidCallback onSearchPressed;
-  final int totalMembers;
   final int familyCount;
+  final int totalMembers;
 
   const _VanshavaliListHeader({
     required this.onSearchPressed,
-    required this.totalMembers,
     required this.familyCount,
+    required this.totalMembers,
   });
 
   @override
@@ -786,21 +684,42 @@ class _VanshavaliListHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.15)),
-          ),
-          child: Text(
-            '$familyCount families • $totalMembers total members',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withOpacity(0.15)),
+              ),
+              child: Text(
+                '$familyCount families',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-          ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white.withOpacity(0.15)),
+              ),
+              child: Text(
+                '$totalMembers total members',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
