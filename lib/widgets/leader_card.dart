@@ -48,13 +48,27 @@ class LeaderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: Text(
-                          leader.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              leader.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            if (leader.englishName.isNotEmpty)
+                              Text(
+                                leader.englishName,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -66,14 +80,14 @@ class LeaderCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color:
-                              leader.position == 'Mukhiya'
-                                  ? Colors.blue.withOpacity(0.2)
+                              leader.position == 'मुखिया'
+                                  ? Colors.orange.withOpacity(0.2)
                                   : Colors.green.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color:
-                                leader.position == 'Mukhiya'
-                                    ? Colors.blue.withOpacity(0.5)
+                                leader.position == 'मुखिया'
+                                    ? Colors.orange.withOpacity(0.5)
                                     : Colors.green.withOpacity(0.5),
                             width: 1,
                           ),
@@ -82,8 +96,8 @@ class LeaderCard extends StatelessWidget {
                           leader.position,
                           style: TextStyle(
                             color:
-                                leader.position == 'Mukhiya'
-                                    ? Colors.blue[200]
+                                leader.position == 'मुखिया'
+                                    ? Colors.orange[300]
                                     : Colors.green[300],
                             fontSize: 11,
                             fontWeight: FontWeight.w600,

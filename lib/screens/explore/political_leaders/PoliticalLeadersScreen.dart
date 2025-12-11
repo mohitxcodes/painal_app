@@ -10,16 +10,18 @@ class PoliticalLeadersScreen extends StatelessWidget {
     // Sample data - replace with your actual data
     final List<PoliticalLeader> currentLeaders = [
       PoliticalLeader(
-        name: 'Shri Ramesh Kumar',
-        position: 'Mukhiya',
+        name: 'श्री रामेश कुमार',
+        englishName: 'Shri Ramesh Kumar',
+        position: 'मुखिया',
         imageUrl: '',
-        tenure: '2020 - Present',
+        tenure: '2020 - वर्तमान',
       ),
       PoliticalLeader(
-        name: 'Smt. Sunita Devi',
-        position: 'Sarpanch',
+        name: 'श्रीमती सुनीता देवी',
+        englishName: 'Smt. Sunita Devi',
+        position: 'सरपंच',
         imageUrl: '',
-        tenure: '2020 - Present',
+        tenure: '2020 - वर्तमान',
       ),
     ];
 
@@ -27,70 +29,80 @@ class PoliticalLeadersScreen extends StatelessWidget {
     final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       MapEntry('2020 - 2025', [
         PoliticalLeader(
-          name: 'Shri Ramesh Kumar',
-          position: 'Mukhiya',
+          name: 'श्री रामेश कुमार',
+          englishName: 'Shri Ramesh Kumar',
+          position: 'मुखिया',
           imageUrl: '',
           tenure: '2020 - 2025',
         ),
         PoliticalLeader(
-          name: 'Smt. Sunita Devi',
-          position: 'Sarpanch',
+          name: 'श्रीमती सुनीता देवी',
+          englishName: 'Smt. Sunita Devi',
+          position: 'सरपंच',
           imageUrl: '',
           tenure: '2020 - 2025',
         ),
       ]),
       MapEntry('2015 - 2020', [
         PoliticalLeader(
-          name: 'Shri Rajesh Sharma',
-          position: 'Mukhiya',
+          name: 'श्री राजेश शर्मा',
+          englishName: 'Shri Rajesh Sharma',
+          position: 'मुखिया',
           imageUrl: '',
           tenure: '2015 - 2020',
         ),
         PoliticalLeader(
-          name: 'Smt. Meena Devi',
-          position: 'Sarpanch',
+          name: 'श्रीमती मीना देवी',
+          englishName: 'Smt. Meena Devi',
+          position: 'सरपंच',
           imageUrl: '',
           tenure: '2015 - 2020',
         ),
       ]),
       MapEntry('2010 - 2015', [
         PoliticalLeader(
-          name: 'Shri Amit Singh',
-          position: 'Mukhiya',
+          name: 'श्री अमित सिंह',
+          englishName: 'Shri Amit Singh',
+          position: 'मुखिया',
           imageUrl: '',
           tenure: '2010 - 2015',
         ),
         PoliticalLeader(
-          name: 'Smt. Rekha Sharma',
-          position: 'Sarpanch',
+          name: 'श्रीमती रेखा शर्मा',
+          englishName: 'Smt. Rekha Sharma',
+          position: 'सरपंच',
           imageUrl: '',
           tenure: '2010 - 2015',
         ),
       ]),
       MapEntry('2005 - 2010', [
         PoliticalLeader(
-          name: 'Shri Vijay Kumar',
-          position: 'Mukhiya',
+          name: 'श्री विजय कुमार',
+          englishName: 'Shri Vijay Kumar',
+          position: 'मुखिया',
           imageUrl: '',
           tenure: '2005 - 2010',
         ),
         PoliticalLeader(
-          name: 'Smt. Asha Devi',
-          position: 'Sarpanch',
+          name: 'श्रीमती आशा देवी',
+          englishName: 'Smt. Asha Devi',
+          position: 'सरपंच',
           imageUrl: '',
           tenure: '2005 - 2010',
         ),
       ]),
       MapEntry('2000 - 2005', [
         PoliticalLeader(
-          name: 'Shri Rakesh Verma',
-          position: 'Mukhiya',
+          name: 'श्री राकेश वर्मा',
+          englishName: 'Shri Rakesh Verma',
+          position: 'मुखिया',
           imageUrl: '',
           tenure: '2000 - 2005',
         ),
         PoliticalLeader(
-          name: 'Smt. Sunita Devi',
-          position: 'Sarpanch',
+          name: 'श्रीमती सुनीता देवी',
+          englishName: 'Smt. Sunita Devi',
+          position: 'सरपंच',
           imageUrl: '',
           tenure: '2000 - 2005',
         ),
@@ -141,10 +153,10 @@ class PoliticalLeadersScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(top: 32.0, bottom: 16.0, left: 8.0),
               child: Text(
-                'Leadership Timeline',
+                'Leadership Timeline (Historical)',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 26,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
                 ),
