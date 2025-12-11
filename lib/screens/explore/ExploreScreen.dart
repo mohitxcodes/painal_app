@@ -122,6 +122,18 @@ class _ExploreScreenState extends State<ExploreScreen>
                   ),
                   const SizedBox(height: 16),
                   _buildCreativeFeatureCard(
+                    icon: Icons.people_alt_rounded,
+                    title: 'Political Leaders',
+                    subtitle: 'Village governance & history',
+                    description: 'Leaders who shaped our community',
+                    color: Colors.white,
+                    onTap: () => _showComingSoon('Political Leaders'),
+                    delay: 300,
+                    isComingSoon: true,
+                    bgIcon: Icons.account_balance_rounded,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildCreativeFeatureCard(
                     icon: Icons.location_on_rounded,
                     title: 'Village Map',
                     subtitle: 'Interactive heritage sites',
