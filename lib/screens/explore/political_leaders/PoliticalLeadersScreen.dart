@@ -25,6 +25,20 @@ class PoliticalLeadersScreen extends StatelessWidget {
 
     // Historical leaders data
     final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
+      MapEntry('2020 - 2025', [
+        PoliticalLeader(
+          name: 'Shri Ramesh Kumar',
+          position: 'Mukhiya',
+          imageUrl: '',
+          tenure: '2020 - 2025',
+        ),
+        PoliticalLeader(
+          name: 'Smt. Sunita Devi',
+          position: 'Sarpanch',
+          imageUrl: '',
+          tenure: '2020 - 2025',
+        ),
+      ]),
       MapEntry('2015 - 2020', [
         PoliticalLeader(
           name: 'Shri Rajesh Sharma',
@@ -39,7 +53,48 @@ class PoliticalLeadersScreen extends StatelessWidget {
           tenure: '2015 - 2020',
         ),
       ]),
-      // Add more years as needed
+      MapEntry('2010 - 2015', [
+        PoliticalLeader(
+          name: 'Shri Amit Singh',
+          position: 'Mukhiya',
+          imageUrl: '',
+          tenure: '2010 - 2015',
+        ),
+        PoliticalLeader(
+          name: 'Smt. Rekha Sharma',
+          position: 'Sarpanch',
+          imageUrl: '',
+          tenure: '2010 - 2015',
+        ),
+      ]),
+      MapEntry('2005 - 2010', [
+        PoliticalLeader(
+          name: 'Shri Vijay Kumar',
+          position: 'Mukhiya',
+          imageUrl: '',
+          tenure: '2005 - 2010',
+        ),
+        PoliticalLeader(
+          name: 'Smt. Asha Devi',
+          position: 'Sarpanch',
+          imageUrl: '',
+          tenure: '2005 - 2010',
+        ),
+      ]),
+      MapEntry('2000 - 2005', [
+        PoliticalLeader(
+          name: 'Shri Rakesh Verma',
+          position: 'Mukhiya',
+          imageUrl: '',
+          tenure: '2000 - 2005',
+        ),
+        PoliticalLeader(
+          name: 'Smt. Sunita Devi',
+          position: 'Sarpanch',
+          imageUrl: '',
+          tenure: '2000 - 2005',
+        ),
+      ]),
     ];
 
     return Scaffold(
@@ -53,6 +108,7 @@ class PoliticalLeadersScreen extends StatelessWidget {
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 22,
+            letterSpacing: 0.5,
           ),
         ),
         centerTitle: true,
@@ -62,7 +118,7 @@ class PoliticalLeadersScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -70,11 +126,12 @@ class PoliticalLeadersScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
               child: Text(
-                'Current Leadership',
+                'Current Leadership (Present)',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
@@ -82,41 +139,110 @@ class PoliticalLeadersScreen extends StatelessWidget {
 
             // Historical Leaders Section
             const Padding(
-              padding: EdgeInsets.only(
-                top: 24.0,
-                bottom: 16.0,
-                left: 8.0,
-                right: 8.0,
-              ),
+              padding: EdgeInsets.only(top: 32.0, bottom: 16.0, left: 8.0),
               child: Text(
-                'Historical Leadership',
+                'Leadership Timeline',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
-            ...historicalLeaders.expand(
-              (entry) => [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8.0,
-                    horizontal: 8.0,
-                  ),
-                  child: Text(
-                    entry.key,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+            const SizedBox(height: 12),
+            ...historicalLeaders.asMap().entries.map((entry) {
+              final index = entry.key;
+              final yearEntry = entry.value;
+              return TweenAnimationBuilder(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: Duration(milliseconds: 300 + (index * 100)),
+                builder: (context, double value, child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.translate(
+                      offset: Offset(0, 20 * (1 - value)),
+                      child: child,
                     ),
-                  ),
+                  );
+                },
+                child: Column(
+                  children: [
+                    // Timeline connector
+                    if (index > 0)
+                      Container(
+                        width: 2,
+                        height: 24,
+                        margin: const EdgeInsets.only(left: 23),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withOpacity(0),
+                              Colors.white.withOpacity(0.3),
+                              Colors.white.withOpacity(0.3),
+                              Colors.white.withOpacity(0),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                    // Timeline item
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Timeline dot and year
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 16,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.15),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  yearEntry.key,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              ...yearEntry.value.map(
+                                (leader) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      child: LeaderCard(leader: leader),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                ...entry.value.map((leader) => LeaderCard(leader: leader)),
-                const SizedBox(height: 8),
-              ],
-            ),
+              );
+            }),
           ],
         ),
       ),
