@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:painal/screens/book/BookScreen.dart';
+import 'package:painal/screens/explore/political_leaders/PoliticalLeadersScreen.dart';
 import 'package:painal/screens/gallery/GalleryScreen.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -127,9 +128,11 @@ class _ExploreScreenState extends State<ExploreScreen>
                     subtitle: 'Village governance & history',
                     description: 'Leaders who shaped our community',
                     color: Colors.white,
-                    onTap: () => _showComingSoon('Political Leaders'),
+                    onTap:
+                        () => _navigateWithAnimation(
+                          const PoliticalLeadersScreen(),
+                        ),
                     delay: 300,
-                    isComingSoon: true,
                     bgIcon: Icons.account_balance_rounded,
                   ),
                   const SizedBox(height: 16),
