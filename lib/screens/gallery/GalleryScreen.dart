@@ -8,7 +8,6 @@ class GalleryScreen extends StatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
-  // List of 20 village-themed placeholder images from internet
   final List<String> galleryImages = [
     'https://images.unsplash.com/photo-1590682680793-1368291ab3ab?w=800',
     'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=800',
@@ -40,31 +39,46 @@ class _GalleryScreenState extends State<GalleryScreen> {
         slivers: [
           // App Bar
           SliverAppBar(
-            expandedHeight: 140,
+            expandedHeight: 80,
             floating: false,
             pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                'Village Gallery',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+                  stops: [0.0, 1.0],
                 ),
               ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Colors.green[600]!, Colors.green[400]!],
+              child: FlexibleSpaceBar(
+                title: const Text(
+                  'Village Gallery',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
                   ),
                 ),
+                centerTitle: true,
               ),
             ),
             actions: [
-              IconButton(icon: const Icon(Icons.search), onPressed: () {}),
-              IconButton(icon: const Icon(Icons.filter_list), onPressed: () {}),
+              IconButton(
+                icon: const Icon(Icons.filter_list, color: Colors.white),
+                onPressed: () {},
+              ),
             ],
           ),
 

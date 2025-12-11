@@ -112,7 +112,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                   const SizedBox(height: 16),
                   _buildCreativeFeatureCard(
                     icon: Icons.photo_library_rounded,
-                    title: 'Memory Gallery',
+                    title: 'Painal Gallery',
                     subtitle: 'Visual journey through time',
                     description: 'Captured moments from generations past',
                     color: Colors.white,
