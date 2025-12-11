@@ -100,7 +100,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                 children: [
                   _buildCreativeFeatureCard(
                     icon: Icons.auto_stories_rounded,
-                    title: 'Sacred Texts',
+                    title: 'Painal Village Book',
                     subtitle: 'Ancient manuscripts & wisdom',
                     description:
                         'Explore digitized sacred books and historical documents',

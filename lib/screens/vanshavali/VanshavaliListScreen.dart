@@ -29,6 +29,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
   bool _isLoading = true;
   String _errorMessage = '';
+  bool _hasRemoteUpdates = false;
 
   // Search related
   final TextEditingController _searchController = TextEditingController();
@@ -41,6 +42,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     super.initState();
     // Load families from cache first, then fetch background update if needed
     _loadFamilies();
+    // Check for remote updates periodically
+    _checkForRemoteUpdates();
   }
 
   @override
@@ -200,6 +203,99 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
       }
       debugPrint("Error fetching families: $e");
     }
+  }
+
+  Future<void> _checkForRemoteUpdates() async {
+    try {
+      bool updateNeeded = false;
+
+      // Check all family collections for updates
+      for (var family in familyMembers) {
+        final collectionName = family['collection'] as String?;
+        if (collectionName == null) continue;
+
+        // Get the latest lastUpdated from Firestore
+        final snapshot =
+            await FirebaseFirestore.instance
+                .collection(collectionName)
+                .orderBy('lastUpdated', descending: true)
+                .limit(1)
+                .get();
+
+        if (snapshot.docs.isEmpty) continue;
+
+        final remote = snapshot.docs.first.data()['lastUpdated'];
+        if (remote == null) continue;
+
+        final remoteTime = (remote as Timestamp).toDate();
+
+        // Compare with local Hive cache
+        final boxName =
+            collectionName == 'familyMembers'
+                ? 'familyBox'
+                : 'familyBox_$collectionName';
+
+        if (await Hive.boxExists(boxName)) {
+          final box =
+              Hive.isBoxOpen(boxName)
+                  ? Hive.box<FamilyMember>(boxName)
+                  : await Hive.openBox<FamilyMember>(boxName);
+
+          DateTime? localTime;
+          for (var member in box.values) {
+            if (member.lastUpdated != null) {
+              final t = member.lastUpdated!;
+              if (localTime == null || t.isAfter(localTime)) {
+                localTime = t;
+              }
+            }
+          }
+
+          if (localTime == null || remoteTime.isAfter(localTime)) {
+            updateNeeded = true;
+            break;
+          }
+        } else {
+          updateNeeded = true;
+          break;
+        }
+      }
+
+      if (mounted && updateNeeded) {
+        setState(() {
+          _hasRemoteUpdates = true;
+        });
+        // Show dialog for non-admin users
+        _showUpdateDialog();
+      }
+    } catch (e) {
+      debugPrint('Error checking for remote updates: $e');
+    }
+  }
+
+  void _showUpdateDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => _UpdateNotificationDialog(
+            onUpdate: () async {
+              Navigator.of(context).pop();
+              await _loadFamilies(forceRefresh: true);
+              if (mounted) {
+                setState(() {
+                  _hasRemoteUpdates = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Data updated successfully!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
+            },
+          ),
+    );
   }
 
   // Show search dialog
@@ -782,6 +878,118 @@ class _VanshavaliListHeader extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+// Update Notification Dialog Widget
+class _UpdateNotificationDialog extends StatefulWidget {
+  final VoidCallback onUpdate;
+
+  const _UpdateNotificationDialog({required this.onUpdate});
+
+  @override
+  State<_UpdateNotificationDialog> createState() =>
+      _UpdateNotificationDialogState();
+}
+
+class _UpdateNotificationDialogState extends State<_UpdateNotificationDialog> {
+  bool _isUpdating = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.transparent,
+      content: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.2),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.orange.shade200, width: 2),
+              ),
+              child: Icon(
+                Icons.update_rounded,
+                color: Colors.orange.shade200,
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Update Available',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'New family data is available. Please update to get the latest information.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed:
+                    _isUpdating
+                        ? null
+                        : () async {
+                          setState(() => _isUpdating = true);
+                          await Future.delayed(
+                            const Duration(milliseconds: 100),
+                          );
+                          widget.onUpdate();
+                        },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child:
+                    _isUpdating
+                        ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                        : const Text(
+                          'Update Now',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

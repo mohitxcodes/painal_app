@@ -56,11 +56,15 @@ class _BookScreenState extends State<BookScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Colors.green.withOpacity(0.4),
+                          color: Colors.green.withOpacity(0.6),
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(18),
-                        color: Colors.white,
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+                        ),
                       ),
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(
@@ -79,11 +83,41 @@ class _BookScreenState extends State<BookScreen> {
                                       controller: controller,
                                       autofocus: true,
                                       keyboardType: TextInputType.number,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
                                       decoration: InputDecoration(
                                         hintText: 'Enter page number...',
+                                        hintStyle: TextStyle(
+                                          color: Colors.white.withOpacity(0.6),
+                                        ),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
                                             12,
+                                          ),
+                                          borderSide: BorderSide(
+                                            color: Colors.white.withOpacity(
+                                              0.3,
+                                            ),
+                                          ),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          borderSide: BorderSide(
+                                            color: Colors.white.withOpacity(
+                                              0.3,
+                                            ),
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          borderSide: const BorderSide(
+                                            color: Colors.green,
+                                            width: 2,
                                           ),
                                         ),
                                         contentPadding:
@@ -93,6 +127,9 @@ class _BookScreenState extends State<BookScreen> {
                                             ),
                                         isDense: true,
                                         errorText: errorText,
+                                        errorStyle: const TextStyle(
+                                          color: Colors.redAccent,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -197,201 +234,238 @@ class _BookScreenState extends State<BookScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar:
           isFullscreen
               ? null
               : PreferredSize(
                 preferredSize: const Size.fromHeight(140),
                 child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-                    child: SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    const Text(
-                                      'Painal Village Book',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                        letterSpacing: 0.2,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(width: 4),
-                                    const Text(
-                                      '(पैनाल गाँव पुस्तक)',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.green,
-                                        letterSpacing: 0.1,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              const Text(
-                                'Total Pages: ',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                '$totalPages',
-                                style: TextStyle(
-                                  color: Colors.green[700],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(width: 18),
-                              const Text(
-                                'Current Page: ',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(
-                                '${currentPage + 1}',
-                                style: TextStyle(
-                                  color: Colors.green[700],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.fullscreen,
-                                  color: Colors.green,
-                                  size: 22,
-                                ),
-                                onPressed:
-                                    () => setState(() => isFullscreen = true),
-                                tooltip: 'Fullscreen',
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.search,
-                                  size: 26,
-                                  color: Colors.green,
-                                  weight: 900, // Flutter 3.10+
-                                ),
-                                tooltip: 'Search',
-                                onPressed: _showSearchDialog,
-                              ),
-                            ],
-                          ),
-                          const Divider(
-                            height: 1,
-                            thickness: 1,
-                            color: Color(0xFFE0E0E0),
-                          ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          const Color(0xFF0B3B2D).withOpacity(0.95),
+                          const Color(0xFF155D42).withOpacity(0.85),
                         ],
                       ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.green.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 50, top: 12),
-        child: Stack(
-          children: [
-            PhotoViewGallery.builder(
-              pageController: _pageController,
-              itemCount: totalPages,
-              scrollPhysics: const BouncingScrollPhysics(),
-              backgroundDecoration: const BoxDecoration(color: Colors.white),
-              builder: (context, index) {
-                return PhotoViewGalleryPageOptions(
-                  imageProvider: NetworkImage(pageImageUrls[index]),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.covered * 3.0,
-                  heroAttributes: PhotoViewHeroAttributes(tag: 'page_$index'),
-                );
-              },
-              onPageChanged: (index) {
-                setState(() {
-                  currentPage = index;
-                });
-              },
-              scrollDirection: Axis.horizontal,
-              loadingBuilder:
-                  (context, event) =>
-                      const Center(child: CircularProgressIndicator()),
-            ),
-            if (!isFullscreen)
-              Positioned(
-                bottom: 24,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Page ${currentPage + 1} of $totalPages',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+                      child: SingleChildScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      const Text(
+                                        'Village Book',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          letterSpacing: 0.2,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Text(
+                                        '(गाँव पुस्तक)',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF4ADE80),
+                                          letterSpacing: 0.1,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Total Pages: ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '$totalPages',
+                                  style: const TextStyle(
+                                    color: Color(0xFF4ADE80),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 18),
+                                const Text(
+                                  'Current Page: ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '${currentPage + 1}',
+                                  style: const TextStyle(
+                                    color: Color(0xFF4ADE80),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.fullscreen,
+                                    color: Color(0xFF4ADE80),
+                                    size: 22,
+                                  ),
+                                  onPressed:
+                                      () => setState(() => isFullscreen = true),
+                                  tooltip: 'Fullscreen',
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.search,
+                                    size: 26,
+                                    color: Color(0xFF4ADE80),
+                                    weight: 900, // Flutter 3.10+
+                                  ),
+                                  tooltip: 'Search',
+                                  onPressed: _showSearchDialog,
+                                ),
+                              ],
+                            ),
+                            Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            if (isFullscreen)
-              Positioned(
-                top: 20,
-                right: 20,
-                child: SafeArea(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.55),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.fullscreen_exit,
-                        color: Colors.white,
-                        size: 36,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 80),
+          child: Stack(
+            children: [
+              PhotoViewGallery.builder(
+                pageController: _pageController,
+                itemCount: totalPages,
+                scrollPhysics: const BouncingScrollPhysics(),
+                backgroundDecoration: const BoxDecoration(
+                  color: Colors.transparent,
+                ),
+                builder: (context, index) {
+                  return PhotoViewGalleryPageOptions(
+                    imageProvider: NetworkImage(pageImageUrls[index]),
+                    minScale: PhotoViewComputedScale.contained,
+                    maxScale: PhotoViewComputedScale.covered * 3.0,
+                    heroAttributes: PhotoViewHeroAttributes(tag: 'page_$index'),
+                  );
+                },
+                onPageChanged: (index) {
+                  setState(() {
+                    currentPage = index;
+                  });
+                },
+                scrollDirection: Axis.horizontal,
+                loadingBuilder:
+                    (context, event) => const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
-                      tooltip: 'Exit Fullscreen',
-                      onPressed: () => setState(() => isFullscreen = false),
+                    ),
+              ),
+              if (!isFullscreen)
+                Positioned(
+                  bottom: 34,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Page ${currentPage + 1} of $totalPages',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ],
+              if (isFullscreen)
+                Positioned(
+                  top: 20,
+                  right: 20,
+                  child: SafeArea(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.55),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.fullscreen_exit,
+                          color: Colors.white,
+                          size: 36,
+                        ),
+                        tooltip: 'Exit Fullscreen',
+                        onPressed: () => setState(() => isFullscreen = false),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
