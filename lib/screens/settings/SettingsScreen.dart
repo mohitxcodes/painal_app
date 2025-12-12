@@ -5,6 +5,7 @@ import 'package:painal/screens/login/LoginScreen.dart';
 import 'package:painal/screens/reports/ReportsScreen.dart';
 import 'package:painal/screens/requests/RequestsScreen.dart';
 import 'package:painal/screens/settings/aboutus/AboutDeveloperScreen.dart';
+import 'package:painal/screens/settings/aboutus/InspirationScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -55,8 +56,10 @@ class SettingsScreen extends StatelessWidget {
               // Account Section
               _buildAccountCard(authProvider, context),
               const SizedBox(height: 20),
-              // About Section
-              _buildAboutCard(context),
+              _buildAdditionalInfoCard(context),
+              const SizedBox(height: 20),
+              // About App Section
+              _buildAboutAppCard(context),
             ],
           ),
         ),
@@ -285,7 +288,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutCard(BuildContext context) {
+  // ... _buildAccountCard and _buildAccountActionTile remain unchanged ...
+
+  Widget _buildAboutAppCard(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -346,6 +351,70 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _buildAccountActionTile(
+            leading: Icons.help_outline_rounded,
+            title: 'Help & Support',
+            subtitle: 'Get help with the app',
+            onTap: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAdditionalInfoCard(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.18),
+            Colors.white.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.2),
+                ),
+                child: const Icon(
+                  Icons.more_horiz_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Text(
+                'Additional Information',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildAccountActionTile(
             leading: Icons.code_rounded,
             title: 'About Developer',
             subtitle: 'Meet the developer',
@@ -359,10 +428,16 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _buildAccountActionTile(
-            leading: Icons.help_outline_rounded,
-            title: 'Help & Support',
-            subtitle: 'Get help with the app',
-            onTap: () {},
+            leading: Icons.lightbulb_outline_rounded,
+            title: 'Inspiration',
+            subtitle: 'The idea behind the app',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const InspirationScreen(),
+                ),
+              );
+            },
           ),
         ],
       ),
