@@ -4,6 +4,7 @@ import 'package:painal/apis/AuthProviderUser.dart';
 import 'package:painal/screens/login/LoginScreen.dart';
 import 'package:painal/screens/reports/ReportsScreen.dart';
 import 'package:painal/screens/requests/RequestsScreen.dart';
+import 'package:painal/screens/settings/aboutus/AboutDeveloperScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -55,7 +56,7 @@ class SettingsScreen extends StatelessWidget {
               _buildAccountCard(authProvider, context),
               const SizedBox(height: 20),
               // About Section
-              _buildAboutCard(),
+              _buildAboutCard(context),
             ],
           ),
         ),
@@ -284,7 +285,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutCard() {
+  Widget _buildAboutCard(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -342,6 +343,19 @@ class SettingsScreen extends StatelessWidget {
             title: 'App Version',
             subtitle: '1.0.0',
             onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          _buildAccountActionTile(
+            leading: Icons.code_rounded,
+            title: 'About Developer',
+            subtitle: 'Meet the developer',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AboutDeveloperScreen(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 12),
           _buildAccountActionTile(
