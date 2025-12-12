@@ -68,15 +68,41 @@ class _CommunityScreenState extends State<CommunityScreen>
     super.dispose();
   }
 
-  void _navigateToVanshavali(String communityName) {
-    // Navigate to VanshavaliListScreen
+  void _navigateToVanshavali(String communityName, String communityId) {
+    // Navigate to VanshavaliListScreen with a custom page route for smooth transition
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const VanshavaliListScreen()),
-    );
+      PageRouteBuilder(
+        pageBuilder:
+            (context, animation, secondaryAnimation) =>
+                const VanshavaliListScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = 0.0;
+          const end = 1.0;
+          const curve = Curves.easeInOut;
 
-    // Note: In a future update, we can pass the community name to filter the list
-    // in VanshavaliListScreen by modifying its constructor and state management.
+          var tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+          var fadeAnimation = animation.drive(tween);
+
+          return FadeTransition(
+            opacity: fadeAnimation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                    begin: const Offset(0.0, 0.1),
+                    end: Offset.zero,
+                  )
+                  .chain(CurveTween(curve: Curves.easeOutCubic))
+                  .animate(animation),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
   }
 
   @override
@@ -150,7 +176,11 @@ class _CommunityScreenState extends State<CommunityScreen>
                           subtitle: community['subtitle'],
                           description: community['description'],
                           color: Colors.white,
-                          onTap: () => _navigateToVanshavali(community['name']),
+                          onTap:
+                              () => _navigateToVanshavali(
+                                community['name'],
+                                community['name'].toLowerCase(),
+                              ),
                           delay: index * 100,
                           bgIcon: community['bgIcon'],
                           hindiName: community['hindiName'],
@@ -228,14 +258,17 @@ class _CommunityScreenState extends State<CommunityScreen>
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
                           children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: color.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(16),
+                            Hero(
+                              tag: 'community_${title.toLowerCase()}_icon',
+                              child: Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: color.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Icon(icon, size: 32, color: color),
                               ),
-                              child: Icon(icon, size: 32, color: color),
                             ),
                             const SizedBox(width: 16),
                             Expanded(

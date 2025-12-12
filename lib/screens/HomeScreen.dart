@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:painal/screens/vanshavali/VanshavaliListScreen.dart';
 import 'overview/OverviewScreen.dart';
 import 'package:painal/screens/settings/SettingsScreen.dart';
 import 'package:painal/screens/explore/ExploreScreen.dart';
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen>
           controller: _tabController,
           children: const [
             OverviewScreen(),
-            CommunityScreen(),
+            VanshavaliListScreen(),
             ExploreScreen(),
           ],
         ),

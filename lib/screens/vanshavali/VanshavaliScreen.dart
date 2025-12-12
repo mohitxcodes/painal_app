@@ -62,15 +62,11 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   final List<FamilyMember> _navigationStack = [];
   bool _loading = true;
   String? _error;
-  DateTime? _localLastUpdated;
-  DateTime? _remoteLastUpdated;
-  bool _showUpdateBanner = false;
 
   @override
   void initState() {
     super.initState();
     _loadFamilyData();
-    _checkForRemoteUpdates();
   }
 
   String _getBoxName() {
@@ -85,90 +81,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
       return Hive.box<FamilyMember>(boxName);
     } else {
       return await Hive.openBox<FamilyMember>(boxName);
-    }
-  }
-
-  Future<void> _checkForRemoteUpdates() async {
-    bool updateNeeded = false;
-    // Get the latest lastUpdated from Firestore
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection(widget.collectionName)
-            .orderBy('lastUpdated', descending: true)
-            .limit(1)
-            .get();
-    if (snapshot.docs.isNotEmpty) {
-      final remote = snapshot.docs.first.data()['lastUpdated'];
-      if (remote != null) {
-        final remoteTime = (remote as Timestamp).toDate();
-        setState(() {
-          _remoteLastUpdated = remoteTime;
-        });
-        // Compare with local
-        final box = await _getBox();
-        DateTime? localTime;
-        for (var member in box.values) {
-          if (member.lastUpdated != null) {
-            final t = member.lastUpdated!;
-            if (localTime == null || t.isAfter(localTime)) {
-              localTime = t;
-            }
-          }
-        }
-        setState(() {
-          _localLastUpdated = localTime;
-          updateNeeded = localTime == null || remoteTime.isAfter(localTime);
-        });
-      }
-    }
-    // After checking main collection, also check other families
-    try {
-      final famSnap =
-          await FirebaseFirestore.instance.collection('families').get();
-      for (final doc in famSnap.docs) {
-        final String? col = doc.data()['collectionName'];
-        if (col == null || col.isEmpty) continue;
-
-        // Get remote latest
-        final remoteSnap =
-            await FirebaseFirestore.instance
-                .collection(col)
-                .orderBy('lastUpdated', descending: true)
-                .limit(1)
-                .get();
-        if (remoteSnap.docs.isEmpty) continue;
-        final Timestamp? ts = remoteSnap.docs.first.data()['lastUpdated'];
-        if (ts == null) continue;
-        final remoteLatest = ts.toDate();
-
-        // Get local latest
-        DateTime? localLatest;
-        final boxName = 'familyBox_$col';
-        if (await Hive.boxExists(boxName)) {
-          final box =
-              Hive.isBoxOpen(boxName)
-                  ? Hive.box<FamilyMember>(boxName)
-                  : await Hive.openBox<FamilyMember>(boxName);
-          for (final m in box.values) {
-            final lu = m.lastUpdated;
-            if (lu != null) {
-              if (localLatest == null || lu.isAfter(localLatest)) {
-                localLatest = lu;
-              }
-            }
-          }
-        }
-        if (localLatest == null || remoteLatest.isAfter(localLatest)) {
-          updateNeeded = true;
-          break;
-        }
-      }
-    } catch (_) {}
-
-    if (mounted) {
-      setState(() {
-        _showUpdateBanner = updateNeeded;
-      });
     }
   }
 
@@ -218,20 +130,10 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         buildFamilyTreeFromFlatData(data, root.id);
       }
 
-      // Find the most recent update time
-      DateTime? localTime;
-      for (var member in data) {
-        if (member.lastUpdated != null &&
-            (localTime == null || member.lastUpdated!.isAfter(localTime))) {
-          localTime = member.lastUpdated;
-        }
-      }
-
       if (mounted) {
         setState(() {
           _familyData = data;
           _currentMember = rootMembers.first;
-          _localLastUpdated = localTime;
           _loading = false;
         });
 
@@ -259,57 +161,17 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
         });
       }
     }
-    // After loading, check for remote updates again
-    _checkForRemoteUpdates();
   }
 
   Future<void> _refreshFromFirebase() async {
-    // Refresh main family data
     await _loadFamilyData(forceRefresh: true);
-    // Refresh all additional families used in MoreFamilyScreen
-    await _refreshOtherFamilies();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('All family data refreshed!'),
-      ), // unified message
-    );
-    setState(() {
-      _showUpdateBanner = false;
-    });
-  }
-
-  /// Fetches every family listed in the root `families` collection,
-  /// pulls the latest members from Firestore, and updates their
-  /// corresponding Hive boxes (familyBox_<collectionName>).
-  Future<void> _refreshOtherFamilies() async {
-    try {
-      final familiesSnapshot =
-          await FirebaseFirestore.instance.collection('families').get();
-      for (final doc in familiesSnapshot.docs) {
-        final data = doc.data();
-        final String? collectionName = data['collectionName'];
-        if (collectionName == null || collectionName.isEmpty) continue;
-
-        final membersSnap =
-            await FirebaseFirestore.instance.collection(collectionName).get();
-        final members =
-            membersSnap.docs
-                .map((d) => FamilyMember.fromMap(d.data()))
-                .toList();
-        if (members.isEmpty) continue;
-
-        final box = await Hive.openBox<FamilyMember>(
-          'familyBox_$collectionName',
-        );
-        await box.clear();
-        for (final member in members) {
-          await box.put(member.id, member);
-        }
-      }
-    } catch (e) {
-      // For now just print, but avoid crashing refresh flow
-      debugPrint('Error refreshing other families: \$e');
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Family data refreshed!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     }
   }
 
@@ -498,8 +360,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
   @override
   Widget build(BuildContext context) {
     final userAuth = Provider.of<AuthProviderUser>(context);
-    bool showBanner = _showUpdateBanner && !userAuth.isAdmin;
-    bool fetchingBanner = false;
 
     // Wrap loading and error states with background gradient
     if (_loading) {
@@ -520,8 +380,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
-                // Pop all routes until we're back at the list or root
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pop();
               },
             ),
             title: Text(
@@ -559,8 +418,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
-                // Pop all routes until we're back at the list or root
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.of(context).pop();
               },
             ),
             title: Text(
@@ -648,8 +506,7 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              // Pop all routes until we're back at the list or root
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.of(context).pop();
             },
           ),
           title: Text(
@@ -669,106 +526,12 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
               bottom: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-                child: SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      if (showBanner)
-                        StatefulBuilder(
-                          builder: (context, setBannerState) {
-                            return Container(
-                              width: double.infinity,
-                              margin: const EdgeInsets.only(bottom: 10),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.25),
-                                ),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.white.withOpacity(0.16),
-                                    Colors.white.withOpacity(0.06),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.warning_amber_rounded,
-                                    color: Colors.orange.shade200,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      'Family data has changed. Please get the latest data.',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white.withOpacity(0.9),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  fetchingBanner
-                                      ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                      : ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.orange
-                                              .withOpacity(0.9),
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 10,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                        ),
-                                        onPressed: () async {
-                                          setBannerState(
-                                            () => fetchingBanner = true,
-                                          );
-                                          await _refreshFromFirebase();
-                                          setBannerState(
-                                            () => fetchingBanner = false,
-                                          );
-                                        },
-                                        child: const Text(
-                                          'Get Latest Data',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      VanshavaliHeader(
-                        totalMembers: totalMembers,
-                        heading: widget.heading,
-                        hindiHeading: widget.hindiHeading,
-                        onRefresh: _refreshFromFirebase,
-                        showRefresh: userAuth.isAdmin,
-                      ),
-                    ],
-                  ),
+                child: VanshavaliHeader(
+                  totalMembers: totalMembers,
+                  heading: widget.heading,
+                  hindiHeading: widget.hindiHeading,
+                  onRefresh: _refreshFromFirebase,
+                  showRefresh: userAuth.isAdmin,
                 ),
               ),
             ),
@@ -845,94 +608,6 @@ class _VanshavaliScreenState extends State<VanshavaliScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _UpdateDialog extends StatefulWidget {
-  final Future<void> Function() onFetch;
-  const _UpdateDialog({required this.onFetch});
-
-  @override
-  State<_UpdateDialog> createState() => _UpdateDialogState();
-}
-
-class _UpdateDialogState extends State<_UpdateDialog> {
-  bool _loading = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final green = theme.colorScheme.secondary;
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      backgroundColor: theme.colorScheme.surface,
-      title: Row(
-        children: [
-          Icon(Icons.warning_amber_rounded, color: green, size: 28),
-          const SizedBox(width: 10),
-          Text(
-            'Family Data Changed',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-      content: Padding(
-        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-        child: Text(
-          'Family data has changed. Please get the latest data to continue.',
-          style: theme.textTheme.bodyMedium,
-        ),
-      ),
-      actions: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: green,
-              foregroundColor: theme.colorScheme.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-            onPressed:
-                _loading
-                    ? null
-                    : () async {
-                      setState(() => _loading = true);
-                      await widget.onFetch();
-                      if (mounted) Navigator.of(context).pop();
-                    },
-            child:
-                _loading
-                    ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: theme.colorScheme.onPrimary,
-                            strokeWidth: 2.5,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Text('Getting Latest Data...'),
-                      ],
-                    )
-                    : const Text(
-                      'Get Latest Data',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-          ),
-        ),
-      ],
     );
   }
 }

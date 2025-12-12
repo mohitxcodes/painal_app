@@ -30,6 +30,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
   bool _isLoading = true;
   String _errorMessage = '';
   bool _hasRemoteUpdates = false;
+  bool _dialogShown = false; // Flag to prevent showing dialog multiple times
 
   // Search related
   final TextEditingController _searchController = TextEditingController();
@@ -42,8 +43,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
     super.initState();
     // Load families from cache first, then fetch background update if needed
     _loadFamilies();
-    // Check for remote updates periodically
-    _checkForRemoteUpdates();
   }
 
   @override
@@ -70,6 +69,8 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
               familyMembers = cachedList;
               _isLoading = false;
             });
+            // Check for remote updates after loading families
+            _checkForRemoteUpdates();
             // Optional: Still fetch in background to keep data fresh
             _fetchFamiliesFromFirestore(updateCache: true);
             return;
@@ -194,6 +195,9 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           print("Cache save error: $e");
         }
       }
+
+      // Check for remote updates after loading families
+      _checkForRemoteUpdates();
     } catch (e) {
       if (mounted && familyMembers.isEmpty) {
         setState(() {
@@ -207,12 +211,24 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
   Future<void> _checkForRemoteUpdates() async {
     try {
+      debugPrint('🔍 Checking for remote updates...');
+      debugPrint('📋 Family members count: ${familyMembers.length}');
+      debugPrint('🚪 Dialog already shown: $_dialogShown');
+
+      // Don't check if dialog is already shown
+      if (_dialogShown) {
+        debugPrint('⏭️ Skipping check - dialog already shown');
+        return;
+      }
+
       bool updateNeeded = false;
 
       // Check all family collections for updates
       for (var family in familyMembers) {
         final collectionName = family['collection'] as String?;
         if (collectionName == null) continue;
+
+        debugPrint('🔎 Checking collection: $collectionName');
 
         // Get the latest lastUpdated from Firestore
         final snapshot =
@@ -222,12 +238,19 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
                 .limit(1)
                 .get();
 
-        if (snapshot.docs.isEmpty) continue;
+        if (snapshot.docs.isEmpty) {
+          debugPrint('⚠️ No documents in $collectionName');
+          continue;
+        }
 
         final remote = snapshot.docs.first.data()['lastUpdated'];
-        if (remote == null) continue;
+        if (remote == null) {
+          debugPrint('⚠️ No lastUpdated field in $collectionName');
+          continue;
+        }
 
         final remoteTime = (remote as Timestamp).toDate();
+        debugPrint('📅 Remote time for $collectionName: $remoteTime');
 
         // Compare with local Hive cache
         final boxName =
@@ -251,25 +274,44 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
             }
           }
 
+          debugPrint('📅 Local time for $collectionName: $localTime');
+
           if (localTime == null || remoteTime.isAfter(localTime)) {
+            debugPrint('✅ Update needed for $collectionName!');
             updateNeeded = true;
             break;
+          } else {
+            debugPrint('✓ $collectionName is up to date');
           }
         } else {
+          debugPrint('⚠️ Box $boxName does not exist - update needed');
           updateNeeded = true;
           break;
         }
       }
 
-      if (mounted && updateNeeded) {
+      debugPrint('🎯 Final result - Update needed: $updateNeeded');
+
+      if (mounted && updateNeeded && !_dialogShown) {
+        debugPrint('🔔 Setting update flag and showing dialog...');
         setState(() {
           _hasRemoteUpdates = true;
+          _dialogShown = true; // Mark dialog as shown
         });
-        // Show dialog for non-admin users
-        _showUpdateDialog();
+        // Show dialog immediately (will be shown after build completes)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _hasRemoteUpdates && _dialogShown) {
+            debugPrint('📢 Showing update dialog now!');
+            _showUpdateDialog();
+          }
+        });
+      } else {
+        debugPrint(
+          'ℹ️ No updates needed or widget not mounted or dialog already shown',
+        );
       }
     } catch (e) {
-      debugPrint('Error checking for remote updates: $e');
+      debugPrint('❌ Error checking for remote updates: $e');
     }
   }
 
@@ -281,14 +323,19 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
           (context) => _UpdateNotificationDialog(
             onUpdate: () async {
               Navigator.of(context).pop();
+              // Refresh family list metadata
               await _loadFamilies(forceRefresh: true);
+              // Refresh all family member data from Firestore
+              await _refreshAllFamilyMemberData();
               if (mounted) {
                 setState(() {
                   _hasRemoteUpdates = false;
+                  _dialogShown =
+                      false; // Reset flag so it can show again next time
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Data updated successfully!'),
+                    content: Text('All family data updated successfully!'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -296,6 +343,56 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
             },
           ),
     );
+  }
+
+  /// Refreshes all family member data from Firestore for all families
+  Future<void> _refreshAllFamilyMemberData() async {
+    try {
+      // Refresh main family
+      final mainCollection = mainFamily['collection'] ?? 'familyMembers';
+      await _refreshFamilyCollection(mainCollection, 'familyBox');
+
+      // Refresh all other families
+      final familiesSnapshot =
+          await FirebaseFirestore.instance.collection('families').get();
+      for (final doc in familiesSnapshot.docs) {
+        final data = doc.data();
+        final String? collectionName = data['collectionName'];
+        if (collectionName == null || collectionName.isEmpty) continue;
+
+        await _refreshFamilyCollection(
+          collectionName,
+          'familyBox_$collectionName',
+        );
+      }
+    } catch (e) {
+      debugPrint('Error refreshing all family member data: $e');
+    }
+  }
+
+  /// Refreshes a single family collection
+  Future<void> _refreshFamilyCollection(
+    String collectionName,
+    String boxName,
+  ) async {
+    try {
+      final membersSnap =
+          await FirebaseFirestore.instance.collection(collectionName).get();
+      final members =
+          membersSnap.docs.map((d) => FamilyMember.fromMap(d.data())).toList();
+      if (members.isEmpty) return;
+
+      final box =
+          Hive.isBoxOpen(boxName)
+              ? Hive.box<FamilyMember>(boxName)
+              : await Hive.openBox<FamilyMember>(boxName);
+      await box.clear();
+      for (final member in members) {
+        await box.put(member.id, member);
+      }
+    } catch (e) {
+      debugPrint('Error refreshing collection $collectionName: $e');
+    }
   }
 
   // Show search dialog
@@ -979,7 +1076,7 @@ class _UpdateNotificationDialogState extends State<_UpdateNotificationDialog> {
                           ),
                         )
                         : const Text(
-                          'Update Now',
+                          'Okay',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
