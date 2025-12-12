@@ -499,7 +499,7 @@ class _SearchDialogState extends State<SearchDialog> {
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
               onTap: () {
-                Navigator.of(context).pop();
+                // Don't pop here - let the callback handle it
                 widget.onMemberSelected(member);
               },
               child: Padding(

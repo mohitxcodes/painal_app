@@ -399,43 +399,96 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
   void _showSearchDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return SearchDialog(
           // No local familyData provided for global search
           onSearch: _globalSearch,
           onMemberSelected: (member) {
-            Navigator.pop(context);
-            // Navigate based on collection
-            final isMain =
-                member.collectionName ==
-                (mainFamily['collection'] ?? 'familyMembers');
+            // Close dialog using root navigator
+            Navigator.of(dialogContext).pop();
 
-            if (isMain) {
-              _navigateWithAnimation(
-                VanshavaliScreen(
-                  initialMemberId: member.id,
-                  isMainFamily: true,
-                ),
-              );
-            } else {
-              // Find family details for the screen title
-              final family = familyMembers.firstWhere(
-                (f) => f['collection'] == member.collectionName,
-                orElse: () => {},
-              );
+            // Wait for dialog to close before navigating
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (!mounted) return;
 
-              final heading = family['name'] ?? 'Family Tree';
+              // Navigate based on collection
+              final isMain =
+                  member.collectionName ==
+                  (mainFamily['collection'] ?? 'familyMembers');
 
-              _navigateWithAnimation(
-                VanshavaliScreen(
-                  collectionName: member.collectionName!,
-                  heading: heading,
-                  hindiHeading: '(वंशावली - परिवार वृक्ष)',
-                  initialMemberId: member.id,
-                  isMainFamily: false,
-                ),
-              );
-            }
+              if (isMain) {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder:
+                        (context, animation, secondaryAnimation) =>
+                            VanshavaliScreen(
+                              initialMemberId: member.id,
+                              isMainFamily: true,
+                            ),
+                    transitionsBuilder: (
+                      context,
+                      animation,
+                      secondaryAnimation,
+                      child,
+                    ) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOut;
+                      var tween = Tween(
+                        begin: begin,
+                        end: end,
+                      ).chain(CurveTween(curve: curve));
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              } else {
+                // Find family details for the screen title
+                final family = familyMembers.firstWhere(
+                  (f) => f['collection'] == member.collectionName,
+                  orElse: () => {},
+                );
+
+                final heading = family['name'] ?? 'Family Tree';
+
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder:
+                        (context, animation, secondaryAnimation) =>
+                            VanshavaliScreen(
+                              collectionName: member.collectionName!,
+                              heading: heading,
+                              hindiHeading: '(वंशावली - परिवार वृक्ष)',
+                              initialMemberId: member.id,
+                              isMainFamily: false,
+                            ),
+                    transitionsBuilder: (
+                      context,
+                      animation,
+                      secondaryAnimation,
+                      child,
+                    ) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.easeInOut;
+                      var tween = Tween(
+                        begin: begin,
+                        end: end,
+                      ).chain(CurveTween(curve: curve));
+                      return SlideTransition(
+                        position: animation.drive(tween),
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              }
+            });
           },
         );
       },
