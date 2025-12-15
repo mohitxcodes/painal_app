@@ -33,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
             icon: const Icon(
               Icons.arrow_back_ios_new_rounded,
               color: Colors.white,
-              size: 18,
+              size: 20,
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
@@ -42,24 +42,25 @@ class SettingsScreen extends StatelessWidget {
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 20,
-              letterSpacing: 0.2,
+              fontSize: 22,
+              letterSpacing: 0.5,
             ),
           ),
           centerTitle: true,
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Account Section
               _buildAccountCard(authProvider, context),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               _buildAdditionalInfoCard(context),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               // About App Section
               _buildAboutAppCard(context),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -87,9 +88,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -103,13 +104,17 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.2),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: Icon(
                   authProvider.isAdmin
                       ? Icons.admin_panel_settings_rounded
                       : Icons.person_outline_rounded,
                   color: Colors.white,
-                  size: 26,
+                  size: 28,
                 ),
               ),
               const SizedBox(width: 16),
@@ -120,10 +125,10 @@ class SettingsScreen extends StatelessWidget {
                     Text(
                       'Account',
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        letterSpacing: 0.2,
+                        letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -134,6 +139,7 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.white.withOpacity(0.8),
+                        letterSpacing: 0.2,
                       ),
                     ),
                   ],
@@ -141,7 +147,7 @@ class SettingsScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           if (authProvider.isAdmin) ...[
             _buildAccountActionTile(
               leading: Icons.list_alt_rounded,
@@ -204,18 +210,18 @@ class SettingsScreen extends StatelessWidget {
     bool isDestructive = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 4),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           splashColor: Colors.white.withOpacity(0.1),
           highlightColor: Colors.white.withOpacity(0.05),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color:
                     isDestructive
@@ -240,7 +246,7 @@ class SettingsScreen extends StatelessWidget {
                     color:
                         isDestructive
                             ? Colors.red.withOpacity(0.2)
-                            : Colors.white.withOpacity(0.15),
+                            : Colors.white.withOpacity(0.1),
                   ),
                   child: Icon(
                     leading,
@@ -262,6 +268,7 @@ class SettingsScreen extends StatelessWidget {
                               isDestructive
                                   ? Colors.red.shade200
                                   : Colors.white,
+                          letterSpacing: 0.3,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -269,7 +276,8 @@ class SettingsScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withOpacity(0.7),
+                          letterSpacing: 0.2,
                         ),
                       ),
                     ],
@@ -277,7 +285,7 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withOpacity(0.4),
                   size: 16,
                 ),
               ],
@@ -287,8 +295,6 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-
-  // ... _buildAccountCard and _buildAccountActionTile remain unchanged ...
 
   Widget _buildAboutAppCard(BuildContext context) {
     return Container(
@@ -307,9 +313,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -323,26 +329,30 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.2),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: const Icon(
                   Icons.info_rounded,
                   color: Colors.white,
-                  size: 26,
+                  size: 28,
                 ),
               ),
               const SizedBox(width: 16),
               const Text(
                 'About',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  letterSpacing: 0.2,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           _buildAccountActionTile(
             leading: Icons.info_outline_rounded,
             title: 'App Version',
@@ -378,9 +388,9 @@ class SettingsScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -394,27 +404,31 @@ class SettingsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withOpacity(0.2),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: const Icon(
                   Icons.more_horiz_rounded,
                   color: Colors.white,
-                  size: 26,
+                  size: 28,
                 ),
               ),
               const SizedBox(width: 16),
               const Text(
                 'Additional Information',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  letterSpacing: 0.2,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 24),
           _buildAccountActionTile(
             leading: Icons.lightbulb_outline_rounded,
             title: 'Inspiration',
