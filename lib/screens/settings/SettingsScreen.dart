@@ -413,20 +413,8 @@ class SettingsScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _buildAccountActionTile(
-            leading: Icons.code_rounded,
-            title: 'About Developer',
-            subtitle: 'Meet the developer',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AboutDeveloperScreen(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 12),
+
+          const SizedBox(height: 18),
           _buildAccountActionTile(
             leading: Icons.lightbulb_outline_rounded,
             title: 'Inspiration',
@@ -435,6 +423,19 @@ class SettingsScreen extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const InspirationScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildAccountActionTile(
+            leading: Icons.code_rounded,
+            title: 'About Developer',
+            subtitle: 'Meet the developer',
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AboutDeveloperScreen(),
                 ),
               );
             },

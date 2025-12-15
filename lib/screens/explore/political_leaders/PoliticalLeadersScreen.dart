@@ -17,8 +17,8 @@ class PoliticalLeadersScreen extends StatelessWidget {
         tenure: '2020 - वर्तमान',
       ),
       PoliticalLeader(
-        name: 'श्रीमती सुनीता देवी',
-        englishName: 'Smt. Sunita Devi',
+        name: 'बाबिता कुमारी',
+        englishName: 'Babita Kumari',
         position: 'सरपंच',
         imageUrl: '',
         tenure: '2020 - वर्तमान',
@@ -27,33 +27,33 @@ class PoliticalLeadersScreen extends StatelessWidget {
 
     // Historical leaders data
     final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
-      MapEntry('2020 - 2025', [
+      MapEntry('1952', [
         PoliticalLeader(
-          name: 'श्री रामेश कुमार',
-          englishName: 'Shri Ramesh Kumar',
+          name: 'श्री कमेश्वर सिंह',
+          englishName: 'Shri Kameshwar Singh',
           position: 'मुखिया',
           imageUrl: '',
-          tenure: '2020 - 2025',
+          tenure: '1952 - 1957',
         ),
         PoliticalLeader(
-          name: 'श्रीमती सुनीता देवी',
-          englishName: 'Smt. Sunita Devi',
+          name: 'श्री गणेश प्रसाद सिंह',
+          englishName: 'Shri Ganesh Prasad Singh',
           position: 'सरपंच',
           imageUrl: '',
-          tenure: '2020 - 2025',
+          tenure: '1952 - 1957',
         ),
       ]),
-      MapEntry('2015 - 2020', [
+      MapEntry('2015 ', [
         PoliticalLeader(
-          name: 'श्री राजेश शर्मा',
-          englishName: 'Shri Rajesh Sharma',
+          name: 'श्री सुधमा वर्मा',
+          englishName: 'Shri Sudhama Verma',
           position: 'मुखिया',
           imageUrl: '',
           tenure: '2015 - 2020',
         ),
         PoliticalLeader(
-          name: 'श्रीमती मीना देवी',
-          englishName: 'Smt. Meena Devi',
+          name: 'श्री राम अनुप शर्मा',
+          englishName: 'Shri Ram Anup Sharma',
           position: 'सरपंच',
           imageUrl: '',
           tenure: '2015 - 2020',
@@ -61,15 +61,15 @@ class PoliticalLeadersScreen extends StatelessWidget {
       ]),
       MapEntry('2010 - 2015', [
         PoliticalLeader(
-          name: 'श्री अमित सिंह',
-          englishName: 'Shri Amit Singh',
+          name: 'श्री गणेश प्रसाद सिंह',
+          englishName: 'Shri Ganesh Prasad Singh',
           position: 'मुखिया',
           imageUrl: '',
           tenure: '2010 - 2015',
         ),
         PoliticalLeader(
-          name: 'श्रीमती रेखा शर्मा',
-          englishName: 'Smt. Rekha Sharma',
+          name: 'श्री राम जन्म महात्मा',
+          englishName: 'Shri Ram Janm Mahto',
           position: 'सरपंच',
           imageUrl: '',
           tenure: '2010 - 2015',
@@ -77,15 +77,15 @@ class PoliticalLeadersScreen extends StatelessWidget {
       ]),
       MapEntry('2005 - 2010', [
         PoliticalLeader(
-          name: 'श्री विजय कुमार',
-          englishName: 'Shri Vijay Kumar',
+          name: 'श्री गणेश प्रसाद सिंह',
+          englishName: 'Shri Ganesh Prasad Singh',
           position: 'मुखिया',
           imageUrl: '',
           tenure: '2005 - 2010',
         ),
         PoliticalLeader(
-          name: 'श्रीमती आशा देवी',
-          englishName: 'Smt. Asha Devi',
+          name: 'श्री राम जन्म वर्मा',
+          englishName: 'Shri Ramjanm Verma',
           position: 'सरपंच',
           imageUrl: '',
           tenure: '2005 - 2010',
@@ -93,18 +93,34 @@ class PoliticalLeadersScreen extends StatelessWidget {
       ]),
       MapEntry('2000 - 2005', [
         PoliticalLeader(
-          name: 'श्री राकेश वर्मा',
-          englishName: 'Shri Rakesh Verma',
+          name: 'श्री रामदेव सिंह',
+          englishName: 'Shri Ramdev Singh',
           position: 'मुखिया',
           imageUrl: '',
           tenure: '2000 - 2005',
         ),
         PoliticalLeader(
-          name: 'श्रीमती सुनीता देवी',
-          englishName: 'Smt. Sunita Devi',
+          name: 'श्री पंचम राय',
+          englishName: 'Shri Pancham Ray',
           position: 'सरपंच',
           imageUrl: '',
           tenure: '2000 - 2005',
+        ),
+      ]),
+      MapEntry('1995 - 2000', [
+        PoliticalLeader(
+          name: 'श्री परस्नत सिंह',
+          englishName: 'Shri Parasnath Singh',
+          position: 'मुखिया',
+          imageUrl: '',
+          tenure: '1995 - 2000',
+        ),
+        PoliticalLeader(
+          name: 'श्री सिध्नाथ सिंह',
+          englishName: 'Shri Sidhnath Singh',
+          position: 'सरपंच',
+          imageUrl: '',
+          tenure: '1995 - 2000',
         ),
       ]),
     ];
