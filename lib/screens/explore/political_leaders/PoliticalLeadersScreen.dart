@@ -43,84 +43,84 @@ class PoliticalLeadersScreen extends StatelessWidget {
           tenure: '1952 - 1957',
         ),
       ]),
-      MapEntry('2015 ', [
+      MapEntry('1957', [
         PoliticalLeader(
           name: 'श्री सुधमा वर्मा',
           englishName: 'Shri Sudhama Verma',
           position: 'मुखिया',
           imageUrl: '',
-          tenure: '2015 - 2020',
+          tenure: '1957 - 1961',
         ),
         PoliticalLeader(
           name: 'श्री राम अनुप शर्मा',
           englishName: 'Shri Ram Anup Sharma',
           position: 'सरपंच',
           imageUrl: '',
-          tenure: '2015 - 2020',
+          tenure: '1957 - 1961',
         ),
       ]),
-      MapEntry('2010 - 2015', [
+      MapEntry('1961', [
         PoliticalLeader(
           name: 'श्री गणेश प्रसाद सिंह',
           englishName: 'Shri Ganesh Prasad Singh',
           position: 'मुखिया',
           imageUrl: '',
-          tenure: '2010 - 2015',
+          tenure: '1961 - 1964',
         ),
         PoliticalLeader(
           name: 'श्री राम जन्म महात्मा',
           englishName: 'Shri Ram Janm Mahto',
           position: 'सरपंच',
           imageUrl: '',
-          tenure: '2010 - 2015',
+          tenure: '1961 - 1964',
         ),
       ]),
-      MapEntry('2005 - 2010', [
+      MapEntry('1964', [
         PoliticalLeader(
           name: 'श्री गणेश प्रसाद सिंह',
           englishName: 'Shri Ganesh Prasad Singh',
           position: 'मुखिया',
           imageUrl: '',
-          tenure: '2005 - 2010',
+          tenure: '1964 - 1971',
         ),
         PoliticalLeader(
           name: 'श्री राम जन्म वर्मा',
           englishName: 'Shri Ramjanm Verma',
           position: 'सरपंच',
           imageUrl: '',
-          tenure: '2005 - 2010',
+          tenure: '1964 - 1971',
         ),
       ]),
-      MapEntry('2000 - 2005', [
+      MapEntry('1971', [
         PoliticalLeader(
           name: 'श्री रामदेव सिंह',
           englishName: 'Shri Ramdev Singh',
           position: 'मुखिया',
           imageUrl: '',
-          tenure: '2000 - 2005',
+          tenure: '1971 - 1976',
         ),
         PoliticalLeader(
           name: 'श्री पंचम राय',
           englishName: 'Shri Pancham Ray',
           position: 'सरपंच',
           imageUrl: '',
-          tenure: '2000 - 2005',
+          tenure: '1971 - 1976',
         ),
       ]),
-      MapEntry('1995 - 2000', [
+      MapEntry('1976', [
         PoliticalLeader(
           name: 'श्री परस्नत सिंह',
           englishName: 'Shri Parasnath Singh',
           position: 'मुखिया',
           imageUrl: '',
-          tenure: '1995 - 2000',
+          tenure: '1976 - 1981',
         ),
         PoliticalLeader(
           name: 'श्री सिध्नाथ सिंह',
           englishName: 'Shri Sidhnath Singh',
           position: 'सरपंच',
           imageUrl: '',
-          tenure: '1995 - 2000',
+          tenure: '1976 - 1981',
         ),
       ]),
     ];
