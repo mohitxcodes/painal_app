@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:painal/screens/book/BookSearchGridScreen.dart';
 import 'dart:ui';
 import 'package:painal/data/BookPageData.dart';
 
@@ -23,197 +24,15 @@ class _BookScreenState extends State<BookScreen> {
   bool isFullscreen = false;
 
   void _showSearchDialog() async {
-    final controller = TextEditingController();
-    int? selectedPage = await showDialog<int>(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.2),
-      builder: (context) {
-        String? errorText;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Stack(
-              children: [
-                BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                  child: Container(color: Colors.transparent),
-                ),
-                Center(
-                  child: Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    insetPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 40,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.green.withOpacity(0.6),
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFF0B3B2D), Color(0xFF155D42)],
-                        ),
-                      ),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: 350,
-                          maxHeight: 220,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: controller,
-                                      autofocus: true,
-                                      keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      decoration: InputDecoration(
-                                        hintText: 'Enter page number...',
-                                        hintStyle: TextStyle(
-                                          color: Colors.white.withOpacity(0.6),
-                                        ),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.white.withOpacity(
-                                              0.3,
-                                            ),
-                                          ),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: Colors.white.withOpacity(
-                                              0.3,
-                                            ),
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          borderSide: const BorderSide(
-                                            color: Colors.green,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                              vertical: 10,
-                                              horizontal: 14,
-                                            ),
-                                        isDense: true,
-                                        errorText: errorText,
-                                        errorStyle: const TextStyle(
-                                          color: Colors.redAccent,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 18),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                right: 16,
-                                bottom: 10,
-                                top: 4,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Material(
-                                    color: Colors.green[700],
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(24),
-                                      onTap: () {
-                                        final page = int.tryParse(
-                                          controller.text,
-                                        );
-                                        if (page == null ||
-                                            page < 1 ||
-                                            page > totalPages) {
-                                          setState(() {
-                                            errorText =
-                                                'Enter a valid page (1-$totalPages)';
-                                          });
-                                        } else {
-                                          Navigator.of(context).pop(page - 1);
-                                        }
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 8,
-                                        ),
-                                        child: Text(
-                                          'Go',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Material(
-                                    color: Colors.red[200],
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(24),
-                                      onTap: () => Navigator.of(context).pop(),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                        child: Text(
-                                          'Cancel',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+    final int? selectedPage = await Navigator.of(context).push<int>(
+      MaterialPageRoute(
+        builder: (context) => BookSearchGridScreen(bookData: _bookData),
+      ),
     );
+
     if (selectedPage != null) {
+      // Small delay to ensure the UI is ready if we just popped
+      await Future.delayed(const Duration(milliseconds: 100));
       _pageController.jumpToPage(selectedPage);
     }
   }
@@ -337,7 +156,7 @@ class _BookScreenState extends State<BookScreen> {
                                 IconButton(
                                   icon: const Icon(
                                     Icons.fullscreen,
-                                    color: Color(0xFF4ADE80),
+                                    color: Colors.white,
                                     size: 22,
                                   ),
                                   onPressed:
@@ -348,7 +167,7 @@ class _BookScreenState extends State<BookScreen> {
                                   icon: const Icon(
                                     Icons.search,
                                     size: 26,
-                                    color: Color(0xFF4ADE80),
+                                    color: Colors.white,
                                     weight: 900, // Flutter 3.10+
                                   ),
                                   tooltip: 'Search',
