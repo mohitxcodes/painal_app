@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'dart:ui';
+import 'package:painal/data/BookPageData.dart';
 
 class BookScreen extends StatefulWidget {
   const BookScreen({super.key});
@@ -11,20 +12,12 @@ class BookScreen extends StatefulWidget {
 }
 
 class _BookScreenState extends State<BookScreen> {
-  // Replace with your own image URLs if desired
-  final List<String> pageImageUrls = [
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-2.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-3.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-4.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-5.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-6.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-7.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-8.jpg",
-    "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748/page-9.jpg",
-  ];
+  final BookPageData _bookData = BookPageData();
 
-  final int totalPages = 9;
+  // Computed property to access images easily
+  List<String> get pageImageUrls => _bookData.pageImageUrls;
+  int get totalPages => pageImageUrls.length;
+
   int currentPage = 0;
   final PageController _pageController = PageController();
   bool isFullscreen = false;
