@@ -107,17 +107,16 @@ class LeaderCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Icon(
-                        Icons.calendar_today_outlined,
+                        Icons.location_on_outlined,
                         size: 14,
                         color: Colors.grey[400],
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        leader.tenure,
+                        leader.place,
                         style: TextStyle(color: Colors.grey[400], fontSize: 13),
                       ),
                     ],

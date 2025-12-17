@@ -17,7 +17,6 @@ class _BookSearchGridScreenState extends State<BookSearchGridScreen> {
   @override
   void initState() {
     super.initState();
-    // Initially show all pages indices [0, 1, 2, ... length-1]
     _filteredIndices = List.generate(
       widget.bookData.pageImageUrls.length,
       (i) => i,
