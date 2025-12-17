@@ -9,26 +9,14 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   final List<String> galleryImages = [
-    'https://images.unsplash.com/photo-1590682680793-1368291ab3ab?w=800',
-    'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=800',
-    'https://images.unsplash.com/photo-1565008576549-57569a49371d?w=800',
-    'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800',
-    'https://images.unsplash.com/photo-1566438480900-0609be27a4be?w=800',
-    'https://images.unsplash.com/photo-1601804123902-3eb5eb4dee3d?w=800',
-    'https://images.unsplash.com/photo-1574067458148-44f87f8d30cc?w=800',
-    'https://images.unsplash.com/photo-1605522561454-c8f0b8de1fc7?w=800',
-    'https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800',
-    'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800',
-    'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800',
-    'https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800',
-    'https://images.unsplash.com/photo-1595855759920-86582396756e?w=800',
-    'https://images.unsplash.com/photo-1600298881974-6be191ceeda1?w=800',
-    'https://images.unsplash.com/photo-1599844764415-c179439b1e0d?w=800',
-    'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800',
-    'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800',
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
-    'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800',
-    'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765963937/img.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765963937/img-2.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765963937/img-3.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765963937/img-4.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765963937/img-5.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765964096/img-6.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765964096/img.jpg',
+    'https://res.cloudinary.com/mohitxcodes/image/upload/v1765964096/img-2.jpg',
   ];
 
   @override

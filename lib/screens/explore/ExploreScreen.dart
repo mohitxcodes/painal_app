@@ -381,7 +381,7 @@ class _ExploreScreenState extends State<ExploreScreen>
             Text('$feature - Coming Soon!'),
           ],
         ),
-        backgroundColor: Colors.white.withOpacity(0.95),
+        backgroundColor: Colors.black.withOpacity(0.95),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

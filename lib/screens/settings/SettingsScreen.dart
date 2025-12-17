@@ -417,7 +417,7 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               const Text(
-                'Additional Information',
+                'Information',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
