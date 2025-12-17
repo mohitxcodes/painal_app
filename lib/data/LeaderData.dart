@@ -37,7 +37,7 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
   ]),
   MapEntry('1957 - 1961', [
     PoliticalLeader(
-      name: 'श्री सुधमा वर्मा',
+      name: 'श्री सुदामा वर्मा',
       englishName: 'Shri Sudhama Verma',
       position: 'मुखिया',
       imageUrl: '',
@@ -101,15 +101,15 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
   ]),
   MapEntry('1976 - 1981', [
     PoliticalLeader(
-      name: 'श्री परस्नत सिंह',
+      name: 'श्री पारसनाथ सिंह',
       englishName: 'Shri Parasnath Singh',
       position: 'मुखिया',
       imageUrl: '',
       place: 'Painal',
     ),
     PoliticalLeader(
-      name: 'श्री सिध्नाथ सिंह',
-      englishName: 'Shri Sidhnath Singh',
+      name: 'श्री सिद्धनाथ सिंह',
+      englishName: 'Shri Siddhanath Singh',
       position: 'सरपंच',
       imageUrl: '',
       place: 'Painal',
