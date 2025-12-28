@@ -5,7 +5,6 @@ import 'package:painal/screens/login/LoginScreen.dart';
 import 'package:painal/screens/reports/ReportsScreen.dart';
 import 'package:painal/screens/requests/RequestsScreen.dart';
 import 'package:painal/screens/settings/aboutus/AboutDeveloperScreen.dart';
-import 'package:painal/screens/settings/aboutus/InspirationScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -56,7 +55,6 @@ class SettingsScreen extends StatelessWidget {
               // Account Section
               _buildAccountCard(authProvider, context),
               const SizedBox(height: 24),
-              _buildAdditionalInfoCard(context),
               const SizedBox(height: 24),
               // About App Section
               _buildAboutAppCard(context),
@@ -76,21 +74,14 @@ class SettingsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.18),
-            Colors.white.withOpacity(0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
-            offset: const Offset(0, 12),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -222,20 +213,10 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color:
-                    isDestructive
-                        ? Colors.red.withOpacity(0.3)
-                        : Colors.white.withOpacity(0.15),
-              ),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withOpacity(0.12),
-                  Colors.white.withOpacity(0.04),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color:
+                  isDestructive
+                      ? Colors.red.withOpacity(0.1)
+                      : Colors.white.withOpacity(0.05),
             ),
             child: Row(
               children: [
@@ -301,21 +282,14 @@ class SettingsScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.18),
-            Colors.white.withOpacity(0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
-            offset: const Offset(0, 12),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -365,94 +339,6 @@ class SettingsScreen extends StatelessWidget {
             title: 'Help & Support',
             subtitle: 'Get help with the app',
             onTap: () {},
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAdditionalInfoCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.25)),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withOpacity(0.18),
-            Colors.white.withOpacity(0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.2),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.more_horiz_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Text(
-                'Information',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-          _buildAccountActionTile(
-            leading: Icons.lightbulb_outline_rounded,
-            title: 'Inspiration',
-            subtitle: 'The idea behind the app',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const InspirationScreen(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildAccountActionTile(
-            leading: Icons.code_rounded,
-            title: 'About Developer',
-            subtitle: 'Meet the developer',
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AboutDeveloperScreen(),
-                ),
-              );
-            },
           ),
         ],
       ),
