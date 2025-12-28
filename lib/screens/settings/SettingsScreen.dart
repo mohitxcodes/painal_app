@@ -330,7 +330,7 @@ class SettingsScreen extends StatelessWidget {
           _buildAccountActionTile(
             leading: Icons.info_outline_rounded,
             title: 'App Version',
-            subtitle: '1.0.0',
+            subtitle: '4.2.0',
             onTap: () {},
           ),
           const SizedBox(height: 12),

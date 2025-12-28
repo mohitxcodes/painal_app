@@ -12,7 +12,8 @@ final List<PoliticalLeader> currentLeaders = [
     name: 'बाबिता कुमारी',
     englishName: 'Babita Kumari',
     position: 'सरपंच',
-    imageUrl: '',
+    imageUrl:
+        'https://res.cloudinary.com/mohitxcodes/image/upload/v1766902649/tlh7vu5xb4vea8xavoih.jpg',
     place: 'Painal',
   ),
   PoliticalLeader(
