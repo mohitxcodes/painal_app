@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:painal/screens/book/BookScreen.dart';
 import 'package:painal/screens/explore/political_leaders/PoliticalLeadersScreen.dart';
 import 'package:painal/screens/gallery/GalleryScreen.dart';
+import 'package:painal/screens/explore/app_founder/AppFounderScreen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -137,15 +138,15 @@ class _ExploreScreenState extends State<ExploreScreen>
                   ),
                   const SizedBox(height: 16),
                   _buildCreativeFeatureCard(
-                    icon: Icons.location_on_rounded,
-                    title: 'Village Map',
-                    subtitle: 'Interactive heritage sites',
-                    description: 'Navigate through sacred places and landmarks',
+                    icon: Icons.lightbulb_outline_rounded,
+                    title: 'App Founder',
+                    subtitle: 'Vision & Creation',
+                    description: 'Meet the visionaries behind this initiative',
                     color: Colors.white,
-                    onTap: () => _showComingSoon('Interactive Village Map'),
+                    onTap:
+                        () => _navigateWithAnimation(const AppFounderScreen()),
                     delay: 200,
-                    isComingSoon: true,
-                    bgIcon: Icons.map_rounded,
+                    bgIcon: Icons.lightbulb_rounded,
                   ),
                 ],
               ),
@@ -356,35 +357,6 @@ class _ExploreScreenState extends State<ExploreScreen>
           );
         },
         transitionDuration: const Duration(milliseconds: 300),
-      ),
-    );
-  }
-
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.2),
-              ),
-              child: Icon(
-                Icons.upcoming_rounded,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text('$feature - Coming Soon!'),
-          ],
-        ),
-        backgroundColor: Colors.black.withOpacity(0.95),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       ),
     );
   }

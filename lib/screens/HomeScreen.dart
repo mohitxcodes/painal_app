@@ -4,7 +4,6 @@ import 'package:painal/screens/vanshavali/VanshavaliListScreen.dart';
 import 'overview/OverviewScreen.dart';
 import 'package:painal/screens/settings/SettingsScreen.dart';
 import 'package:painal/screens/explore/ExploreScreen.dart';
-import 'package:painal/screens/community/CommunityScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

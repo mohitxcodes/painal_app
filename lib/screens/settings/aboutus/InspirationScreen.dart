@@ -173,7 +173,7 @@ class InspirationScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'इस एप्लिकेशन का मूल विचार श्री सभजीत कुमार जी द्वारा दिया गया था। उन्होंने महसूस किया कि हमारे समाज को एक डिजिटल मंच की आवश्यकता है जो हमें एक साथ ला सके और हमारी संस्कृति को संरक्षित कर सके।',
+            '',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               height: 1.6,
@@ -182,7 +182,7 @@ class InspirationScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'उनके मार्गदर्शन और दूरदर्शिता ने हमें इस ऐप को विकसित करने के लिए प्रेरित किया। यह प्रयास उनके सपने को साकार करने की दिशा में एक छोटा सा कदम है।',
+            '',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               height: 1.6,
