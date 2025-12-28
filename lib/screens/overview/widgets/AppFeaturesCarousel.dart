@@ -21,7 +21,6 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
       'subtitle': 'Family Tree',
       'desc':
           'Explore your family tree, lineage, and discover relationships across generations.',
-      'button': 'View Tree',
       'color': Colors.green[700],
       'bgIcon': Icons.family_restroom_rounded,
     },
@@ -31,7 +30,6 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
       'subtitle': 'Digital Village Book',
       'desc':
           'Read the digital book of Painal village, featuring its history & culture',
-      'button': 'Read Book',
       'color': Colors.orange[700],
       'bgIcon': Icons.import_contacts_rounded,
     },
@@ -41,7 +39,6 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
       'subtitle': 'Village Memories',
       'desc':
           'Browse a curated gallery of photos and memories from the village.',
-      'button': 'Open Gallery',
       'color': Colors.blue[700],
       'bgIcon': Icons.collections_rounded,
     },
@@ -155,10 +152,7 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
                             ),
 
                             Padding(
-                              padding: const EdgeInsets.only(
-                                right: 60,
-                                bottom: 36,
-                              ),
+                              padding: const EdgeInsets.only(right: 60),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
@@ -196,45 +190,6 @@ class _AppFeaturesCarouselState extends State<AppFeaturesCarousel> {
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: (feature['color'] as Color).withValues(
-                                    alpha: 0.2,
-                                  ),
-                                  border: Border.all(
-                                    color: (feature['color'] as Color)
-                                        .withValues(alpha: 0.3),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      feature['button'] as String,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    const Icon(
-                                      Icons.arrow_forward_rounded,
-                                      color: Colors.white,
-                                      size: 14,
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                           ],
