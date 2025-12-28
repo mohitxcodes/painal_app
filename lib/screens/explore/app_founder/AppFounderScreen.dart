@@ -43,6 +43,7 @@ class AppFounderScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildPersonCard(
+                context,
                 name: 'Sabhajeet Kumar',
                 role: 'Visionary & Guide',
                 description:
@@ -52,6 +53,7 @@ class AppFounderScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               _buildPersonCard(
+                context,
                 name: 'Mohit Singh',
                 role: 'Developer & Creator',
                 description:
@@ -67,7 +69,8 @@ class AppFounderScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPersonCard({
+  Widget _buildPersonCard(
+    BuildContext context, {
     required String name,
     required String role,
     required String description,
@@ -100,7 +103,36 @@ class AppFounderScreen extends StatelessWidget {
                 width: 1,
               ),
             ),
-            child: CircleAvatar(radius: 50, backgroundImage: AssetImage(image)),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder:
+                        (context) => Scaffold(
+                          backgroundColor: Colors.black,
+                          appBar: AppBar(
+                            backgroundColor: Colors.transparent,
+                            iconTheme: const IconThemeData(color: Colors.white),
+                            elevation: 0,
+                          ),
+                          body: Center(
+                            child: Hero(
+                              tag: 'founder-$name', // Unique tag for Hero
+                              child: Image.asset(image, fit: BoxFit.contain),
+                            ),
+                          ),
+                        ),
+                  ),
+                );
+              },
+              child: Hero(
+                tag: 'founder-$name',
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage(image),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 16),
           Text(

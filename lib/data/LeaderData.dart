@@ -15,6 +15,14 @@ final List<PoliticalLeader> currentLeaders = [
     imageUrl: '',
     place: 'Painal',
   ),
+  PoliticalLeader(
+    name: 'दीपू कुमार',
+    englishName: 'Dipu Kumar',
+    position: 'पैक्स',
+    imageUrl:
+        'https://res.cloudinary.com/mohitxcodes/image/upload/v1766901089/knmimdsw7k4nupukutwu.jpg',
+    place: 'Painal',
+  ),
 ];
 
 // Historical leaders data
@@ -34,6 +42,13 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       imageUrl: '',
       place: 'Painal',
     ),
+    PoliticalLeader(
+      name: 'Unavailable',
+      englishName: 'Unavailable',
+      position: 'पैक्स',
+      imageUrl: '',
+      place: 'Painal',
+    ),
   ]),
   MapEntry('1957 - 1961', [
     PoliticalLeader(
@@ -41,12 +56,19 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Sudhama Verma',
       position: 'मुखिया',
       imageUrl: '',
-      place: 'Bhagwatipur',
+      place: 'Painal',
     ),
     PoliticalLeader(
       name: 'श्री राम अनुप शर्मा',
       englishName: 'Shri Ram Anup Sharma',
       position: 'सरपंच',
+      imageUrl: '',
+      place: 'Painal',
+    ),
+    PoliticalLeader(
+      name: 'Unavailable',
+      englishName: 'Unavailable',
+      position: 'पैक्स',
       imageUrl: '',
       place: 'Painal',
     ),
@@ -64,7 +86,14 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Ram Janm Mahto',
       position: 'सरपंच',
       imageUrl: '',
-      place: 'Mustafapur',
+      place: 'Painal',
+    ),
+    PoliticalLeader(
+      name: 'Unavailable',
+      englishName: 'Unavailable',
+      position: 'पैक्स',
+      imageUrl: '',
+      place: 'Painal',
     ),
   ]),
   MapEntry('1964 - 1971', [
@@ -80,7 +109,14 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Ramjanm Verma',
       position: 'सरपंच',
       imageUrl: '',
-      place: 'Shrichandpur',
+      place: 'Painal',
+    ),
+    PoliticalLeader(
+      name: 'Unavailable',
+      englishName: 'Unavailable',
+      position: 'पैक्स',
+      imageUrl: '',
+      place: 'Painal',
     ),
   ]),
   MapEntry('1971 - 1976', [
@@ -96,7 +132,14 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Pancham Ray',
       position: 'सरपंच',
       imageUrl: '',
-      place: 'Subhawo Tola',
+      place: 'Painal',
+    ),
+    PoliticalLeader(
+      name: 'Unavailable',
+      englishName: 'Unavailable',
+      position: 'पैक्स',
+      imageUrl: '',
+      place: 'Painal',
     ),
   ]),
   MapEntry('1976 - 1981', [
@@ -111,6 +154,13 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'श्री सिद्धनाथ सिंह',
       englishName: 'Shri Siddhanath Singh',
       position: 'सरपंच',
+      imageUrl: '',
+      place: 'Painal',
+    ),
+    PoliticalLeader(
+      name: 'Unavailable',
+      englishName: 'Unavailable',
+      position: 'पैक्स',
       imageUrl: '',
       place: 'Painal',
     ),

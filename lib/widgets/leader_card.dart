@@ -22,21 +22,56 @@ class LeaderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Leader's Avatar with fallback
-            CircleAvatar(
-              radius: 30,
-              backgroundColor: Colors.white.withOpacity(0.1),
-              backgroundImage:
-                  leader.imageUrl.isNotEmpty
-                      ? NetworkImage(leader.imageUrl)
-                      : null,
-              child:
-                  leader.imageUrl.isEmpty
-                      ? const Icon(
-                        Icons.person,
-                        size: 30,
-                        color: Colors.white70,
-                      )
-                      : null,
+            GestureDetector(
+              onTap: () {
+                if (leader.imageUrl.isNotEmpty) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => Scaffold(
+                            backgroundColor: Colors.black,
+                            appBar: AppBar(
+                              backgroundColor: Colors.transparent,
+                              iconTheme: const IconThemeData(
+                                color: Colors.white,
+                              ),
+                            ),
+                            body: Center(
+                              child: Hero(
+                                tag: leader.name, // Unique tag for Hero
+                                child: Image.network(
+                                  leader.imageUrl,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ),
+                  );
+                }
+              },
+              child: Hero(
+                tag:
+                    leader.imageUrl.isNotEmpty
+                        ? leader.name
+                        : 'no-image-${leader.name}',
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                  backgroundImage:
+                      leader.imageUrl.isNotEmpty
+                          ? NetworkImage(leader.imageUrl)
+                          : null,
+                  child:
+                      leader.imageUrl.isEmpty
+                          ? const Icon(
+                            Icons.person,
+                            size: 30,
+                            color: Colors.white70,
+                          )
+                          : null,
+                ),
+              ),
             ),
             const SizedBox(width: 16),
             // Leader's Details
@@ -82,12 +117,16 @@ class LeaderCard extends StatelessWidget {
                           color:
                               leader.position == 'मुखिया'
                                   ? Colors.orange.withOpacity(0.2)
+                                  : leader.position == 'पैक्स'
+                                  ? Colors.lightBlue.withOpacity(0.2)
                                   : Colors.green.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color:
                                 leader.position == 'मुखिया'
                                     ? Colors.orange.withOpacity(0.5)
+                                    : leader.position == 'पैक्स'
+                                    ? Colors.lightBlue.withOpacity(0.5)
                                     : Colors.green.withOpacity(0.5),
                             width: 1,
                           ),
@@ -98,6 +137,8 @@ class LeaderCard extends StatelessWidget {
                             color:
                                 leader.position == 'मुखिया'
                                     ? Colors.orange[300]
+                                    : leader.position == 'पैक्स'
+                                    ? Colors.lightBlue[300]
                                     : Colors.green[300],
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
