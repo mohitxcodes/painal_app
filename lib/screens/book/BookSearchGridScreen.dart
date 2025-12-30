@@ -61,6 +61,15 @@ class _BookSearchGridScreenState extends State<BookSearchGridScreen> {
     }
   }
 
+  String _getOptimizedUrl(String url) {
+    if (url.contains('cloudinary.com') && url.contains('/upload/')) {
+      // For grid thumbnails, we can optimize even more if needed,
+      // but sticking to f_auto,q_auto is good for consistency.
+      return url.replaceFirst('/upload/', '/upload/f_auto,q_auto/');
+    }
+    return url;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -187,7 +196,7 @@ class _BookSearchGridScreenState extends State<BookSearchGridScreen> {
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: Image.network(
-                                  imageUrl,
+                                  _getOptimizedUrl(imageUrl),
                                   fit: BoxFit.cover,
                                   loadingBuilder: (
                                     context,

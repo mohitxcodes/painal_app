@@ -37,6 +37,13 @@ class _BookScreenState extends State<BookScreen> {
     }
   }
 
+  String _getOptimizedUrl(String url) {
+    if (url.contains('cloudinary.com') && url.contains('/upload/')) {
+      return url.replaceFirst('/upload/', '/upload/f_auto,q_auto/');
+    }
+    return url;
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -209,7 +216,9 @@ class _BookScreenState extends State<BookScreen> {
                 ),
                 builder: (context, index) {
                   return PhotoViewGalleryPageOptions(
-                    imageProvider: NetworkImage(pageImageUrls[index]),
+                    imageProvider: NetworkImage(
+                      _getOptimizedUrl(pageImageUrls[index]),
+                    ),
                     minScale: PhotoViewComputedScale.contained,
                     maxScale: PhotoViewComputedScale.covered * 3.0,
                     heroAttributes: PhotoViewHeroAttributes(tag: 'page_$index'),

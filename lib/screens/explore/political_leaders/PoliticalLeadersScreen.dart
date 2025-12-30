@@ -36,7 +36,7 @@ class PoliticalLeadersScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
               child: Text(
-                'Current Leadership (Present)',
+                'Current (2025 - 26)',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -51,7 +51,7 @@ class PoliticalLeadersScreen extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(top: 32.0, bottom: 16.0, left: 8.0),
               child: Text(
-                'Leadership Timeline (Historical)',
+                'Leadership Timeline ',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -131,16 +131,11 @@ class PoliticalLeadersScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               ...yearEntry.value.map(
-                                (leader) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 16.0),
-                                  child: MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 200,
-                                      ),
-                                      child: LeaderCard(leader: leader),
-                                    ),
+                                (leader) => MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: LeaderCard(leader: leader),
                                   ),
                                 ),
                               ),

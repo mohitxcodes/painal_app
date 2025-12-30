@@ -119,6 +119,8 @@ class LeaderCard extends StatelessWidget {
                                   ? Colors.orange.withOpacity(0.2)
                                   : leader.position == 'पैक्स'
                                   ? Colors.lightBlue.withOpacity(0.2)
+                                  : leader.position == 'समिति'
+                                  ? Colors.purple.withOpacity(0.2)
                                   : Colors.green.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
@@ -127,6 +129,8 @@ class LeaderCard extends StatelessWidget {
                                     ? Colors.orange.withOpacity(0.5)
                                     : leader.position == 'पैक्स'
                                     ? Colors.lightBlue.withOpacity(0.5)
+                                    : leader.position == 'समिति'
+                                    ? Colors.purple.withOpacity(0.5)
                                     : Colors.green.withOpacity(0.5),
                             width: 1,
                           ),
@@ -139,6 +143,8 @@ class LeaderCard extends StatelessWidget {
                                     ? Colors.orange[300]
                                     : leader.position == 'पैक्स'
                                     ? Colors.lightBlue[300]
+                                    : leader.position == 'समिति'
+                                    ? Colors.purple[300]
                                     : Colors.green[300],
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
