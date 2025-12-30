@@ -531,7 +531,6 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
 
       // Filter locally for case-insensitive substring search
       final lowerQuery = query.toLowerCase();
-      final isNumeric = int.tryParse(query) != null;
 
       final results =
           allMembers.where((member) {
@@ -545,35 +544,7 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
               lowerQuery,
             );
 
-            // Search by ID
-            final matchesId = isNumeric && member.id.toString().contains(query);
-
-            // Search in father's name if available
-            bool matchesFatherName = false;
-            if (member.parentId != null) {
-              final parent = allMembers.firstWhere(
-                (m) => m.id == member.parentId,
-                orElse:
-                    () => FamilyMember(
-                      id: -1,
-                      name: '',
-                      hindiName: '',
-                      birthYear: '',
-                      children: [],
-                      profilePhoto: '',
-                    ),
-              );
-              if (parent.id != -1) {
-                matchesFatherName =
-                    parent.name.toLowerCase().contains(lowerQuery) ||
-                    parent.hindiName.toLowerCase().contains(lowerQuery);
-              }
-            }
-
-            return matchesEnglishName ||
-                matchesHindiName ||
-                matchesId ||
-                matchesFatherName;
+            return matchesEnglishName || matchesHindiName;
           }).toList();
 
       // Populate parent names for display

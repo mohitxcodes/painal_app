@@ -61,7 +61,6 @@ class _SearchDialogState extends State<SearchDialog> {
     } else {
       // Local Search (Existing logic)
       if (widget.familyData != null) {
-        final isNumeric = int.tryParse(query) != null;
         setState(() {
           results =
               widget.familyData!.where((m) {
@@ -69,8 +68,7 @@ class _SearchDialogState extends State<SearchDialog> {
                   query.toLowerCase(),
                 );
                 final matchesHindi = m.hindiName.contains(query);
-                final matchesId = isNumeric && m.id.toString().contains(query);
-                return matchesName || matchesHindi || matchesId;
+                return matchesName || matchesHindi;
               }).toList();
         });
       }
@@ -263,7 +261,7 @@ class _SearchDialogState extends State<SearchDialog> {
                             ),
                             cursorColor: Colors.white,
                             decoration: InputDecoration(
-                              hintText: 'Search by name, ID...',
+                              hintText: 'Search by name...',
                               hintStyle: TextStyle(
                                 color: Colors.white.withOpacity(0.5),
                               ),
@@ -413,7 +411,7 @@ class _SearchDialogState extends State<SearchDialog> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Find family members by name or ID',
+            'Find family members by name',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 13,

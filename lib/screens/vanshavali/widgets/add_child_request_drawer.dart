@@ -55,11 +55,6 @@ class _AddChildRequestDrawerState extends State<AddChildRequestDrawer> {
     }
   }
 
-  Future<String?> _uploadImage() async {
-    // Deprecated: use pickAndUploadImage directly
-    return null;
-  }
-
   Future<void> _submit() async {
     final name = nameController.text.trim();
     final hindiName = hindiNameController.text.trim();

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class BookPageData {
   static const String _baseUrl =
       "https://res.cloudinary.com/mohitxcodes/image/upload/v1751433748";
