@@ -127,7 +127,8 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'श्री रामदेव सिंह',
       englishName: 'Shri Ramdev Singh',
       position: 'मुखिया',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767163129/m4sg4fzmdyd1pk0cipip.jpg',
       place: 'Painal',
     ),
     PoliticalLeader(
@@ -189,7 +190,8 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'श्री रामदेव सिंह',
       englishName: 'Shri Ramdev Singh',
       position: 'मुखिया',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767163129/m4sg4fzmdyd1pk0cipip.jpg',
       place: 'Painal',
     ),
     PoliticalLeader(
