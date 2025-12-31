@@ -159,14 +159,16 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'रघुवीर सिंह',
       englishName: 'Raghuveer Singh',
       position: 'पैक्स',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767165538/ypqxef40h4wo3qu4muma.jpg',
       place: 'Painal',
     ),
     PoliticalLeader(
       name: 'रघुवीर सिंह',
       englishName: 'Raghuveer Singh',
       position: 'समिति',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767165538/ypqxef40h4wo3qu4muma.jpg',
       place: 'Painal',
     ),
   ]),
@@ -200,7 +202,7 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Pancham Ray',
       position: 'सरपंच',
       imageUrl: '',
-      place: 'Painal',
+      place: 'Subhav Tola',
     ),
   ]),
   MapEntry('1964 - 1971', [
@@ -216,7 +218,7 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Ramjanm Verma',
       position: 'सरपंच',
       imageUrl: '',
-      place: 'Painal',
+      place: 'Srichandpur',
     ),
   ]),
   MapEntry('1961 - 1964', [
@@ -232,7 +234,7 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Ram Janm Mahto',
       position: 'सरपंच',
       imageUrl: '',
-      place: 'Painal',
+      place: 'Mustafapur',
     ),
   ]),
   MapEntry('1957 - 1961', [
@@ -241,7 +243,7 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       englishName: 'Shri Sudhama Verma',
       position: 'मुखिया',
       imageUrl: '',
-      place: 'Painal',
+      place: 'Bhagwatipur',
     ),
     PoliticalLeader(
       name: 'श्री राम अनुप शर्मा',
