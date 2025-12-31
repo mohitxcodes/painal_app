@@ -28,7 +28,8 @@ final List<PoliticalLeader> currentLeaders = [
     name: 'रेशमी देवी',
     englishName: 'Resmi Devi',
     position: 'समिति',
-    imageUrl: '',
+    imageUrl:
+        'https://res.cloudinary.com/mohitxcodes/image/upload/v1767203649/knu1gkfalmarry9wnfzi.jpg',
     place: 'Painal',
   ),
 ];
@@ -63,7 +64,8 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'रेशमी देवी',
       englishName: 'Resmi Devi',
       position: 'समिति',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767203649/knu1gkfalmarry9wnfzi.jpg',
       place: 'Painal',
     ),
   ]),
@@ -95,7 +97,8 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'रेशमी देवी',
       englishName: 'Resmi Devi',
       position: 'समिति',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767203649/knu1gkfalmarry9wnfzi.jpg',
       place: 'Painal',
     ),
   ]),
