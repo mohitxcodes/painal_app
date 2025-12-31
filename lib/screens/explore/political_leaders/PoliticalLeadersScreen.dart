@@ -1,9 +1,43 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:painal/data/LeaderData.dart';
 import 'package:painal/widgets/leader_card.dart';
 
-class PoliticalLeadersScreen extends StatelessWidget {
+class PoliticalLeadersScreen extends StatefulWidget {
   const PoliticalLeadersScreen({super.key});
+
+  @override
+  State<PoliticalLeadersScreen> createState() => _PoliticalLeadersScreenState();
+}
+
+class _PoliticalLeadersScreenState extends State<PoliticalLeadersScreen> {
+  int _currentYear = DateTime.now().year;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCurrentYear();
+  }
+
+  Future<void> _fetchCurrentYear() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://worldtimeapi.org/api/ip'),
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final datetime = DateTime.parse(data['datetime']);
+        if (mounted) {
+          setState(() {
+            _currentYear = datetime.year;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching year: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +67,14 @@ class PoliticalLeadersScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Current Leaders Section
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 16.0,
+                horizontal: 8.0,
+              ),
               child: Text(
-                'Current (2025 - 26)',
-                style: TextStyle(
+                'Current ($_currentYear)',
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.w700,

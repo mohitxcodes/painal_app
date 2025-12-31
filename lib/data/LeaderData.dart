@@ -104,7 +104,8 @@ final List<MapEntry<String, List<PoliticalLeader>>> historicalLeaders = [
       name: 'लिलावती देवी',
       englishName: 'Lilavati Devi',
       position: 'मुखिया',
-      imageUrl: '',
+      imageUrl:
+          'https://res.cloudinary.com/mohitxcodes/image/upload/v1767164084/afmdknjhw0hie4a1kmag.jpg',
       place: 'Painal',
     ),
     PoliticalLeader(
