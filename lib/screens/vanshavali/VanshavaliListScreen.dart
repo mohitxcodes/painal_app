@@ -141,11 +141,10 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
       countFutures.add(
         FirebaseFirestore.instance
             .collection(currentMainFamily['collection'] ?? 'familyMembers')
-            .count()
             .get()
             .then((snapshot) {
               if (mounted) {
-                currentMainFamily['members'] = snapshot.count ?? 0;
+                currentMainFamily['members'] = snapshot.size;
               }
             })
             .catchError((e) {
@@ -160,11 +159,10 @@ class _VanshavaliListScreenState extends State<VanshavaliListScreen>
         countFutures.add(
           FirebaseFirestore.instance
               .collection(collectionName)
-              .count()
               .get()
               .then((snapshot) {
                 if (mounted) {
-                  family['members'] = snapshot.count ?? 0;
+                  family['members'] = snapshot.size;
                 }
               })
               .catchError((e) {
